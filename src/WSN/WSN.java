@@ -1,7 +1,12 @@
+package WSN;
+
+import events.StartTxEvent;
+import events.StopTxEvent;
+
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import WSN.Node;
 
 /**
  * Created by Gianluca on 16/07/2017.
@@ -37,7 +42,7 @@ public class WSN {
 
 
     private List<Node> nodes;
-    private List<Event> eventList;
+    private List<events.Event> eventList;
     private List<Node> trasmittingNodes;
 
     public WSN(int nodeCount, double width, double height){
@@ -55,7 +60,7 @@ public class WSN {
 
             StartTxEvent e = new StartTxEvent(i, n , getPoisson(meanInterarrivalTime));
             eventList.add(e);
-            eventList.add(new StopTxEvent(i, e, e.time+WSN.txTime));
+            eventList.add(new StopTxEvent(i, e, e.getTime()+WSN.txTime));
             eventList.sort((a,b) -> a.getTime() < b.getTime() ? -1 : a.getTime() == b.getTime() ? 0 : 1);
         }
 
@@ -84,7 +89,7 @@ public class WSN {
                 Thread.currentThread().interrupt();
             }
 
-            Event e = eventList.get(0);
+            events.Event e = eventList.get(0);
             eventList.remove(e);
 
             System.out.println(e);
@@ -95,13 +100,13 @@ public class WSN {
                 trasmittingNodes.add(e.getNode());
             }
 
-            if (e instanceof StopTxEvent ){
+            if (e instanceof StopTxEvent){
                 Node n = e.getNode();
 
                 trasmittingNodes.remove(n);
 
-                StartTxEvent newTx = new StartTxEvent(0, n, e.time + getPoisson(meanInterarrivalTime));
-                StopTxEvent stopTx = new StopTxEvent(0, newTx, newTx.time + WSN.txTime);
+                StartTxEvent newTx = new StartTxEvent(0, n, e.getTime() + getPoisson(meanInterarrivalTime));
+                StopTxEvent stopTx = new StopTxEvent(0, newTx, newTx.getTime() + WSN.txTime);
 
                 eventList.add(newTx);
                 eventList.add(stopTx);

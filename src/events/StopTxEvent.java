@@ -1,9 +1,11 @@
-import java.awt.*;
+package events;
+import WSN.*;
+import events.StartTxEvent;
 
 /**
  * Created by Gianluca on 16/07/2017.
  */
-public class StopTxEvent extends Event {
+public class StopTxEvent extends events.Event {
 
     public StopTxEvent(int id, StartTxEvent e, double time){
         super(id, e.getNode(), time, WSN.normColor);
@@ -11,7 +13,7 @@ public class StopTxEvent extends Event {
 
     @Override
     public String toString(){
-        return "[" + time + "][StopTxEvent] from node " +  this.n;
+        return "[" + time + "][events.StopTxEvent] from node " +  this.n;
     }
 
 

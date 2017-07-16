@@ -1,4 +1,7 @@
+package events;
+
 import java.awt.*;
+import WSN.*;
 
 /**
  * Created by Gianluca on 16/07/2017.

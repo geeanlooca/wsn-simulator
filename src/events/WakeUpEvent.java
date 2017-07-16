@@ -1,3 +1,9 @@
+package events;
+
+import WSN.*;
+import events.Event;
+import events.StartSleepEvent;
+
 /**
  * Created by Gianluca on 17/07/2017.
  */
@@ -12,6 +18,6 @@ public class WakeUpEvent extends Event {
 
     @Override
     public String toString(){
-        return "[" + time + "][WakeUpEvent] from node " +  this.n;
+        return "[" + time + "][events.WakeUpEvent] from node " +  this.n;
     }
 }
