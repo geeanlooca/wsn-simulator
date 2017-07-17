@@ -24,7 +24,7 @@ public class WakeUpEvent extends Event {
 
             Packet p = n.dequeue();
             // schedule transmission at time t0 + t_backoff
-            WSN.eventList.add(new StartTxEvent(n, p, time + WSN.getPoisson(WSN.meanBackoff)));
+            WSN.eventList.add(new StartTxEvent(n, p, time + WSN.getPoisson(20)));
         }
         else
         {
@@ -34,6 +34,6 @@ public class WakeUpEvent extends Event {
 
     @Override
     public String toString(){
-        return "[" + time + "][events.WakeUpEvent] from node " +  this.n;
+        return "[" + time + "][WakeUpEvent] from node " +  this.n;
     }
 }

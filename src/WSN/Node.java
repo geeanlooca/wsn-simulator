@@ -69,7 +69,6 @@ public class Node {
         e = new Ellipse2D.Double(X, Y, size, size);
     }
 
-
     public void enqueuePacket(Packet p){
         this.buffer.add(p);
     }

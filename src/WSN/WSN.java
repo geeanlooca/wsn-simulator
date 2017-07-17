@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.List;
 import WSN.Node;
 
+
 /**
  * Created by Gianluca on 16/07/2017.
  */
@@ -23,26 +24,26 @@ public class WSN {
     public static Color normColor = Color.blue;
     public static Color sleepColor = Color.pink;
 
-    public static double txTime = 2; // microseconds
-    public static double meanInterarrivalTime = 20;
-    public static double meanBackoff = 200;
-    public static double sleepTime = 50;
+    public static double txTime = 2.0; // microseconds
+    public static double meanInterarrivalTime = 20.0;
+    public static double meanBackoff = 200.0;
+    public static double sleepTime = 50.0;
 
     public static double normSize = 10;
     public static double txSize = 20;
-    public static long sleepDelay = 50;
+    public static long sleepDelay = 1;
 
-    public static int getPoisson(double lambda) {
-        double L = Math.exp(-lambda);
+    public static double getPoisson(double mean) {
+        Random r = new Random();
+        double L = Math.exp(-mean);
+        double k = 0.0;
         double p = 1.0;
-        int k = 0;
-
         do {
+            p = p * r.nextDouble();
             k++;
-            p *= Math.random();
         } while (p > L);
-
         return k - 1;
+
     }
 
 
@@ -67,9 +68,8 @@ public class WSN {
             PacketArrivalEvent e = new PacketArrivalEvent(n, n, getPoisson(meanInterarrivalTime));
 
             eventList.add(e);
-            eventList.add(new StartSleepEvent(n, 0));
+            eventList.add(new StartSleepEvent(n, 0.0));
         }
-
     }
 
     public List<Node> getNodes(){
@@ -79,7 +79,6 @@ public class WSN {
     public int nodeCount(){
         return this.nodes.size();
     }
-
 
     public void run(){
         Random r = new Random();

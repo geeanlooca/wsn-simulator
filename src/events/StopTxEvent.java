@@ -19,7 +19,6 @@ public class StopTxEvent extends events.Event {
         return "[" + time + "][StopTxEvent] from node " +  this.n;
     }
 
-
     public void run(){
         super.run();
         this.n.setSize(WSN.normSize);
@@ -28,7 +27,6 @@ public class StopTxEvent extends events.Event {
 
         // go to sleep
         WSN.eventList.add(new StartSleepEvent(n, time + WSN.getPoisson(5)));
-
     }
 
     public Packet getPacket(){

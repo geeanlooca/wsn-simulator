@@ -13,12 +13,12 @@ public class StartSleepEvent extends Event {
 
     public void run(){
         super.run();
+
         n.setStatus(WSN.NODE_STATUS.SLEEPING);
 
         // schedule wakeup event
         WSN.eventList.add(new WakeUpEvent(this, getTime() + WSN.sleepTime));
     }
-
 
     @Override
     public String toString(){

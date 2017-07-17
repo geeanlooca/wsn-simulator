@@ -17,7 +17,6 @@ public class PacketArrivalEvent extends Event {
         return "[" + time + "][PacketArrival] from node " +  this.n;
     }
 
-
     public  void run(){
 
         super.run();
@@ -34,7 +33,6 @@ public class PacketArrivalEvent extends Event {
         PacketArrivalEvent e = new PacketArrivalEvent(this.n, this.n, time + WSN.getPoisson(WSN.meanInterarrivalTime) );
         WSN.eventList.add(e);
     }
-
 
     public Node getDestination(){
         return this.destination;
