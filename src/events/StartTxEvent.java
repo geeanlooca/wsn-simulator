@@ -25,7 +25,6 @@ public class StartTxEvent extends events.Event {
         n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
 
         WSN.eventList.add(new StopTxEvent(this, time + WSN.txTime));
-
     }
 
     public Packet getPacket(){
