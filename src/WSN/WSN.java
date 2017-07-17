@@ -1,5 +1,7 @@
 package WSN;
 
+import events.PacketArrivalEvent;
+import events.StartSleepEvent;
 import events.StartTxEvent;
 import events.StopTxEvent;
 
@@ -13,19 +15,22 @@ import WSN.Node;
  */
 public class WSN {
 
+    public static enum NODE_STATUS {
+      SLEEPING, TRANSMITTING, IDLING, RECEIVING
+    };
 
     public static Color txColor = Color.magenta;
     public static Color normColor = Color.blue;
     public static Color sleepColor = Color.pink;
 
-    public static double txTime = 5; // microseconds
-    public static double meanInterarrivalTime = 100;
+    public static double txTime = 2; // microseconds
+    public static double meanInterarrivalTime = 20;
     public static double meanBackoff = 200;
     public static double sleepTime = 50;
 
     public static double normSize = 10;
     public static double txSize = 20;
-    public static long sleepDelay = 0;
+    public static long sleepDelay = 50;
 
     public static int getPoisson(double lambda) {
         double L = Math.exp(-lambda);
@@ -42,14 +47,15 @@ public class WSN {
 
 
     private List<Node> nodes;
-    private List<events.Event> eventList;
-    private List<Node> trasmittingNodes;
+    public static Queue<events.Event> eventList;
+    public static List<Node> trasmittingNodes;
 
     public WSN(int nodeCount, double width, double height){
 
         Random r = new Random();
         this.nodes = new LinkedList<>();
-        this.eventList = new LinkedList<>();
+        this.eventList = new PriorityQueue<>((a,b) -> a.getTime() < b.getTime() ? -1 : a.getTime() == b.getTime() ? 0 : 1);
+
         this.trasmittingNodes = new LinkedList<>();
 
         for (int i = 0; i < nodeCount; i++) {
@@ -58,10 +64,10 @@ public class WSN {
             Node n = new Node(i,X,Y);
             nodes.add(n);
 
-            StartTxEvent e = new StartTxEvent(i, n , getPoisson(meanInterarrivalTime));
+            PacketArrivalEvent e = new PacketArrivalEvent(n, n, getPoisson(meanInterarrivalTime));
+
             eventList.add(e);
-            eventList.add(new StopTxEvent(i, e, e.getTime()+WSN.txTime));
-            eventList.sort((a,b) -> a.getTime() < b.getTime() ? -1 : a.getTime() == b.getTime() ? 0 : 1);
+            eventList.add(new StartSleepEvent(n, 0));
         }
 
     }
@@ -89,29 +95,8 @@ public class WSN {
                 Thread.currentThread().interrupt();
             }
 
-            events.Event e = eventList.get(0);
-            eventList.remove(e);
-
-            System.out.println(e);
+            events.Event e = eventList.remove();
             e.run();
-
-
-            if (e instanceof StartTxEvent){
-                trasmittingNodes.add(e.getNode());
-            }
-
-            if (e instanceof StopTxEvent){
-                Node n = e.getNode();
-
-                trasmittingNodes.remove(n);
-
-                StartTxEvent newTx = new StartTxEvent(0, n, e.getTime() + getPoisson(meanInterarrivalTime));
-                StopTxEvent stopTx = new StopTxEvent(0, newTx, newTx.getTime() + WSN.txTime);
-
-                eventList.add(newTx);
-                eventList.add(stopTx);
-                eventList.sort((a,b) -> a.getTime() < b.getTime() ? -1 : a.getTime() == b.getTime() ? 0 : 1);
-            }
 
             System.out.println("Number of transmitting nodes: " + trasmittingNodes.size());
         }

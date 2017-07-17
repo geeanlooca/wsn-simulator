@@ -7,25 +7,18 @@ import WSN.*;
  * Created by Gianluca on 16/07/2017.
  */
 public class Event {
-    protected int id;
     protected Node n;
     protected double time;
     protected Color c;
 
-    public Event(int id, Node n, double time, Color c){
-        this.id = id;
+    public Event(Node n, double time, Color c){
         this.n = n;
         this.time = time;
         this.c = c;
     }
 
     public String toString(){
-        return "[" + time + "][" + id + "]" + " fired by node " + n.getId();
-    }
-
-
-    public int getId(){
-        return this.id;
+        return "[" + time + "]" + " fired by node " + n.getId();
     }
 
     public Node getNode(){
@@ -34,6 +27,7 @@ public class Event {
 
     public void run(){
         n.setColor(c);
+        System.out.println(this);
     }
 
     public double getTime(){

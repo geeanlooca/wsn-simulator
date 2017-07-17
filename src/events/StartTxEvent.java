@@ -5,18 +5,30 @@ import WSN.*;
  */
 public class StartTxEvent extends events.Event {
 
-    public StartTxEvent(int id, Node n, double time){
-        super(id, n, time, WSN.txColor);
+    private Packet p;
+
+    public StartTxEvent(Node n, Packet p, double time){
+        super(n, time, WSN.txColor);
+        this.p = p;
     }
 
     @Override
     public String toString(){
-        return "[" + time + "][events.StartTxEvent] from node " +  this.n;
+        return "[" + time + "][StartTxEvent] from node " +  this.n;
     }
 
 
     public void run(){
         super.run();
         this.n.setSize(WSN.txSize);
+        WSN.trasmittingNodes.add(n);
+        n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
+
+        WSN.eventList.add(new StopTxEvent(this, time + WSN.txTime));
+
+    }
+
+    public Packet getPacket(){
+        return this.p;
     }
 }
