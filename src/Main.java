@@ -2,6 +2,7 @@ import WSN.*;
 
 import java.awt.*;
 import java.awt.geom.*;
+import java.util.PriorityQueue;
 import javax.swing.*;
 
 /**
@@ -10,11 +11,12 @@ import javax.swing.*;
 public class Main {
     public static void main (String [] args){
 
+
         int W, H;
         W = 500;
         H = 500;
 
-        int nodeCount = 100;
+        int nodeCount = 3;
 
         WSN netw = new WSN(nodeCount, W, H);
         JFrame f = new JFrame();
@@ -24,9 +26,7 @@ public class Main {
         f.setLocation(200,200);
         f.setVisible(true);
 
-
         netw.run();
-
     }
 }
 

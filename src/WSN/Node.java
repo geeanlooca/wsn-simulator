@@ -4,9 +4,7 @@ import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import WSN.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
-import java.util.AbstractQueue;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * Created by Gianluca on 16/07/2017.
@@ -21,6 +19,14 @@ public class Node {
 
     private WSN.NODE_STATUS status;
     private java.util.Queue<Packet> buffer;
+    private java.util.List<Packet> transmittedPackets;
+
+
+    private int BOcounter;
+    private int CW;
+
+    public boolean freeChannel;
+    public boolean collided;
 
     public Node(int id, double X, double Y){
         this.X = X;
@@ -30,6 +36,11 @@ public class Node {
         c = Color.blue;
         e = new Ellipse2D.Double(X, Y, size, size);
         buffer = new LinkedList<Packet>();
+
+
+        Random r = new Random();
+        CW = WSN.CWmin;
+        BOcounter = r.nextInt(CW + 1);
     }
 
     public double getX(){
@@ -87,5 +98,26 @@ public class Node {
 
     public void setStatus(WSN.NODE_STATUS status){
         this.status = status;
+    }
+
+    public int decreaseCounter(){
+        BOcounter--;
+        return BOcounter;
+    }
+
+    public int getBOcounter(){
+        return BOcounter;
+    }
+
+    public void setBOcounter(int BOcounter){
+        this.BOcounter = BOcounter;
+    }
+
+    public int getCW(){
+        return CW;
+    }
+
+    public void setCW(int CW){
+        this.CW = CW;
     }
 }

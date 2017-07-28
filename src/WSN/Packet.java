@@ -7,6 +7,8 @@ public class Packet {
 
     private Node source, destination;
     private int txAttempts;
+    private double emissionTime;
+
 
     public Packet(Node source, Node destination){
         this.source = source;
