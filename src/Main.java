@@ -26,6 +26,8 @@ public class Main {
         f.setLocation(200,200);
         f.setVisible(true);
 
+        System.out.println("done");
+
         netw.run();
     }
 }
