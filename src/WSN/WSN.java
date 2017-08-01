@@ -34,7 +34,7 @@ public class WSN {
 
     public static double normSize = 10;
     public static double txSize = 20;
-    public static long sleepDelay = 100;
+    public static long sleepDelay = 1000;
 
     public static double SIFS = 10;
     public static double DIFS = 50;
@@ -92,9 +92,10 @@ public class WSN {
             //PacketArrivalEvent e = new PacketArrivalEvent(n, n, getPoisson(meanInterarrivalTime));
 
             currentEventIndex ++;
-            WSN.printEventIndex();
+            //WSN.printEventIndex();
 
-            eventList.add(new StartListeningEvent(n, currentEventIndex,0));
+            eventList.add(new StartListeningEvent(n,0, currentEventIndex));
+
 
         }
     }
@@ -125,7 +126,7 @@ public class WSN {
 
             events.Event e = eventList.remove();
             e.run(WSN.currentEventIndex);
-            WSN.printEventIndex();
+            //WSN.printEventIndex();
 
             System.out.println("Number of transmitting nodes: " + trasmittingNodes.size() + "\n\n");
         }

@@ -10,7 +10,7 @@ import WSN.Packet;
 public class StartListeningEvent extends Event{
 
 
-    public StartListeningEvent(Node n, double eventIndex, double time){ super(n, time, eventIndex, WSN.listenColor);
+    public StartListeningEvent(Node n, double time, double eventIndex){ super(n, time, eventIndex, WSN.listenColor);
     }
 
     public void run(double currentEventIndex){

@@ -29,6 +29,7 @@ public class Event {
 
     public void run(double currentEventIndex){
         n.setColor(c);
+        System.out.println("Event number: "+ this.eventIndex);
         System.out.println(this);
     }
 

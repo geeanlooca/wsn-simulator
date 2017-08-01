@@ -48,13 +48,13 @@ public class StopTxEvent extends events.Event {
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
             // start new round after SIFS + tACK
-            WSN.eventList.add(new StartListeningEvent(n, currentEventIndex, time + WSN.tACK + WSN.SIFS));
+            WSN.eventList.add(new StartListeningEvent(n,time + WSN.tACK + WSN.SIFS, currentEventIndex));
         }
 
         // if the end of this transmission frees up the channel then notify all of the listening nodes
         // and make them start listening for DIFS seconds of silence
 
-        // NB POSSIBLE PROBLEM WITH EVENTS INDEXES!!
+        // NB PROBLEM WITH EVENT INDEXES!!
 
         if (WSN.trasmittingNodes.isEmpty()){
             WSN.status = WSN.CHANNEL_STATUS.FREE;
