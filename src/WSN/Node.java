@@ -28,6 +28,10 @@ public class Node {
     public boolean freeChannel;
     public boolean collided;
 
+    private int transmCounter = 0;
+    private int collCounter = 0;
+
+
     public Node(int id, double X, double Y){
         this.X = X;
         this.Y = Y;
@@ -122,4 +126,18 @@ public class Node {
     public void setCW(int CW){
         this.CW = CW;
     }
+
+    public void addTransmission(){ this.transmCounter ++; }
+
+    public void addCollision(){ this.collCounter ++; }
+
+    public int[] getCollisionParam(){
+        int[] param = new int[2];
+        param[0] = this.collCounter;
+        param[1] = this.transmCounter;
+        return param;
+    }
+
+
+
 }

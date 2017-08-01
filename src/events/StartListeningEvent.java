@@ -4,16 +4,20 @@ import WSN.Node;
 import WSN.WSN;
 import WSN.Packet;
 
+import static WSN.WSN.currentEventIndex;
+
 /**
  * Created by gianluca on 28/07/17.
  */
 public class StartListeningEvent extends Event{
 
 
-    public StartListeningEvent(Node n, double time, double eventIndex){ super(n, time, eventIndex, WSN.listenColor);
+
+    public StartListeningEvent(Node n, double time, int eventIndex){ super(n, time, eventIndex, WSN.listenColor);
     }
 
-    public void run(double currentEventIndex){
+    public int run(int currentEventIndex){
+
         super.run(currentEventIndex);
 
         System.out.println("Channel is: " + WSN.status + ". BO counter: " + n.getBOcounter());
@@ -24,6 +28,8 @@ public class StartListeningEvent extends Event{
             n.freeChannel = true;
             WSN.eventList.add(new CheckChannelStatus(n,time+WSN.DIFS, currentEventIndex, WSN.DIFS));
         }
+        return 0;
+
     }
 
     @Override

@@ -9,10 +9,10 @@ import WSN.*;
 public class Event {
     protected Node n;
     protected double time;
-    protected double eventIndex;
+    protected int eventIndex;
     protected Color c;
 
-    public Event(Node n, double time, double eventIndex, Color c){
+    public Event(Node n, double time, int eventIndex, Color c){
         this.n = n;
         this.time = time;
         this.eventIndex = eventIndex;
@@ -27,10 +27,11 @@ public class Event {
         return this.n;
     }
 
-    public void run(double currentEventIndex){
+    public int run(int currentEventIndex){
         n.setColor(c);
-        System.out.println("Event number: "+ this.eventIndex);
+        System.out.println("Event index: "+ this.eventIndex);
         System.out.println(this);
+        return 0;       // shift on currentEventIndex needed in case of StopTxEvent adds more than one event in the queue
     }
 
     public double getTime(){

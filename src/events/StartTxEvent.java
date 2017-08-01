@@ -7,7 +7,7 @@ public class StartTxEvent extends events.Event {
 
     private Packet p;
 
-    public StartTxEvent(Node n, Packet p, double time, double  eventIndex){
+    public StartTxEvent(Node n, Packet p, double time, int  eventIndex){
         super(n, time, eventIndex, WSN.txColor);
         this.p = p;
     }
@@ -18,10 +18,11 @@ public class StartTxEvent extends events.Event {
     }
 
 
-    public void run(double currentEventIndex){
+    public int run(int currentEventIndex){
         super.run(currentEventIndex);
         this.n.setSize(WSN.txSize);
 
+//        this.n.addTransmission();
 
         if (WSN.trasmittingNodes.isEmpty()){
             // no collision
@@ -32,6 +33,8 @@ public class StartTxEvent extends events.Event {
             for (Node t :
                     WSN.trasmittingNodes) {
                 t.collided = true;
+                //this.n.addCollision();
+
             }
         }
 
@@ -46,13 +49,14 @@ public class StartTxEvent extends events.Event {
         // decreased (1 -> 0) and a new transmission will not start
         // SOLUTION: modify the priority queue in order to extract older events if more than one event with the
         // same time is present. In this way we first decrease all the BO counters and then start the transmission
-        // for all those with BO = 0.
+        // for all those with BO = 0. -> SOLVED
         for (Node listening :
                 WSN.listeningNodes) {
 
             System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");
             listening.freeChannel = false;
         }
+        return 0;
     }
 
     public Packet getPacket(){

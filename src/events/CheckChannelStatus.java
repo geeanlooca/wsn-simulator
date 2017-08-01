@@ -13,12 +13,12 @@ public class CheckChannelStatus extends Event{
 
     private double duration;
 
-    public CheckChannelStatus(Node n, double time, double eventIndex, double duration){
+    public CheckChannelStatus(Node n, double time, int eventIndex, double duration){
         super(n, time, eventIndex, WSN.listenColor);
         this.duration = duration;
     }
 
-    public void run(double currentEventIndex){
+    public int run(int currentEventIndex){
         super.run(currentEventIndex);
 
         if (n.freeChannel){
@@ -32,7 +32,8 @@ public class CheckChannelStatus extends Event{
                     WSN.eventList.add(new CheckChannelStatus(n,time + WSN.tSlot, currentEventIndex, WSN.tSlot));
                 }else{
                     // transmit
-                    System.out.println("This node will now start transmitting.");
+                    System.out.println("-> This node will now start transmitting.");
+                    n.addTransmission();
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
                     WSN.eventList.add(new StartTxEvent(n, p, time, currentEventIndex));
@@ -41,8 +42,9 @@ public class CheckChannelStatus extends Event{
             else if (duration == WSN.DIFS){
                 // restart BO counter
                 if (n.getBOcounter() == 0){
-                    System.out.println("This node will now start transmitting.");
+                    System.out.println("-> This node will now start transmitting.");
                     // transmit
+                    n.addTransmission();
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
                     WSN.eventList.add(new StartTxEvent(n, p, time, currentEventIndex));
@@ -51,6 +53,7 @@ public class CheckChannelStatus extends Event{
                 }
             }
         }
+        return 0;
     }
 
     @Override

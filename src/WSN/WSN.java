@@ -34,7 +34,7 @@ public class WSN {
 
     public static double normSize = 10;
     public static double txSize = 20;
-    public static long sleepDelay = 1000;
+    public static long sleepDelay = 1;
 
     public static double SIFS = 10;
     public static double DIFS = 50;
@@ -45,7 +45,10 @@ public class WSN {
     public static int CWmax = 1023;
     public static double tPLC = 192;
 
-    public static double currentEventIndex;
+    public static int currentEventIndex;
+//    private static double maxIndex = Double.POSITIVE_INFINITY;           // used to exit the script
+    private static double maxIndex = 50000;                                  // used to exit the script
+
 
 
     public static double getPoisson(double mean) {
@@ -62,7 +65,7 @@ public class WSN {
     }
 
 
-    private List<Node> nodes;
+    private static List<Node> nodes;        // why not static? it is a problem if it is set to static?
     public static Queue<events.Event> eventList;
     public static List<Node> trasmittingNodes;
     public static List<Node> listeningNodes;
@@ -96,7 +99,6 @@ public class WSN {
 
             eventList.add(new StartListeningEvent(n,0, currentEventIndex));
 
-
         }
     }
 
@@ -111,7 +113,7 @@ public class WSN {
     public void run(){
         Random r = new Random();
 
-        while (!eventList.isEmpty()){
+        while ((!eventList.isEmpty()) && (currentEventIndex < maxIndex)){
 
             try
             {
@@ -125,23 +127,22 @@ public class WSN {
             currentEventIndex ++;
 
             events.Event e = eventList.remove();
-            e.run(WSN.currentEventIndex);
-            //WSN.printEventIndex();
+            int shift = e.run(WSN.currentEventIndex);
+
+            currentEventIndex = currentEventIndex + shift;
+
+           // WSN.printEventIndex();
 
             System.out.println("Number of transmitting nodes: " + trasmittingNodes.size() + "\n\n");
         }
 
-    }
+        WSN.printCollisionRate();
 
-    public static void printEventIndex(){
-        System.out.println("Current Event Index: " + WSN.currentEventIndex);
+        System.exit(0);
     }
-
 
     public class EventComparator implements Comparator<events.Event>
     {
-        //a.getTime() < b.getTime() ? -1 : a.getTime() == b.getTime() ? 0 : 1);
-
         @Override
         public int compare(events.Event a, events.Event b) {
 
@@ -160,10 +161,33 @@ public class WSN {
                 return 0;
             }
         }
+    }
+
+    public static void printEventIndex(){
+        System.out.println("Current Event Index: " + WSN.currentEventIndex);
+    }
 
 
+    public static void printCollisionRate(){
+
+        double collRate = 0;
+        double avCollRate =0;
+        double numb = WSN.nodes.size();
+
+        System.out.println("Node ||  Coll/Transm  ||  Collision Rate ");
+
+        for (Node node : WSN.nodes) {
+            collRate = ((double)node.getCollisionParam()[0])/((double)node.getCollisionParam()[1]);
+            avCollRate = avCollRate + collRate / numb;
+            System.out.println(node.getId() + "\t\t\t" + node.getCollisionParam()[0] + " / " + node.getCollisionParam()[1] + "\t\t\t\t"+ collRate);
+            //System.out.printf("%.2f",collRate);
+        }
+
+
+        System.out.println("\n Average Collision Rate = " +avCollRate);
 
     }
-    }
+
+}
 
 

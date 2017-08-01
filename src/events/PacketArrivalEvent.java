@@ -8,7 +8,7 @@ public class PacketArrivalEvent extends Event {
 
     private Node destination;
 
-    public PacketArrivalEvent(Node n, Node destination, double time, double eventIndex){
+    public PacketArrivalEvent(Node n, Node destination, double time, int eventIndex){
         super(n, time, eventIndex, WSN.normColor);
         this.destination = destination;
     }
@@ -17,7 +17,7 @@ public class PacketArrivalEvent extends Event {
         return "[" + time + "][PacketArrival] from node " +  this.n;
     }
 
-    public  void run(double currentEventIndex){
+    public int run(int currentEventIndex){
 
         super.run(currentEventIndex);
 
@@ -32,6 +32,7 @@ public class PacketArrivalEvent extends Event {
         // schedule new packet arrival at time given by new Poisson RV
         PacketArrivalEvent e = new PacketArrivalEvent(this.n, this.n, time + WSN.getPoisson(WSN.meanInterarrivalTime), currentEventIndex );
         WSN.eventList.add(e);
+        return 0;
     }
 
     public Node getDestination(){
