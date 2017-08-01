@@ -40,6 +40,8 @@ public class Node {
 
         Random r = new Random();
         CW = WSN.CWmin;
+
+        //BOcounter = 4;
         BOcounter = r.nextInt(CW + 1);
     }
 

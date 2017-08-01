@@ -34,7 +34,7 @@ public class WSN {
 
     public static double normSize = 10;
     public static double txSize = 20;
-    public static long sleepDelay = 1000;
+    public static long sleepDelay = 100;
 
     public static double SIFS = 10;
     public static double DIFS = 50;
@@ -44,6 +44,8 @@ public class WSN {
     public static int CWmin = 15;
     public static int CWmax = 1023;
     public static double tPLC = 192;
+
+    public static double currentEventIndex;
 
 
     public static double getPoisson(double mean) {
@@ -70,10 +72,15 @@ public class WSN {
         Random r = new Random();
         this.nodes = new LinkedList<>();
 
-        WSN.eventList = new PriorityQueue<>((a,b) -> a.getTime() < b.getTime() ? -1 : a.getTime() == b.getTime() ? 0 : 1);
+        Comparator<events.Event> comparator = new EventComparator();
+
+//        WSN.eventList = new PriorityQueue<>((a,b) -> a.getTime() < b.getTime() ? -1 : a.getTime() == b.getTime() ? 0 : 1);
+        WSN.eventList = new PriorityQueue<>(comparator);
+
         WSN.trasmittingNodes = new LinkedList<>();
         WSN.listeningNodes = new LinkedList<>();
         WSN.status = CHANNEL_STATUS.FREE;
+        WSN.currentEventIndex = 0;
 
 
         for (int i = 0; i < nodeCount; i++) {
@@ -84,8 +91,11 @@ public class WSN {
 
             //PacketArrivalEvent e = new PacketArrivalEvent(n, n, getPoisson(meanInterarrivalTime));
 
+            currentEventIndex ++;
+            WSN.printEventIndex();
 
-            eventList.add(new StartListeningEvent(n, 0));
+            eventList.add(new StartListeningEvent(n, currentEventIndex,0));
+
         }
     }
 
@@ -111,11 +121,48 @@ public class WSN {
                 Thread.currentThread().interrupt();
             }
 
+            currentEventIndex ++;
+
             events.Event e = eventList.remove();
-            e.run();
+            e.run(WSN.currentEventIndex);
+            WSN.printEventIndex();
 
             System.out.println("Number of transmitting nodes: " + trasmittingNodes.size() + "\n\n");
         }
 
     }
-}
+
+    public static void printEventIndex(){
+        System.out.println("Current Event Index: " + WSN.currentEventIndex);
+    }
+
+
+    public class EventComparator implements Comparator<events.Event>
+    {
+        //a.getTime() < b.getTime() ? -1 : a.getTime() == b.getTime() ? 0 : 1);
+
+        @Override
+        public int compare(events.Event a, events.Event b) {
+
+            if (a.getTime() < b.getTime()) {
+                return -1;
+            }
+            else if (a.getTime() > b.getTime()) {
+                return 1;
+            }
+            else {
+                if (a.getEventIndex() < b.getEventIndex()) {
+                    return -1;
+                } else if (a.getEventIndex() > b.getEventIndex()) {
+                    return 1;
+                }
+                return 0;
+            }
+        }
+
+
+
+    }
+    }
+
+

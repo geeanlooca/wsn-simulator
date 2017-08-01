@@ -7,8 +7,8 @@ public class StartTxEvent extends events.Event {
 
     private Packet p;
 
-    public StartTxEvent(Node n, Packet p, double time){
-        super(n, time, WSN.txColor);
+    public StartTxEvent(Node n, Packet p, double time, double  eventIndex){
+        super(n, time, eventIndex, WSN.txColor);
         this.p = p;
     }
 
@@ -18,8 +18,8 @@ public class StartTxEvent extends events.Event {
     }
 
 
-    public void run(){
-        super.run();
+    public void run(double currentEventIndex){
+        super.run(currentEventIndex);
         this.n.setSize(WSN.txSize);
 
 
@@ -37,7 +37,7 @@ public class StartTxEvent extends events.Event {
 
         WSN.listeningNodes.remove(n);
         n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
-        WSN.eventList.add(new StopTxEvent(this, time + WSN.txTime));
+        WSN.eventList.add(new StopTxEvent(this, time + WSN.txTime, currentEventIndex));
 
 
         // there's a bug here. if another node's BO counter reaches 0 at the same time and this event is

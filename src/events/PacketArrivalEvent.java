@@ -8,8 +8,8 @@ public class PacketArrivalEvent extends Event {
 
     private Node destination;
 
-    public PacketArrivalEvent(Node n, Node destination, double time){
-        super(n, time, WSN.normColor);
+    public PacketArrivalEvent(Node n, Node destination, double time, double eventIndex){
+        super(n, time, eventIndex, WSN.normColor);
         this.destination = destination;
     }
 
@@ -17,9 +17,9 @@ public class PacketArrivalEvent extends Event {
         return "[" + time + "][PacketArrival] from node " +  this.n;
     }
 
-    public  void run(){
+    public  void run(double currentEventIndex){
 
-        super.run();
+        super.run(currentEventIndex);
 
         // add packet to queue if sensor is awake
         if (n.getStatus() != WSN.NODE_STATUS.SLEEPING){
@@ -30,7 +30,7 @@ public class PacketArrivalEvent extends Event {
         // get new destination
 
         // schedule new packet arrival at time given by new Poisson RV
-        PacketArrivalEvent e = new PacketArrivalEvent(this.n, this.n, time + WSN.getPoisson(WSN.meanInterarrivalTime) );
+        PacketArrivalEvent e = new PacketArrivalEvent(this.n, this.n, time + WSN.getPoisson(WSN.meanInterarrivalTime), currentEventIndex );
         WSN.eventList.add(e);
     }
 

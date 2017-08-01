@@ -11,8 +11,8 @@ public class StopTxEvent extends events.Event {
 
     private Packet p;
 
-    public StopTxEvent(StartTxEvent e, double time){
-        super(e.getNode(), time, WSN.normColor);
+    public StopTxEvent(StartTxEvent e, double time, double eventIndex){
+        super(e.getNode(), time, eventIndex, WSN.normColor);
         this.p = e.getPacket();
     }
 
@@ -21,8 +21,8 @@ public class StopTxEvent extends events.Event {
         return "[" + time + "][StopTxEvent] from node " +  this.n;
     }
 
-    public void run(){
-        super.run();
+    public void run(double currentEventIndex){
+        super.run(currentEventIndex);
         this.n.setSize(WSN.normSize);
         WSN.trasmittingNodes.remove(n);
         Random r = new Random();
@@ -40,7 +40,7 @@ public class StopTxEvent extends events.Event {
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
             // start new round NOW
-            WSN.eventList.add(new StartListeningEvent(n, time));
+            WSN.eventList.add(new StartListeningEvent(n, time, currentEventIndex));
         }else{
 
             System.out.println("Tranmission successful");
@@ -48,17 +48,20 @@ public class StopTxEvent extends events.Event {
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
             // start new round after SIFS + tACK
-            WSN.eventList.add(new StartListeningEvent(n, time + WSN.tACK + WSN.SIFS));
+            WSN.eventList.add(new StartListeningEvent(n, currentEventIndex, time + WSN.tACK + WSN.SIFS));
         }
 
         // if the end of this transmission frees up the channel then notify all of the listening nodes
         // and make them start listening for DIFS seconds of silence
+
+        // NB POSSIBLE PROBLEM WITH EVENTS INDEXES!!
+
         if (WSN.trasmittingNodes.isEmpty()){
             WSN.status = WSN.CHANNEL_STATUS.FREE;
 
             for (Node listening :
                     WSN.listeningNodes) {
-                WSN.eventList.add(new CheckChannelStatus(listening, time + WSN.DIFS, WSN.DIFS));
+                WSN.eventList.add(new CheckChannelStatus(listening, time + WSN.DIFS, currentEventIndex, WSN.DIFS));
                 listening.freeChannel = true;
             }
         }

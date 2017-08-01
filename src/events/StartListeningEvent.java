@@ -10,12 +10,11 @@ import WSN.Packet;
 public class StartListeningEvent extends Event{
 
 
-    public StartListeningEvent(Node n, double time){
-        super(n, time, WSN.listenColor);
+    public StartListeningEvent(Node n, double eventIndex, double time){ super(n, time, eventIndex, WSN.listenColor);
     }
 
-    public void run(){
-        super.run();
+    public void run(double currentEventIndex){
+        super.run(currentEventIndex);
 
         System.out.println("Channel is: " + WSN.status + ". BO counter: " + n.getBOcounter());
         n.setStatus(WSN.NODE_STATUS.LISTENING);
@@ -23,7 +22,7 @@ public class StartListeningEvent extends Event{
 
         if (WSN.status == WSN.CHANNEL_STATUS.FREE){
             n.freeChannel = true;
-            WSN.eventList.add(new CheckChannelStatus(n, time+WSN.DIFS, WSN.DIFS));
+            WSN.eventList.add(new CheckChannelStatus(n,time+WSN.DIFS, currentEventIndex, WSN.DIFS));
         }
     }
 

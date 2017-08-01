@@ -9,23 +9,25 @@ import WSN.*;
 public class Event {
     protected Node n;
     protected double time;
+    protected double eventIndex;
     protected Color c;
 
-    public Event(Node n, double time, Color c){
+    public Event(Node n, double time, double eventIndex, Color c){
         this.n = n;
         this.time = time;
+        this.eventIndex = eventIndex;
         this.c = c;
     }
 
     public String toString(){
-        return "[" + time + "]" + " fired by node " + n.getId();
+        return "[" + time + "]" + "[EventIndex: " +  eventIndex + "]" + " fired by node " + n.getId();
     }
 
     public Node getNode(){
         return this.n;
     }
 
-    public void run(){
+    public void run(double currentEventIndex){
         n.setColor(c);
         System.out.println(this);
     }
@@ -33,4 +35,10 @@ public class Event {
     public double getTime(){
         return this.time;
     }
+
+    public double getEventIndex(){
+        return this.eventIndex;
+    }
 }
+
+

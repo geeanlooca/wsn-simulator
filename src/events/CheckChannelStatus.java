@@ -13,13 +13,13 @@ public class CheckChannelStatus extends Event{
 
     private double duration;
 
-    public CheckChannelStatus(Node n, double time, double duration){
-        super(n, time, WSN.listenColor);
+    public CheckChannelStatus(Node n, double time, double eventIndex, double duration){
+        super(n, time, eventIndex, WSN.listenColor);
         this.duration = duration;
     }
 
-    public void run(){
-        super.run();
+    public void run(double currentEventIndex){
+        super.run(currentEventIndex);
 
         if (n.freeChannel){
             System.out.println("Channel has been free for: " + duration);
@@ -29,13 +29,13 @@ public class CheckChannelStatus extends Event{
                 System.out.println("BO Counter decreased: " + bo);
 
                 if (bo > 0){
-                    WSN.eventList.add(new CheckChannelStatus(n, time + WSN.tSlot, WSN.tSlot));
+                    WSN.eventList.add(new CheckChannelStatus(n,time + WSN.tSlot, currentEventIndex, WSN.tSlot));
                 }else{
                     // transmit
                     System.out.println("This node will now start transmitting.");
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
-                    WSN.eventList.add(new StartTxEvent(n, p, time));
+                    WSN.eventList.add(new StartTxEvent(n, p, time, currentEventIndex));
                 }
             }
             else if (duration == WSN.DIFS){
@@ -45,9 +45,9 @@ public class CheckChannelStatus extends Event{
                     // transmit
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
-                    WSN.eventList.add(new StartTxEvent(n, p, time));
+                    WSN.eventList.add(new StartTxEvent(n, p, time, currentEventIndex));
                 }else {
-                    WSN.eventList.add(new CheckChannelStatus(n, time + WSN.tSlot, WSN.tSlot));
+                    WSN.eventList.add(new CheckChannelStatus(n, time + WSN.tSlot, currentEventIndex, WSN.tSlot));
                 }
             }
         }
