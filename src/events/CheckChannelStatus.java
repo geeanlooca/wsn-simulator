@@ -22,18 +22,25 @@ public class CheckChannelStatus extends Event{
         super.run(currentEventIndex);
 
         if (n.freeChannel){
-            System.out.println("Channel has been free for: " + duration);
+            if (WSN.print){ System.out.println("Channel has been free for: " + duration);}
             if (duration == WSN.tSlot){
+
+                this.n.addContSlot();
+
                 // decrease BO counter
                 int bo = n.decreaseCounter();
-                System.out.println("BO Counter decreased: " + bo);
+                if (WSN.print){ System.out.println("BO Counter decreased: " + bo);};
 
                 if (bo > 0){
                     WSN.eventList.add(new CheckChannelStatus(n,time + WSN.tSlot, currentEventIndex, WSN.tSlot));
+
+
                 }else{
                     // transmit
-                    System.out.println("-> This node will now start transmitting.");
+                    if (WSN.print){ System.out.println("-> This node will now start transmitting.");};
+
                     n.addTransmission();
+
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
                     WSN.eventList.add(new StartTxEvent(n, p, time, currentEventIndex));
@@ -42,9 +49,11 @@ public class CheckChannelStatus extends Event{
             else if (duration == WSN.DIFS){
                 // restart BO counter
                 if (n.getBOcounter() == 0){
-                    System.out.println("-> This node will now start transmitting.");
+                    if (WSN.print){ System.out.println("-> This node will now start transmitting.");};
                     // transmit
+
                     n.addTransmission();
+
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
                     WSN.eventList.add(new StartTxEvent(n, p, time, currentEventIndex));

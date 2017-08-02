@@ -30,7 +30,7 @@ public class StopTxEvent extends events.Event {
 
         if (n.collided){
 
-            System.out.println("Tranmission unsuccessful");
+            if (WSN.print){ System.out.println("Tranmission unsuccessful");};
 
             this.n.addCollision();
 
@@ -46,9 +46,11 @@ public class StopTxEvent extends events.Event {
             WSN.eventList.add(new StartListeningEvent(n, time, currentEventIndex));
         }else{
 
-            System.out.println("Tranmission successful");
+            if (WSN.print){ System.out.println("Tranmission successful");};
             n.setCW(WSN.CWmin);
             n.setBOcounter(r.nextInt(n.getCW() + 1));
+
+            this.n.storeSlotNumber();
 
             // start new round after SIFS + tACK
             WSN.eventList.add(new StartListeningEvent(n,time + WSN.tACK + WSN.SIFS, currentEventIndex));
@@ -68,6 +70,7 @@ public class StopTxEvent extends events.Event {
                 WSN.eventList.add(new CheckChannelStatus(listening, time + WSN.DIFS, currentEventIndex, WSN.DIFS));
                 currentEventIndex ++;
                 listening.freeChannel = true;
+                listening.resetContSlot();
             }
             shift = WSN.listeningNodes.size();
 

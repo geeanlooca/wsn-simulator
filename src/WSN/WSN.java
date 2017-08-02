@@ -34,7 +34,7 @@ public class WSN {
 
     public static double normSize = 10;
     public static double txSize = 20;
-    public static long sleepDelay = 1;
+    public static long sleepDelay = 0;
 
     public static double SIFS = 10;
     public static double DIFS = 50;
@@ -46,9 +46,10 @@ public class WSN {
     public static double tPLC = 192;
 
     public static int currentEventIndex;
-//    private static double maxIndex = Double.POSITIVE_INFINITY;           // used to exit the script
-    private static double maxIndex = 50000;                                  // used to exit the script
+//    private static double maxIndex = Double.POSITIVE_INFINITY;           // used to never exit the script
+    private static double maxIndex = 10000000;                                  // used to exit the script 1000000000
 
+    public static boolean print = false;
 
 
     public static double getPoisson(double mean) {
@@ -129,14 +130,15 @@ public class WSN {
             events.Event e = eventList.remove();
             int shift = e.run(WSN.currentEventIndex);
 
-            currentEventIndex = currentEventIndex + shift;
-
+            currentEventIndex += shift;
            // WSN.printEventIndex();
 
-            System.out.println("Number of transmitting nodes: " + trasmittingNodes.size() + "\n\n");
+            if (print){ System.out.println("Number of transmitting nodes: " + trasmittingNodes.size() + "\n\n"); }
+
         }
 
         WSN.printCollisionRate();
+        WSN.printSlotNumber();
 
         System.exit(0);
     }
@@ -174,18 +176,45 @@ public class WSN {
         double avCollRate =0;
         double numb = WSN.nodes.size();
 
-        System.out.println("Node ||  Coll/Transm  ||  Collision Rate ");
+        System.out.println("\n Node ||  Coll/Transm  ||  Collision Rate ");
 
         for (Node node : WSN.nodes) {
             collRate = ((double)node.getCollisionParam()[0])/((double)node.getCollisionParam()[1]);
             avCollRate = avCollRate + collRate / numb;
             System.out.println(node.getId() + "\t\t\t" + node.getCollisionParam()[0] + " / " + node.getCollisionParam()[1] + "\t\t\t\t"+ collRate);
-            //System.out.printf("%.2f",collRate);
         }
-
-
         System.out.println("\n Average Collision Rate = " +avCollRate);
 
+    }
+
+    public static void printSlotNumber(){
+
+        ArrayList<Integer> slotNumberList;
+        double allAverageSlotNumber =0;
+        double numb = WSN.nodes.size();
+
+        System.out.println("\n Node ||  Average # of Contention Slots to successful transmit ");
+
+        for (Node node : WSN.nodes) {
+            slotNumberList = node.getSlotCounterList();
+            //System.out.println(node.getId() + "\t\t" + slotNumberList.toString());
+            double avSlotNumber = calculateAverage(slotNumberList);
+            allAverageSlotNumber +=  avSlotNumber / numb;
+
+            System.out.println(node.getId() + "\t\t\t\t" + avSlotNumber);
+        }
+        System.out.println("\n Average Number of Contention Slot = " +allAverageSlotNumber);
+
+    }
+    private static double calculateAverage(List <Integer> list) {
+        Integer sum = 0;
+        if(!list.isEmpty()) {
+            for (Integer entry : list) {
+                sum += entry;
+            }
+            return sum.doubleValue() / list.size();
+        }
+        return sum;
     }
 
 }

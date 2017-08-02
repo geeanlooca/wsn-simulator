@@ -31,6 +31,9 @@ public class Node {
     private int transmCounter = 0;
     private int collCounter = 0;
 
+    private int slotCounter = 0;
+    private ArrayList<Integer> slotCounterList;
+
 
     public Node(int id, double X, double Y){
         this.X = X;
@@ -40,7 +43,7 @@ public class Node {
         c = Color.blue;
         e = new Ellipse2D.Double(X, Y, size, size);
         buffer = new LinkedList<Packet>();
-
+        this.slotCounterList = new ArrayList<Integer>();
 
         Random r = new Random();
         CW = WSN.CWmin;
@@ -138,6 +141,22 @@ public class Node {
         return param;
     }
 
+    public void addContSlot(){
+        this.slotCounter ++;
+        //System.out.println("Node " + this.id + "  "+ this.slotCounter);
+    }
+
+    public void resetContSlot(){ this.slotCounter=0; }
+
+    public void storeSlotNumber() {
+        this.slotCounterList.add(this.slotCounter);
+        this.slotCounter = 0;
+        //System.out.println("Node " + this.id + "  "+ this.slotCounterList);
+
+    }
+    public ArrayList<Integer> getSlotCounterList() {
+        return this.slotCounterList;
+    }
 
 
 }

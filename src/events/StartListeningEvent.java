@@ -20,7 +20,7 @@ public class StartListeningEvent extends Event{
 
         super.run(currentEventIndex);
 
-        System.out.println("Channel is: " + WSN.status + ". BO counter: " + n.getBOcounter());
+        if (WSN.print){ System.out.println("Channel is: " + WSN.status + ". BO counter: " + n.getBOcounter());}
         n.setStatus(WSN.NODE_STATUS.LISTENING);
         WSN.listeningNodes.add(n);
 

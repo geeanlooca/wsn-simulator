@@ -16,7 +16,7 @@ public class Main {
         W = 500;
         H = 500;
 
-        int nodeCount = 30;
+        int nodeCount = 100;
 
         WSN netw = new WSN(nodeCount, W, H);
         JFrame f = new JFrame();
