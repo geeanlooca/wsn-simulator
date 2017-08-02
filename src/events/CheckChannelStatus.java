@@ -26,6 +26,7 @@ public class CheckChannelStatus extends Event{
             if (duration == WSN.tSlot){
 
                 this.n.addContSlot();
+                this.n.addtSlot();
 
                 // decrease BO counter
                 int bo = n.decreaseCounter();
@@ -53,6 +54,7 @@ public class CheckChannelStatus extends Event{
                     // transmit
 
                     n.addTransmission();
+                    n.addDIFS();
 
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
@@ -62,6 +64,8 @@ public class CheckChannelStatus extends Event{
                 }
             }
         }
+        else{ this.n.remExtra(time);}
+
         return 0;
     }
 

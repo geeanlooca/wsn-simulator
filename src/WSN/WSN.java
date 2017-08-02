@@ -12,6 +12,18 @@ import java.util.List;
  */
 public class WSN {
 
+    // --------- MAIN SIMULATION PARAMETERS ----------//
+
+    final int nodeCount = 5;                // number of nodes in the network
+    final long sleepDelay = 0;              // delay used to extract events
+    final double maxIndex = 100000000;        // max available number of events; used to exit the script and print results (use Double.POSITIVE_INFINITY to never exit) 1000000000
+    public static boolean print = false;    // printing of extra information useful for debugging
+
+
+    // ------------------------------------//
+
+
+
     public enum NODE_STATUS {
       SLEEPING, TRANSMITTING, IDLING, RECEIVING, LISTENING
     };
@@ -34,7 +46,6 @@ public class WSN {
 
     public static double normSize = 10;
     public static double txSize = 20;
-    public static long sleepDelay = 0;
 
     public static double SIFS = 10;
     public static double DIFS = 50;
@@ -46,11 +57,6 @@ public class WSN {
     public static double tPLC = 192;
 
     public static int currentEventIndex;
-//    private static double maxIndex = Double.POSITIVE_INFINITY;           // used to never exit the script
-    private static double maxIndex = 10000000;                                  // used to exit the script 1000000000
-
-    public static boolean print = false;
-
 
     public static double getPoisson(double mean) {
         Random r = new Random();
@@ -65,13 +71,12 @@ public class WSN {
 
     }
 
-
     private static List<Node> nodes;        // why not static? it is a problem if it is set to static?
     public static Queue<events.Event> eventList;
     public static List<Node> trasmittingNodes;
     public static List<Node> listeningNodes;
 
-    public WSN(int nodeCount, double width, double height){
+    public WSN(double width, double height){
 
         Random r = new Random();
         this.nodes = new LinkedList<>();
@@ -92,8 +97,6 @@ public class WSN {
             double Y = height * r.nextDouble();
             Node n = new Node(i,X,Y);
             nodes.add(n);
-
-            //PacketArrivalEvent e = new PacketArrivalEvent(n, n, getPoisson(meanInterarrivalTime));
 
             currentEventIndex ++;
             //WSN.printEventIndex();
@@ -139,6 +142,7 @@ public class WSN {
 
         WSN.printCollisionRate();
         WSN.printSlotNumber();
+        WSN.printThroughput();
 
         System.exit(0);
     }
@@ -197,7 +201,7 @@ public class WSN {
 
         for (Node node : WSN.nodes) {
             slotNumberList = node.getSlotCounterList();
-            //System.out.println(node.getId() + "\t\t" + slotNumberList.toString());
+            if(print){System.out.println(node.getId() + "\t\t" + slotNumberList.toString());}
             double avSlotNumber = calculateAverage(slotNumberList);
             allAverageSlotNumber +=  avSlotNumber / numb;
 
@@ -206,6 +210,30 @@ public class WSN {
         System.out.println("\n Average Number of Contention Slot = " +allAverageSlotNumber);
 
     }
+
+    public static void printThroughput(){
+
+        ArrayList<Double> totalTimeList;
+        double allAvThroughput =0;
+        double numb = WSN.nodes.size();
+
+        System.out.println("\n Node ||  Av. Total Time to success. delivery || Av. Throughput  ");
+
+        for (Node node : WSN.nodes) {
+
+            totalTimeList = node.getTotalTimeList();
+            //System.out.println(node.getId() + "\t\t" + totalTimeList.toString());
+            double avTotalTime = calculateAverageDouble(totalTimeList);
+            double avThroughput = (WSN.DIFS + WSN.txTime + WSN.tACK + WSN.SIFS)/ avTotalTime;
+            allAvThroughput +=  avThroughput / numb;
+            System.out.println(node.getId() + "\t\t\t\t" +  avTotalTime+ "\t\t\t\t" +  avThroughput);
+
+        }
+        System.out.println("\n Average Throughput = " +allAvThroughput);
+
+    }
+
+
     private static double calculateAverage(List <Integer> list) {
         Integer sum = 0;
         if(!list.isEmpty()) {
@@ -213,6 +241,17 @@ public class WSN {
                 sum += entry;
             }
             return sum.doubleValue() / list.size();
+        }
+        return sum;
+    }
+
+    private static double calculateAverageDouble(List <Double> list) {
+        double sum = 0;
+        if(!list.isEmpty()) {
+            for (double entry : list) {
+                sum += entry;
+            }
+            return sum / list.size();
         }
         return sum;
     }

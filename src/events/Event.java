@@ -33,7 +33,7 @@ public class Event {
             System.out.println("Event index: " + this.eventIndex);
             System.out.println(this);
         }
-        else if ((eventIndex % 1000)==0){
+        else if ((eventIndex % 1000000)==0){
             System.out.println("Event index: " + this.eventIndex);
         }
         return 0;       // shift on currentEventIndex needed in case of StopTxEvent adds more than one event in the queue

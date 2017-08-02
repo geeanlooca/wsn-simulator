@@ -34,6 +34,9 @@ public class Node {
     private int slotCounter = 0;
     private ArrayList<Integer> slotCounterList;
 
+    private double totalTime;
+    private ArrayList<Double> totalTimeList;
+
 
     public Node(int id, double X, double Y){
         this.X = X;
@@ -44,6 +47,8 @@ public class Node {
         e = new Ellipse2D.Double(X, Y, size, size);
         buffer = new LinkedList<Packet>();
         this.slotCounterList = new ArrayList<Integer>();
+        this.totalTimeList = new ArrayList<Double>();
+
 
         Random r = new Random();
         CW = WSN.CWmin;
@@ -143,7 +148,7 @@ public class Node {
 
     public void addContSlot(){
         this.slotCounter ++;
-        //System.out.println("Node " + this.id + "  "+ this.slotCounter);
+        if (WSN.print){ System.out.println("Slot Counter: \t"+ this.slotCounter);}
     }
 
     public void resetContSlot(){ this.slotCounter=0; }
@@ -151,12 +156,36 @@ public class Node {
     public void storeSlotNumber() {
         this.slotCounterList.add(this.slotCounter);
         this.slotCounter = 0;
-        //System.out.println("Node " + this.id + "  "+ this.slotCounterList);
+        if (WSN.print){ System.out.println("Slot Counter List: \t"+ this.slotCounterList);}
 
     }
-    public ArrayList<Integer> getSlotCounterList() {
-        return this.slotCounterList;
+    public ArrayList<Integer> getSlotCounterList() { return this.slotCounterList; }
+
+
+    private double tempTime=0;
+    public void addDIFS(){ this.totalTime += WSN.DIFS; }
+    public void addtSlot(){ this.totalTime += WSN.tSlot; }
+    public void addTX(double time){
+        tempTime=time;
+        this.totalTime += WSN.txTime;
     }
+    public void remExtra(double time){
+        this.totalTime -= time - tempTime;
+        //System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!"+tempTime + "\t\t"+ time);
+
+    }
+
+    public void setTotalTime(){
+        this.totalTimeList.add(this.totalTime);
+        this.totalTime = WSN.SIFS + WSN.tACK;
+        tempTime = 0;
+    }
+
+    public ArrayList<Double> getTotalTimeList() { return this.totalTimeList; }
+
+
+
+
 
 
 }

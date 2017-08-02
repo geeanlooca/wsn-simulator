@@ -33,7 +33,8 @@ public class StopTxEvent extends events.Event {
             if (WSN.print){ System.out.println("Tranmission unsuccessful");};
 
             this.n.addCollision();
-
+            this.n.resetContSlot();
+            //       I'm not sure to put here the reset of the contention time slot counter. If a collision occurs the contention fails, thus we start a new contention. Right?
 
             int oldCW = n.getCW();
             int newCW = Math.min(2*(oldCW+1) - 1, WSN.CWmax);
@@ -51,6 +52,7 @@ public class StopTxEvent extends events.Event {
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
             this.n.storeSlotNumber();
+            this.n.setTotalTime();
 
             // start new round after SIFS + tACK
             WSN.eventList.add(new StartListeningEvent(n,time + WSN.tACK + WSN.SIFS, currentEventIndex));
@@ -59,17 +61,17 @@ public class StopTxEvent extends events.Event {
         // if the end of this transmission frees up the channel then notify all of the listening nodes
         // and make them start listening for DIFS seconds of silence
 
-        // NB PROBLEM WITH EVENT INDEXES!! solved
         currentEventIndex ++;
 
         if (WSN.trasmittingNodes.isEmpty()){
             WSN.status = WSN.CHANNEL_STATUS.FREE;
 
-            for (Node listening :
-                    WSN.listeningNodes) {
+            for (Node listening : WSN.listeningNodes) {
                 WSN.eventList.add(new CheckChannelStatus(listening, time + WSN.DIFS, currentEventIndex, WSN.DIFS));
                 currentEventIndex ++;
+
                 listening.freeChannel = true;
+
                 listening.resetContSlot();
             }
             shift = WSN.listeningNodes.size();
