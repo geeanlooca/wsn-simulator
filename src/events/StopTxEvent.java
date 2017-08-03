@@ -28,12 +28,16 @@ public class StopTxEvent extends events.Event {
         WSN.trasmittingNodes.remove(n);
         Random r = new Random();
 
+        this.n.addTX();
+
+
         if (n.collided){
 
             if (WSN.print){ System.out.println("Tranmission unsuccessful");};
 
             this.n.addCollision();
             this.n.resetContSlot();
+
             //       I'm not sure to put here the reset of the contention time slot counter. If a collision occurs the contention fails, thus we start a new contention. Right?
 
             int oldCW = n.getCW();
@@ -51,7 +55,7 @@ public class StopTxEvent extends events.Event {
             n.setCW(WSN.CWmin);
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
-            this.n.storeSlotNumber();
+            this.n.storeContSlotNumber();
             this.n.setTotalTime();
 
             // start new round after SIFS + tACK
@@ -71,7 +75,6 @@ public class StopTxEvent extends events.Event {
                 currentEventIndex ++;
 
                 listening.freeChannel = true;
-
                 listening.resetContSlot();
             }
             shift = WSN.listeningNodes.size();

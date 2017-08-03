@@ -22,9 +22,6 @@ public class StartTxEvent extends events.Event {
         super.run(currentEventIndex);
         this.n.setSize(WSN.txSize);
 
-        this.n.addTX(time);
-
-
         if (WSN.trasmittingNodes.isEmpty()){
             // no collision
             WSN.trasmittingNodes.add(n);
@@ -54,7 +51,6 @@ public class StartTxEvent extends events.Event {
             if (WSN.print){ System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");}
             listening.freeChannel = false;
 
-            listening.addTX(time);
         }
         return 0;
     }

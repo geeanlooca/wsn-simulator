@@ -48,13 +48,14 @@ public class CheckChannelStatus extends Event{
                 }
             }
             else if (duration == WSN.DIFS){
+
+                n.addDIFS();
                 // restart BO counter
                 if (n.getBOcounter() == 0){
                     if (WSN.print){ System.out.println("-> This node will now start transmitting.");};
                     // transmit
 
                     n.addTransmission();
-                    n.addDIFS();
 
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
@@ -64,7 +65,8 @@ public class CheckChannelStatus extends Event{
                 }
             }
         }
-        else{ this.n.remExtra(time);}
+        else{ //this.n.remExtra(time);
+             }
 
         return 0;
     }

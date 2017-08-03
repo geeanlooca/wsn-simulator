@@ -14,11 +14,13 @@ public class WSN {
 
     // --------- MAIN SIMULATION PARAMETERS ----------//
 
-    final int nodeCount = 5;                // number of nodes in the network
-    final long sleepDelay = 0;              // delay used to extract events
-    final double maxIndex = 100000000;        // max available number of events; used to exit the script and print results (use Double.POSITIVE_INFINITY to never exit) 1000000000
-    public static boolean print = false;    // printing of extra information useful for debugging
+    final int nodeCount = 10;                       // number of nodes in the network
+    final long sleepDelay = 0;                      // delay used to extract events
+    final double maxIndex = Math.pow(10, 7);        // max available number of events; used to exit the script and print results (use Double.POSITIVE_INFINITY to never exit) 1000000000
+    public static boolean print = false;            // printing extra information useful for debugging
 
+    final static double maxAvailableThroughput = 11;    // Mb/s
+    final static double frameSize = 1500;               // bytes
 
     // ------------------------------------//
 
@@ -39,7 +41,9 @@ public class WSN {
     public static Color sleepColor = Color.pink;
     public static Color listenColor = Color.cyan;
 
-    public static double txTime = 200; // microseconds
+    //public static double txTime = 200; // microseconds
+    public static double txTime = (frameSize * 8) / (maxAvailableThroughput); // txTime in microsecond
+
     public static double meanInterarrivalTime = 20.0;
     public static double meanBackoff = 200.0;
     public static double sleepTime = 50.0;
@@ -71,7 +75,7 @@ public class WSN {
 
     }
 
-    private static List<Node> nodes;        // why not static? it is a problem if it is set to static?
+    private static List<Node> nodes;
     public static Queue<events.Event> eventList;
     public static List<Node> trasmittingNodes;
     public static List<Node> listeningNodes;
@@ -82,8 +86,6 @@ public class WSN {
         this.nodes = new LinkedList<>();
 
         Comparator<events.Event> comparator = new EventComparator();
-
-//        WSN.eventList = new PriorityQueue<>((a,b) -> a.getTime() < b.getTime() ? -1 : a.getTime() == b.getTime() ? 0 : 1);
         WSN.eventList = new PriorityQueue<>(comparator);
 
         WSN.trasmittingNodes = new LinkedList<>();
@@ -102,7 +104,6 @@ public class WSN {
             //WSN.printEventIndex();
 
             eventList.add(new StartListeningEvent(n,0, currentEventIndex));
-
         }
     }
 
@@ -134,7 +135,6 @@ public class WSN {
             int shift = e.run(WSN.currentEventIndex);
 
             currentEventIndex += shift;
-           // WSN.printEventIndex();
 
             if (print){ System.out.println("Number of transmitting nodes: " + trasmittingNodes.size() + "\n\n"); }
 
