@@ -18,7 +18,7 @@ for k = 1 : length(K)
 %         q = quantile(collision_estimates, 0.9);
 %         errors(k, n) = q*col_std/sqrt(runs);
         
-        collision_rate(k,n) = estimate_collisionrate(N(n), K(k), ...
+        collision_rate(k,n) = estimate_collision_rate(N(n), K(k), ...
             0.5*ones(1, K(k)), runs);
     end
     
@@ -65,8 +65,8 @@ N = 5:5:30;
 col_uni = zeros(1, length(N));
 col_opt = zeros(size(col_uni));
 for n = 1 : length(N)
-    col_uni(n) = estimate_collisionrate(N(n), 5, 0.5*ones(1, N(n)), 100000);
-    col_opt(n) = estimate_collisionrate(N(n), 5, p_opt, 100000);
+    col_uni(n) = estimate_collision_rate(N(n), 5, 0.5*ones(1, N(n)), 100000);
+    col_opt(n) = estimate_collision_rate(N(n), 5, p_opt, 100000);
 end
 
 figure('Color', 'White');
