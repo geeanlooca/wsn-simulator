@@ -51,9 +51,6 @@ public class StartTxEvent extends events.Event {
             if (WSN.print){ System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");}
             listening.freeChannel = false;
 
-            listening.addTX_secondary(time);
-
-
         }
         return 0;
     }

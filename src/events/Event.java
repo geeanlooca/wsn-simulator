@@ -36,7 +36,7 @@ public class Event {
         else if ((eventIndex % 1000000)==0){
             System.out.println("Event index: " + this.eventIndex);
         }
-        return 0;       // shift on currentEventIndex needed in case of StopTxEvent adds more than one event in the queue
+        return 0;       // shift on currentEventIndex needed in case of StopTxEvent adds more than one event into the queue
     }
 
     public double getTime(){

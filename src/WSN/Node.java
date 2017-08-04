@@ -34,14 +34,10 @@ public class Node {
 
     private double totalTime;
     private ArrayList<Double> totalTimeList;
-    private double totalDelay;
-    private ArrayList<Double> totalDelayList;
-    private ArrayList<Double> delayList;
 
     private double startTX;
+    private ArrayList<Double> delayList;
 
-
-    double tempTime;
 
     public Node(int id, double X, double Y){
         this.X = X;
@@ -56,14 +52,10 @@ public class Node {
         transCounter = 0;
         collCounter = 0;
         slotCounter = 0;
-        totalDelay=0;
         startTX =0;
         this.slotCounterList = new ArrayList<Integer>();
         this.totalTimeList = new ArrayList<Double>();
-        this.totalDelayList = new ArrayList<Double>();
         this.delayList = new ArrayList<Double>();
-
-        tempTime =0;
 
 
         Random r = new Random();
@@ -150,6 +142,7 @@ public class Node {
         this.CW = CW;
     }
 
+
     // methods to calculate collision rate
 
     public void addTransmission(){ this.transCounter++; }
@@ -182,92 +175,36 @@ public class Node {
     public ArrayList<Integer> getSlotCounterList() { return this.slotCounterList; }
 
 
-    // methods to calculate the total transmission time for a packet useful for the throughput
+    // methods to calculate the packet total transmission time useful for throughput and delay
 
-    public void addDIFS(){
-        this.totalTime += WSN.DIFS;
-        this.totalDelay += WSN.DIFS;
-        this.print();
+    public void addDIFS(){ this.totalTime += WSN.DIFS; }
+    public void addtSlot(){ this.totalTime += WSN.tSlot; }
+    public void addTX(){ this.totalTime += WSN.txTime; }
 
+    public void startTXTime(double time){
+        if (!collided){ this.startTX = time; }
     }
-    public void addtSlot(){
-        this.totalTime += WSN.tSlot;
-        this.totalDelay += WSN.tSlot;
-        this.print();
-
-    }
-    public void addTX(){
-        this.totalTime += WSN.txTime;
-        this.totalDelay += WSN.txTime;
-        this.print();
-
-    }
-
-    public void addTX_secondary(double time){
-        if (this.tempTime == 0) {
-            this.totalDelay += WSN.txTime;
-            this.tempTime = time;
-            this.print();
-
-        }
-    }
-
-    public void remExtra(double time){
-        if (this.tempTime != 0) {
-            totalDelay -= time - this.tempTime;
-            this.tempTime = 0;
-            this.print();
-
-        }
-    }
-
 
     public void setTotalTime( double time){
+        // throughput
         this.totalTime += WSN.SIFS + WSN.tACK;
         this.totalTimeList.add(this.totalTime);
         this.totalTime=0;
 
-        this.totalDelay += WSN.SIFS + WSN.tACK;
-        this.totalDelayList.add(this.totalDelay);
-        this.tempTime = 0;
-        this.print();
-        System.out.println(this.totalDelayList.toString());
-
-
-
-        double delay =  (time + WSN.SIFS + WSN.tACK) - this.startTX;
+        // delay
+        double delay = (time + WSN.SIFS + WSN.tACK) - this.startTX;
         this.delayList.add(delay);
-
-        System.out.println("Delay = "+ delay);
-
         this.startTX = 0;
-
-        this.totalDelay=0;
-
-
+        if (WSN.print){ System.out.println("Delay = "+ delay); }
 
     }
 
     public ArrayList<Double> getTotalTimeList() { return this.totalTimeList; }
 
-    public ArrayList<Double> getTotalDelayList() {
-        return this.totalDelayList;
 
-    }
-
-    public ArrayList<Double> getDelayList() {
-        return this.delayList;
-
-    }
-
-    public void print(){System.out.println("Node: " +this.id + " Total Delay: "+this.totalDelay);}
+    public ArrayList<Double> getDelayList() { return this.delayList; }
 
 
-    public void startTXTime(double time){
-        if (!collided){
-            this.startTX = time;
-        }
-    }
 
 
 

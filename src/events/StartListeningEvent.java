@@ -27,6 +27,8 @@ public class StartListeningEvent extends Event{
         if (WSN.status == WSN.CHANNEL_STATUS.FREE){
             n.freeChannel = true;
             WSN.eventList.add(new CheckChannelStatus(n,time+WSN.DIFS, currentEventIndex, WSN.DIFS));
+
+            // save transmission initial time (delay)
             this.n.startTXTime(time);
         }
         return 0;

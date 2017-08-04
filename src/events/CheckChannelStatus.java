@@ -25,8 +25,8 @@ public class CheckChannelStatus extends Event{
             if (WSN.print){ System.out.println("Channel has been free for: " + duration);}
             if (duration == WSN.tSlot){
 
-                this.n.addContSlot();
-                this.n.addtSlot();
+                this.n.addContSlot();       // increment contention slot counter
+                this.n.addtSlot();          // add a tSLOT to the packet transmission time
 
                 // decrease BO counter
                 int bo = n.decreaseCounter();
@@ -40,7 +40,7 @@ public class CheckChannelStatus extends Event{
                     // transmit
                     if (WSN.print){ System.out.println("-> This node will now start transmitting.");};
 
-                    n.addTransmission();
+                    n.addTransmission();    // increment transmissions counter
 
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
@@ -49,13 +49,14 @@ public class CheckChannelStatus extends Event{
             }
             else if (duration == WSN.DIFS){
 
-                n.addDIFS();
+                n.addDIFS();            // add a DIFS to the packet trasmission time
+
                 // restart BO counter
                 if (n.getBOcounter() == 0){
                     if (WSN.print){ System.out.println("-> This node will now start transmitting.");};
                     // transmit
 
-                    n.addTransmission();
+                    n.addTransmission();    // increment transmissions counter
 
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
@@ -63,15 +64,6 @@ public class CheckChannelStatus extends Event{
                 }else {
                     WSN.eventList.add(new CheckChannelStatus(n, time + WSN.tSlot, currentEventIndex, WSN.tSlot));
                 }
-            }
-        }
-        else {
-            if (duration == WSN.tSlot) {
-                this.n.addtSlot();
-                this.n.remExtra(time);
-            } else if (duration == WSN.DIFS) {
-                this.n.addDIFS();
-                this.n.remExtra(time);
             }
         }
 
