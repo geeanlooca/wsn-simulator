@@ -16,15 +16,17 @@ public class Main {
         W = 500;
         H = 500;
 
-        int nodeCount = 3;
+        // N.B. nodeCount variable was moved into WSN class
 
-        WSN netw = new WSN(nodeCount, W, H);
+        WSN netw = new WSN(W, H);
         JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.getContentPane().add(new WSNWindow(netw));
         f.setSize(W,H);
         f.setLocation(200,200);
         f.setVisible(true);
+
+        System.out.println("end.");
 
         netw.run();
     }

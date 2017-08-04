@@ -10,9 +10,10 @@ public class StopTxEvent extends events.Event {
 
 
     private Packet p;
+    private int shift = 0;
 
-    public StopTxEvent(StartTxEvent e, double time){
-        super(e.getNode(), time, WSN.normColor);
+    public StopTxEvent(StartTxEvent e, double time, int eventIndex){
+        super(e.getNode(), time, eventIndex, WSN.normColor);
         this.p = e.getPacket();
     }
 
@@ -21,51 +22,70 @@ public class StopTxEvent extends events.Event {
         return "[" + time + "][StopTxEvent] from node " +  this.n;
     }
 
-    public void run(){
-        super.run();
+    public int run(int currentEventIndex){
+        super.run(currentEventIndex);
         this.n.setSize(WSN.normSize);
         WSN.trasmittingNodes.remove(n);
         Random r = new Random();
 
+        this.n.addTX();             // add txTime to the total packet transmission time
+
+
         if (n.collided){
 
-            System.out.println("Tranmission unsuccessful");
+            if (WSN.print){ System.out.println("Tranmission unsuccessful");};
+            if (WSN.print){ System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");};
+            if (WSN.print){ System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");};
+
+            this.n.addCollision();               // increment collision counter for this node
+            this.n.resetContSlot();              // reset the contention slot counter for this node (this round is finished)
+
+            //       I'm not sure to put here the reset of the contention time slot counter. If a collision occurs the contention fails, thus we start a new contention. Right?
 
             int oldCW = n.getCW();
             int newCW = Math.min(2*(oldCW+1) - 1, WSN.CWmax);
 
             n.setCW(newCW);
 
-
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
             // start new round NOW
-            WSN.eventList.add(new StartListeningEvent(n, time));
+            WSN.eventList.add(new StartListeningEvent(n, time, currentEventIndex));
         }else{
 
-            System.out.println("Tranmission successful");
+            if (WSN.print){ System.out.println("Tranmission successful");};
             n.setCW(WSN.CWmin);
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
+            this.n.storeContSlotNumber();           // save the contention slot counter (this round is successfully finished)
+            this.n.setTotalTime(time);              // save the overall packet transmission time useful for throughput and delay
+
             // start new round after SIFS + tACK
-            WSN.eventList.add(new StartListeningEvent(n, time + WSN.tACK + WSN.SIFS));
+            WSN.eventList.add(new StartListeningEvent(n,time + WSN.tACK + WSN.SIFS, currentEventIndex));
         }
 
         // if the end of this transmission frees up the channel then notify all of the listening nodes
         // and make them start listening for DIFS seconds of silence
+
+        currentEventIndex ++;
+
         if (WSN.trasmittingNodes.isEmpty()){
             WSN.status = WSN.CHANNEL_STATUS.FREE;
 
-            for (Node listening :
-                    WSN.listeningNodes) {
-                WSN.eventList.add(new CheckChannelStatus(listening, time + WSN.DIFS, WSN.DIFS));
+            for (Node listening : WSN.listeningNodes) {
+                WSN.eventList.add(new CheckChannelStatus(listening, time + WSN.DIFS, currentEventIndex, WSN.DIFS));
+                currentEventIndex ++;
+
                 listening.freeChannel = true;
+                listening.resetContSlot();      //  reset the contention slot counter for all the listening nodes (the round is finished)
             }
+            shift = WSN.listeningNodes.size();
+
         }
 
         n.setStatus(WSN.NODE_STATUS.IDLING);
 
-
+        return shift;                    // return to WSN the number of new events to align currentEventIndex
     }
 
     public Packet getPacket(){

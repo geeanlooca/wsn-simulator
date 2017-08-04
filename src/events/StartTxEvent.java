@@ -7,8 +7,8 @@ public class StartTxEvent extends events.Event {
 
     private Packet p;
 
-    public StartTxEvent(Node n, Packet p, double time){
-        super(n, time, WSN.txColor);
+    public StartTxEvent(Node n, Packet p, double time, int  eventIndex){
+        super(n, time, eventIndex, WSN.txColor);
         this.p = p;
     }
 
@@ -18,10 +18,9 @@ public class StartTxEvent extends events.Event {
     }
 
 
-    public void run(){
-        super.run();
+    public int run(int currentEventIndex){
+        super.run(currentEventIndex);
         this.n.setSize(WSN.txSize);
-
 
         if (WSN.trasmittingNodes.isEmpty()){
             // no collision
@@ -29,15 +28,15 @@ public class StartTxEvent extends events.Event {
             n.collided = false;
         }else{
             WSN.trasmittingNodes.add(n);
-            for (Node t :
-                    WSN.trasmittingNodes) {
+            for (Node t : WSN.trasmittingNodes) {
                 t.collided = true;
+
             }
         }
 
         WSN.listeningNodes.remove(n);
         n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
-        WSN.eventList.add(new StopTxEvent(this, time + WSN.txTime));
+        WSN.eventList.add(new StopTxEvent(this, time + WSN.txTime, currentEventIndex));
 
 
         // there's a bug here. if another node's BO counter reaches 0 at the same time and this event is
@@ -46,13 +45,14 @@ public class StartTxEvent extends events.Event {
         // decreased (1 -> 0) and a new transmission will not start
         // SOLUTION: modify the priority queue in order to extract older events if more than one event with the
         // same time is present. In this way we first decrease all the BO counters and then start the transmission
-        // for all those with BO = 0.
-        for (Node listening :
-                WSN.listeningNodes) {
+        // for all those with BO = 0. -> SOLVED
+        for (Node listening : WSN.listeningNodes) {
 
-            System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");
+            if (WSN.print){ System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");}
             listening.freeChannel = false;
+
         }
+        return 0;
     }
 
     public Packet getPacket(){

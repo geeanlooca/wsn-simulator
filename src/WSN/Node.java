@@ -1,7 +1,5 @@
 package WSN;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
-import WSN.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.util.*;
@@ -28,6 +26,19 @@ public class Node {
     public boolean freeChannel;
     public boolean collided;
 
+    private int transCounter;
+    private int collCounter;
+
+    private int slotCounter;
+    private ArrayList<Integer> slotCounterList;
+
+    private double totalTime;
+    private ArrayList<Double> totalTimeList;
+
+    private double startTX;
+    private ArrayList<Double> delayList;
+
+
     public Node(int id, double X, double Y){
         this.X = X;
         this.Y = Y;
@@ -36,10 +47,20 @@ public class Node {
         c = Color.blue;
         e = new Ellipse2D.Double(X, Y, size, size);
         buffer = new LinkedList<Packet>();
+        collided = false;
+
+        transCounter = 0;
+        collCounter = 0;
+        slotCounter = 0;
+        startTX =0;
+        this.slotCounterList = new ArrayList<Integer>();
+        this.totalTimeList = new ArrayList<Double>();
+        this.delayList = new ArrayList<Double>();
 
 
         Random r = new Random();
         CW = WSN.CWmin;
+
         BOcounter = r.nextInt(CW + 1);
     }
 
@@ -120,4 +141,71 @@ public class Node {
     public void setCW(int CW){
         this.CW = CW;
     }
+
+
+    // methods to calculate collision rate
+
+    public void addTransmission(){ this.transCounter++; }
+
+    public void addCollision(){ this.collCounter ++; }
+
+    public int[] getCollisionParam(){
+        int[] param = new int[2];
+        param[0] = this.collCounter;
+        param[1] = this.transCounter;
+
+        return param;
+    }
+
+    // methods to calculate the average number of contention slots
+
+    public void addContSlot(){
+        this.slotCounter ++;
+        if (WSN.print){ System.out.println("Slot Counter: \t"+ this.slotCounter);}
+    }
+
+    public void resetContSlot(){ this.slotCounter=0; }
+
+    public void storeContSlotNumber() {
+        this.slotCounterList.add(this.slotCounter);
+        this.slotCounter = 0;
+        if (WSN.print){ System.out.println("Slot Counter List: \t"+ this.slotCounterList);}
+
+    }
+    public ArrayList<Integer> getSlotCounterList() { return this.slotCounterList; }
+
+
+    // methods to calculate the packet total transmission time useful for throughput and delay
+
+    public void addDIFS(){ this.totalTime += WSN.DIFS; }
+    public void addtSlot(){ this.totalTime += WSN.tSlot; }
+    public void addTX(){ this.totalTime += WSN.txTime; }
+
+    public void startTXTime(double time){
+        if (!collided){ this.startTX = time; }
+    }
+
+    public void setTotalTime( double time){
+        // throughput
+        this.totalTime += WSN.SIFS + WSN.tACK;
+        this.totalTimeList.add(this.totalTime);
+        this.totalTime=0;
+
+        // delay
+        double delay = (time + WSN.SIFS + WSN.tACK) - this.startTX;
+        this.delayList.add(delay);
+        this.startTX = 0;
+        if (WSN.print){ System.out.println("Delay = "+ delay); }
+
+    }
+
+    public ArrayList<Double> getTotalTimeList() { return this.totalTimeList; }
+
+
+    public ArrayList<Double> getDelayList() { return this.delayList; }
+
+
+
+
+
 }
