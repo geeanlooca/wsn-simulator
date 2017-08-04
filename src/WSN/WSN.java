@@ -14,13 +14,13 @@ public class WSN {
 
     // --------- MAIN SIMULATION PARAMETERS ----------//
 
-    final int nodeCount = 10;                       // number of nodes in the network
+    final int nodeCount = 3;                       // number of nodes in the network
     final long sleepDelay = 0;                      // delay used to extract events
-    final double maxIndex = Math.pow(10, 7);        // max available number of events; used to exit the script and print results (use Double.POSITIVE_INFINITY to never exit) 1000000000
-    public static boolean print = false;            // printing extra information useful for debugging
+    final double maxIndex = Math.pow(10, 4);        // max available number of events; used to exit the script and print results (use Double.POSITIVE_INFINITY to never exit) 1000000000
+    public static boolean print = true;            // printing extra information useful for debugging
 
     final static double maxAvailableThroughput = 11;    // Mb/s
-    final static double frameSize = 1500;               // bytes
+    final static double frameSize = 250;               // bytes
 
     // ------------------------------------//
 
@@ -41,8 +41,8 @@ public class WSN {
     public static Color sleepColor = Color.pink;
     public static Color listenColor = Color.cyan;
 
-    //public static double txTime = 200; // microseconds
-    public static double txTime = (frameSize * 8) / (maxAvailableThroughput); // txTime in microsecond
+    public static double txTime = 200; // microseconds
+    //public static double txTime = (frameSize * 8) / (maxAvailableThroughput); // txTime in microsecond
 
     public static double meanInterarrivalTime = 20.0;
     public static double meanBackoff = 200.0;
@@ -136,6 +136,7 @@ public class WSN {
 
             currentEventIndex += shift;
 
+
             if (print){ System.out.println("Number of transmitting nodes: " + trasmittingNodes.size() + "\n\n"); }
 
         }
@@ -143,6 +144,9 @@ public class WSN {
         WSN.printCollisionRate();
         WSN.printSlotNumber();
         WSN.printThroughput();
+        WSN.printDelay();
+        WSN.printDelay2();
+
 
         System.exit(0);
     }
@@ -232,6 +236,51 @@ public class WSN {
         System.out.println("\n Average Throughput = " +allAvThroughput);
 
     }
+
+
+    public static void printDelay(){
+
+        ArrayList<Double> totalDelayList;
+        double allAvDelay =0;
+        double numb = WSN.nodes.size();
+
+        System.out.println("\n Node\t ||\t Av. Delay  ");
+
+        for (Node node : WSN.nodes) {
+
+            totalDelayList = node.getTotalDelayList();
+            double avDelayTime = calculateAverageDouble(totalDelayList);
+            allAvDelay +=  avDelayTime / numb;
+            System.out.println(node.getId() + "\t\t\t\t" +  avDelayTime);
+
+        }
+        System.out.println("\n Average Delay = " +allAvDelay);
+
+    }
+
+
+    public static void printDelay2(){
+
+        ArrayList<Double> delayList;
+        double allAvDelay =0;
+        double numb = WSN.nodes.size();
+
+        System.out.println("\n Node\t ||\t Av. Delay 2  ");
+
+        for (Node node : WSN.nodes) {
+
+            delayList = node.getDelayList();
+            double avDelayTime = calculateAverageDouble(delayList);
+            allAvDelay +=  avDelayTime / numb;
+            System.out.println(node.getId() + "\t\t\t\t" +  avDelayTime);
+
+        }
+        System.out.println("\n Average Delay 2= " +allAvDelay);
+
+    }
+
+
+
 
 
     private static double calculateAverage(List <Integer> list) {

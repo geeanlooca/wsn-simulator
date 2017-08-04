@@ -65,8 +65,15 @@ public class CheckChannelStatus extends Event{
                 }
             }
         }
-        else{ //this.n.remExtra(time);
-             }
+        else {
+            if (duration == WSN.tSlot) {
+                this.n.addtSlot();
+                this.n.remExtra(time);
+            } else if (duration == WSN.DIFS) {
+                this.n.addDIFS();
+                this.n.remExtra(time);
+            }
+        }
 
         return 0;
     }
