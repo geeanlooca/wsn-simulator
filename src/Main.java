@@ -16,6 +16,7 @@ public class Main {
         W = 500;
         H = 500;
 
+        System.out.println("Starting simulation...");
         // N.B. nodeCount variable was moved into WSN class
 
         WSN netw = new WSN(W, H);
