@@ -12,14 +12,15 @@ public class Main {
     public static void main (String [] args){
 
 
-        int W, H;
+        int W, H, topologyID;
         W = 500;
         H = 500;
+        topologyID = 0;
 
         System.out.println("Starting simulation...");
         // N.B. nodeCount variable was moved into WSN class
 
-        WSN netw = new WSN(W, H);
+        WSN netw = new WSN(W, H,topologyID);
         JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.getContentPane().add(new WSNWindow(netw));
@@ -58,6 +59,23 @@ class WSNWindow extends JPanel{
                 Ellipse2D e = n.getEllipse();
                 g2.setPaint(n.getColor());
                 g2.fill(e);
+            }
+
+            int topologyID = network.getTopologyID();
+            double[] networkSize = network.getNetworkSize();
+            double width = networkSize[0];
+            double height = networkSize[1];
+
+            switch (topologyID){
+                case 0:
+                    g2.setPaint(Color.black);
+                    g2.draw(new Ellipse2D.Double(0.05 * width,0.05 * height,0.9 * width, 0.9 * height));
+                    break;
+
+                default:
+                    g2.setPaint(Color.black);
+                    g2.draw(new Rectangle2D.Double(1, 1, width - 2 , height - 3));
+                    break;
             }
 
         repaint();

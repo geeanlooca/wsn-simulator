@@ -9,6 +9,7 @@ import java.util.*;
  */
 public class Node {
 
+    // coordinates, color and size of the node
     private double X, Y;
     private int id;
     private Ellipse2D e;
@@ -19,7 +20,7 @@ public class Node {
     private java.util.Queue<Packet> buffer;
     private java.util.List<Packet> transmittedPackets;
 
-
+    // congestion window and backoff counter
     private int BOcounter;
     private int CW;
 

@@ -15,7 +15,7 @@ public class WSN {
     // --------- MAIN SIMULATION PARAMETERS ----------//
 
     final int nodeCount = 5;                       // number of nodes in the network
-    final long sleepDelay = 0;                      // delay used to extract events
+    final long sleepDelay = 200;                      // delay used to extract events
     final double maxIndex = Math.pow(10, 6);        // max available number of events; used to exit the script and print results (use Double.POSITIVE_INFINITY to never exit) 1000000000
     public static boolean print = false;            // printing extra information useful for debugging
 
@@ -62,6 +62,9 @@ public class WSN {
 
     public static int currentEventIndex;
 
+    private int topologyID;
+    private double width, height;
+
     public static double getPoisson(double mean) {
         Random r = new Random();
         double L = Math.exp(-mean);
@@ -80,10 +83,15 @@ public class WSN {
     public static List<Node> trasmittingNodes;
     public static List<Node> listeningNodes;
 
-    public WSN(double width, double height){
+    public WSN(double width, double height, int topologyID){
 
         Random r = new Random();
         this.nodes = new LinkedList<>();
+
+        this.width = width;
+        this.height = height;
+
+        this.topologyID = topologyID;
 
         Comparator<events.Event> comparator = new EventComparator();
         WSN.eventList = new PriorityQueue<>(comparator);
@@ -95,8 +103,16 @@ public class WSN {
 
 
         for (int i = 0; i < nodeCount; i++) {
-            double X = width * r.nextDouble();
-            double Y = height * r.nextDouble();
+
+            /**
+             * changed by William on 14/08/2017.
+             * default topology and circular topology added
+             */
+            double[] coord = nodePosition();
+
+            double X = coord[0];
+            double Y = coord[1];
+
             Node n = new Node(i,X,Y);
             nodes.add(n);
 
@@ -107,8 +123,40 @@ public class WSN {
         }
     }
 
+    private double[] nodePosition()
+    {
+        Random r = new Random();
+        double[] coord = new double[2];
+
+        double maxRadius = 0.5 * Math.round(0.9 * Math.min(width,height));
+
+        switch (this.topologyID){
+
+            // circular cell
+            case 0:
+                double a = maxRadius * Math.sqrt(r.nextDouble());
+                double theta = 2 * Math.PI * r.nextDouble();
+                coord[0] = width/2 + a * Math.cos(theta);
+                coord[1] = height/2 + a * Math.sin(theta);
+                break;
+
+            default:
+                coord[0] = width * r.nextDouble();
+                coord[1] = height * r.nextDouble();
+                break;
+        }
+
+        return coord;
+    }
     public List<Node> getNodes(){
         return nodes;
+    }
+
+    public int getTopologyID() { return topologyID; };
+
+    public double[] getNetworkSize() {
+        double[] size = {width, height};
+        return size;
     }
 
     public int nodeCount(){
