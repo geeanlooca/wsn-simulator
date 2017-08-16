@@ -15,7 +15,7 @@ for i = 1 : length(U)
     
     J = costobj(p, u);
     
-    handles(i) = plot(p, J, 'k','linewidth',1, 'DisplayName', sprintf("$u=%d$", u));
+    handles(i) = plot(p, J, 'k','linewidth',1, 'DisplayName', sprintf('$u=%d$', u));
     plot(p_opt, J_opt, '-r*','markersize', 12);
     %plot([0 1], [J_opt J_opt], '-g');
 end

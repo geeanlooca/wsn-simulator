@@ -14,8 +14,8 @@ public class WSN {
 
     // --------- MAIN SIMULATION PARAMETERS ----------//
 
-    final int nodeCount = 50;                       // number of nodes in the network
-    final long sleepDelay = 200;                      // delay used to extract events
+    final int nodeCount = 5;                       // number of nodes in the network
+    final long sleepDelay = 0;                      // delay used to extract events
     final double maxIndex = Math.pow(10, 6);        // max available number of events; used to exit the script and print results (use Double.POSITIVE_INFINITY to never exit) 1000000000
     public static boolean print = false;            // printing extra information useful for debugging
 
@@ -49,7 +49,7 @@ public class WSN {
     public static double sleepTime = 50.0;
 
     public static double normSize = 10;
-    public static double txSize = 15;
+    public static double txSize = 20;
 
     public static double SIFS = 10;
     public static double DIFS = 50;
@@ -128,34 +128,18 @@ public class WSN {
         Random r = new Random();
         double[] coord = new double[2];
 
-        double a, theta;
-        double maxRadius = 0.45 * Math.min(width,height);
+        double maxRadius = 0.5 * Math.round(0.9 * Math.min(width,height));
 
         switch (this.topologyID){
 
             // circular cell
             case 0:
-                a = maxRadius * Math.sqrt(r.nextDouble());
-                theta = 2 * Math.PI * r.nextDouble();
+                double a = maxRadius * Math.sqrt(r.nextDouble());
+                double theta = 2 * Math.PI * r.nextDouble();
                 coord[0] = width/2 + a * Math.cos(theta);
                 coord[1] = height/2 + a * Math.sin(theta);
                 break;
 
-            // hexagonal cell
-            case 1:
-                double c = Math.cos(Math.PI/6);
-
-                do {
-                    a = Math.sqrt(r.nextDouble());
-                    theta = - Math.PI/6 + Math.PI/3 * r.nextDouble();
-                }while((a * Math.cos(theta)) > c);
-
-                a = a * maxRadius;
-                theta = theta + Math.PI/3 * r.nextInt(6);
-
-                coord[0] = width/2 + a * Math.cos(theta);
-                coord[1] = height/2 + a * Math.sin(theta);
-                break;
             default:
                 coord[0] = width * r.nextDouble();
                 coord[1] = height * r.nextDouble();
@@ -274,7 +258,7 @@ public class WSN {
 
             System.out.println(node.getId() + "\t\t\t\t" + avSlotNumber);
         }
-        System.out.println("\n Total Average Number of Contention Slot = " +allAverageSlotNumber);
+        System.out.println("\n Total Average Number of Contention Slots = " +allAverageSlotNumber);
 
     }
 
@@ -322,9 +306,6 @@ public class WSN {
         System.out.println("\n Total Average Delay = " +allAvDelay+" [us]");
 
     }
-
-
-
 
 
     private static double calculateAverage(List <Integer> list) {

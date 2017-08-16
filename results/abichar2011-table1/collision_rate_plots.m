@@ -38,7 +38,7 @@ hold on;
 for n = 1 : length(N)
     plot(K, collision_rate(:, n), styles{n}, 'linewidth', 1, ...
         'MarkerFaceColor', marks{n}, 'MarkerSize', 8, ...
-        'DisplayName', sprintf("$n = %d$", N(n)));
+        'DisplayName', sprintf('$n = %d$', N(n)));
 end
 hold off;
 
