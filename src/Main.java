@@ -15,7 +15,7 @@ public class Main {
         int W, H, topologyID;
         W = 500;
         H = 500;
-        topologyID = 0;
+        topologyID = 1;
 
         System.out.println("Starting simulation...");
         // N.B. nodeCount variable was moved into WSN class
@@ -66,16 +66,37 @@ class WSNWindow extends JPanel{
             double width = networkSize[0];
             double height = networkSize[1];
 
+            g2.setPaint(Color.black);
+
             switch (topologyID){
+                // circular cell
                 case 0:
                     g2.setPaint(Color.black);
                     g2.draw(new Ellipse2D.Double(0.05 * width,0.05 * height,0.9 * width, 0.9 * height));
+                    break;
+
+                // hexagonal cell
+                case 1:
+                    Path2D hexagon = new Path2D.Double();
+                    Point2D center = new Point2D.Double(width/2, height/2);
+                    double r = 0.45 * Math.min(height, width);
+
+                    // initial point
+                    hexagon.moveTo(center.getX() + r * Math.cos(Math.PI/6), center.getY() + r * Math.sin(Math.PI/6));
+
+                    for(int i=1; i<6; i++) {
+                        hexagon.lineTo(center.getX() + r * Math.cos((2*i+1)*Math.PI/6), center.getY() + r * Math.sin((2*i+1)*Math.PI/6));
+                    }
+                    hexagon.closePath();
+
+                    g2.draw(hexagon);
                     break;
 
                 default:
                     g2.setPaint(Color.black);
                     g2.draw(new Rectangle2D.Double(1, 1, width - 2 , height - 3));
                     break;
+
             }
 
         repaint();

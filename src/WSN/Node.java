@@ -46,7 +46,7 @@ public class Node {
         this.id = id;
         this.size = 10;
         c = Color.blue;
-        e = new Ellipse2D.Double(X, Y, size, size);
+        e = new Ellipse2D.Double(X-size/2, Y-size/2, size, size);
         buffer = new LinkedList<Packet>();
         collided = false;
 
@@ -99,7 +99,7 @@ public class Node {
 
     public void setSize(double size){
         this.size = size;
-        e = new Ellipse2D.Double(X, Y, size, size);
+        e = new Ellipse2D.Double(X-size/2, Y-size/2, size, size);
     }
 
     public void enqueuePacket(Packet p){
