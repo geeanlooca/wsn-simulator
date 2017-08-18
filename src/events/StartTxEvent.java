@@ -7,8 +7,8 @@ public class StartTxEvent extends events.Event {
 
     private Packet p;
 
-    public StartTxEvent(Node n, Packet p, double time, int  eventIndex){
-        super(n, time, eventIndex, WSN.txColor);
+    public StartTxEvent(Node n, Packet p, double time){
+        super(n, time, WSN.txColor);
         this.p = p;
     }
 
@@ -18,8 +18,11 @@ public class StartTxEvent extends events.Event {
     }
 
 
-    public int run(int currentEventIndex){
-        super.run(currentEventIndex);
+    public void run(){
+        super.run();
+
+        Scheduler scheduler = Scheduler.getInstance();
+
         this.n.setSize(WSN.txSize);
 
         if (WSN.trasmittingNodes.isEmpty()){
@@ -36,7 +39,7 @@ public class StartTxEvent extends events.Event {
 
         WSN.listeningNodes.remove(n);
         n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
-        WSN.eventList.add(new StopTxEvent(this, time + WSN.txTime, currentEventIndex));
+        scheduler.schedule(new StopTxEvent(this, time + WSN.txTime));
 
 
         // there's a bug here. if another node's BO counter reaches 0 at the same time and this event is
@@ -48,11 +51,10 @@ public class StartTxEvent extends events.Event {
         // for all those with BO = 0. -> SOLVED
         for (Node listening : WSN.listeningNodes) {
 
-            if (WSN.print){ System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");}
+            if (WSN.debug){ System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");}
             listening.freeChannel = false;
 
         }
-        return 0;
     }
 
     public Packet getPacket(){

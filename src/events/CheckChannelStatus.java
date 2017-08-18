@@ -3,7 +3,7 @@ package events;
 import WSN.Node;
 import WSN.WSN;
 import WSN.Packet;
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
+import WSN.Scheduler;
 
 /**
  * Created by gianluca on 28/07/17.
@@ -13,16 +13,19 @@ public class CheckChannelStatus extends Event{
 
     private double duration;
 
-    public CheckChannelStatus(Node n, double time, int eventIndex, double duration){
-        super(n, time, eventIndex, WSN.listenColor);
+    public CheckChannelStatus(Node n, double time, double duration){
+        super(n, time, WSN.listenColor);
         this.duration = duration;
     }
 
-    public int run(int currentEventIndex){
-        super.run(currentEventIndex);
+    public void run(){
+        super.run();
+
+        Scheduler scheduler = Scheduler.getInstance();
+
 
         if (n.freeChannel){
-            if (WSN.print){ System.out.println("Channel has been free for: " + duration);}
+            if (WSN.debug){ System.out.println("Channel has been free for: " + duration);}
             if (duration == WSN.tSlot){
 
                 this.n.addContSlot();       // increment contention slot counter
@@ -30,21 +33,21 @@ public class CheckChannelStatus extends Event{
 
                 // decrease BO counter
                 int bo = n.decreaseCounter();
-                if (WSN.print){ System.out.println("BO Counter decreased: " + bo);};
+                if (WSN.debug){ System.out.println("BO Counter decreased: " + bo);};
 
                 if (bo > 0){
-                    WSN.eventList.add(new CheckChannelStatus(n,time + WSN.tSlot, currentEventIndex, WSN.tSlot));
+                    scheduler.schedule(new CheckChannelStatus(n,time + WSN.tSlot, WSN.tSlot));
 
 
                 }else{
                     // transmit
-                    if (WSN.print){ System.out.println("-> This node will now start transmitting.");};
+                    if (WSN.debug){ System.out.println("-> This node will now start transmitting.");};
 
                     n.addTransmission();    // increment transmissions counter
 
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
-                    WSN.eventList.add(new StartTxEvent(n, p, time, currentEventIndex));
+                    scheduler.schedule(new StartTxEvent(n, p, time));
                 }
             }
             else if (duration == WSN.DIFS){
@@ -53,21 +56,19 @@ public class CheckChannelStatus extends Event{
 
                 // restart BO counter
                 if (n.getBOcounter() == 0){
-                    if (WSN.print){ System.out.println("-> This node will now start transmitting.");};
+                    if (WSN.debug){ System.out.println("-> This node will now start transmitting.");};
                     // transmit
 
                     n.addTransmission();    // increment transmissions counter
 
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
-                    WSN.eventList.add(new StartTxEvent(n, p, time, currentEventIndex));
+                    scheduler.schedule(new StartTxEvent(n, p, time));
                 }else {
-                    WSN.eventList.add(new CheckChannelStatus(n, time + WSN.tSlot, currentEventIndex, WSN.tSlot));
+                    scheduler.schedule(new CheckChannelStatus(n, time + WSN.tSlot, WSN.tSlot));
                 }
             }
         }
-
-        return 0;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package WSN;
 
 import events.*;
+import events.Event;
 
 import java.awt.*;
 import java.util.*;
@@ -14,17 +15,15 @@ public class WSN {
 
     // --------- MAIN SIMULATION PARAMETERS ----------//
 
-    final int nodeCount = 50;                       // number of nodes in the network
-    final long sleepDelay = 200;                      // delay used to extract events
-    final double maxIndex = Math.pow(10, 6);        // max available number of events; used to exit the script and print results (use Double.POSITIVE_INFINITY to never exit) 1000000000
-    public static boolean print = false;            // printing extra information useful for debugging
+    private int nodeCount;                       // number of nodes in the network
+    private long sleepDelay = 0;                      // delay used to extract events
+    final double maxIndex = Math.pow(10, 6);        // max available number of events; used to exit the script and debug results (use Double.POSITIVE_INFINITY to never exit) 1000000000
+    public static boolean debug = true;            // printing extra information useful for debugging
 
     final static double maxAvailableThroughput = 11;    // Mb/s
     final static double frameSize = 250;               // bytes
 
     // ------------------------------------//
-
-
 
     public enum NODE_STATUS {
       SLEEPING, TRANSMITTING, IDLING, RECEIVING, LISTENING
@@ -60,8 +59,6 @@ public class WSN {
     public static int CWmax = 1023;
     public static double tPLC = 192;
 
-    public static int currentEventIndex;
-
     private int topologyID;
     private double width, height;
 
@@ -77,32 +74,30 @@ public class WSN {
         return k - 1;
 
     }
-
     private static List<Node> nodes;
-    public static Queue<events.Event> eventList;
+
     public static List<Node> trasmittingNodes;
     public static List<Node> listeningNodes;
 
-    public WSN(double width, double height, int topologyID){
+    public WSN(int nodeCount, double width, double height, int topologyID){
 
         Random r = new Random();
-        this.nodes = new LinkedList<>();
+        nodes = new LinkedList<>();
+        this.nodeCount = nodeCount;
 
         this.width = width;
         this.height = height;
 
         this.topologyID = topologyID;
 
-        Comparator<events.Event> comparator = new EventComparator();
-        WSN.eventList = new PriorityQueue<>(comparator);
+
+        Scheduler scheduler = Scheduler.getInstance();
 
         WSN.trasmittingNodes = new LinkedList<>();
         WSN.listeningNodes = new LinkedList<>();
         WSN.status = CHANNEL_STATUS.FREE;
-        WSN.currentEventIndex = 0;
 
-
-        for (int i = 0; i < nodeCount; i++) {
+        for (int i = 0; i < this.nodeCount; i++) {
 
             /**
              * changed by William on 14/08/2017.
@@ -116,10 +111,7 @@ public class WSN {
             Node n = new Node(i,X,Y);
             nodes.add(n);
 
-            currentEventIndex ++;
-            //WSN.printEventIndex();
-
-            eventList.add(new StartListeningEvent(n,0, currentEventIndex));
+            scheduler.schedule(new StartListeningEvent(n,0));
         }
     }
 
@@ -168,6 +160,10 @@ public class WSN {
         return nodes;
     }
 
+    public int getNodeCount(){
+        return nodes.size();
+    }
+
     public int getTopologyID() { return topologyID; };
 
     public double[] getNetworkSize() {
@@ -176,14 +172,27 @@ public class WSN {
     }
 
     public int nodeCount(){
-        return this.nodes.size();
+        return WSN.nodes.size();
+    }
+
+    public void setAnimationDelay(int ms){
+        this.sleepDelay = ms;
+    }
+
+    public void debugging(boolean enable){
+        debug = enable;
     }
 
     public void run(){
+        this.run(Double.POSITIVE_INFINITY);
+    }
+    public void run(double maxTime){
         Random r = new Random();
 
-        while ((!eventList.isEmpty()) && (currentEventIndex < maxIndex)){
+        Scheduler scheduler = Scheduler.getInstance();
+        double currentTime = 0;
 
+        while ((!scheduler.isEmpty()) && (currentTime < maxTime)){
             try
             {
                 Thread.sleep(sleepDelay);
@@ -193,15 +202,19 @@ public class WSN {
                 Thread.currentThread().interrupt();
             }
 
-            currentEventIndex ++;
 
-            events.Event e = eventList.remove();
-            int shift = e.run(WSN.currentEventIndex);
+            Event e = scheduler.remove();
+            currentTime += e.getTime();
 
-            currentEventIndex += shift;
+            if (debug){
+                System.out.println(e);
+                //System.out.println("Number of transmitting nodes: " + trasmittingNodes.size());
+            }
+            e.run();
 
-
-            if (print){ System.out.println("Number of transmitting nodes: " + trasmittingNodes.size() + "\n\n"); }
+            if (debug){
+                System.out.println("\n");
+            };
 
         }
 
@@ -213,33 +226,6 @@ public class WSN {
 
         System.exit(0);
     }
-
-    public class EventComparator implements Comparator<events.Event>
-    {
-        @Override
-        public int compare(events.Event a, events.Event b) {
-
-            if (a.getTime() < b.getTime()) {
-                return -1;
-            }
-            else if (a.getTime() > b.getTime()) {
-                return 1;
-            }
-            else {
-                if (a.getEventIndex() < b.getEventIndex()) {
-                    return -1;
-                } else if (a.getEventIndex() > b.getEventIndex()) {
-                    return 1;
-                }
-                return 0;
-            }
-        }
-    }
-
-    public static void printEventIndex(){
-        System.out.println("Current Event Index: " + WSN.currentEventIndex);
-    }
-
 
     public static void printCollisionRate(){
 
@@ -268,7 +254,7 @@ public class WSN {
 
         for (Node node : WSN.nodes) {
             slotNumberList = node.getSlotCounterList();
-            if(print){System.out.println(node.getId() + "\t\t" + slotNumberList.toString());}
+            if(debug){System.out.println(node.getId() + "\t\t" + slotNumberList.toString());}
             double avSlotNumber = calculateAverage(slotNumberList);
             allAverageSlotNumber +=  avSlotNumber / numb;
 
@@ -300,9 +286,6 @@ public class WSN {
 
     }
 
-
-
-
     public static void printDelay(){
 
         ArrayList<Double> delayList;
@@ -322,10 +305,6 @@ public class WSN {
         System.out.println("\n Total Average Delay = " +allAvDelay+" [us]");
 
     }
-
-
-
-
 
     private static double calculateAverage(List <Integer> list) {
         Integer sum = 0;

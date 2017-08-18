@@ -2,7 +2,6 @@ import WSN.*;
 
 import java.awt.*;
 import java.awt.geom.*;
-import java.util.PriorityQueue;
 import javax.swing.*;
 
 /**
@@ -17,10 +16,20 @@ public class Main {
         H = 500;
         topologyID = 1;
 
-        System.out.println("Starting simulation...");
-        // N.B. nodeCount variable was moved into WSN class
+        double seconds = 1e6;
+        double minutes = seconds * 60;
+        double simulationTime =  60 * minutes;
 
-        WSN netw = new WSN(W, H,topologyID);
+
+        System.out.println("Starting simulation...");
+
+        WSN netw = new WSN(15, W, H,topologyID);
+        netw.debugging(false);
+        netw.setAnimationDelay(200);
+
+
+
+
         JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.getContentPane().add(new WSNWindow(netw));
@@ -28,9 +37,8 @@ public class Main {
         f.setLocation(200,200);
         f.setVisible(true);
 
-        System.out.println("end.");
 
-        netw.run();
+        netw.run(simulationTime);
     }
 }
 
