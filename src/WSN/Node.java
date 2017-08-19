@@ -63,6 +63,7 @@ public class Node {
         CW = WSN.CWmin;
 
         BOcounter = r.nextInt(CW + 1);
+        //BOcounter = 3;
     }
 
     public double getX(){
@@ -162,7 +163,7 @@ public class Node {
 
     public void addContSlot(){
         this.slotCounter ++;
-        if (WSN.print){ System.out.println("Slot Counter: \t"+ this.slotCounter);}
+        if (WSN.debug){ System.out.println("Slot Counter: \t"+ this.slotCounter);}
     }
 
     public void resetContSlot(){ this.slotCounter=0; }
@@ -170,7 +171,7 @@ public class Node {
     public void storeContSlotNumber() {
         this.slotCounterList.add(this.slotCounter);
         this.slotCounter = 0;
-        if (WSN.print){ System.out.println("Slot Counter List: \t"+ this.slotCounterList);}
+        if (WSN.debug){ System.out.println("Slot Counter List: \t"+ this.slotCounterList);}
 
     }
     public ArrayList<Integer> getSlotCounterList() { return this.slotCounterList; }
@@ -196,17 +197,11 @@ public class Node {
         double delay = (time + WSN.SIFS + WSN.tACK) - this.startTX;
         this.delayList.add(delay);
         this.startTX = 0;
-        if (WSN.print){ System.out.println("Delay = "+ delay); }
+        if (WSN.debug){ System.out.println("Delay = "+ delay); }
 
     }
 
     public ArrayList<Double> getTotalTimeList() { return this.totalTimeList; }
-
-
     public ArrayList<Double> getDelayList() { return this.delayList; }
-
-
-
-
 
 }
