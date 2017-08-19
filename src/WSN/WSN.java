@@ -21,8 +21,9 @@ public class WSN {
     public static boolean debug = true;            // printing extra information useful for debugging
 
     final static double maxAvailableThroughput = 11;    // Mb/s
-    final static double frameSize = 250;               // bytes
+    final static double frameSize = 1500;               // bytes
 
+    private int windowSize = 1000;                 //  window size used in Fairness calculation
     // ------------------------------------//
 
     public enum NODE_STATUS {
@@ -79,6 +80,9 @@ public class WSN {
     public static List<Node> trasmittingNodes;
     public static List<Node> listeningNodes;
 
+    public static ArrayList<Node> nodeTrace;
+
+
     public WSN(int nodeCount, double width, double height, int topologyID){
 
         Random r = new Random();
@@ -96,6 +100,8 @@ public class WSN {
         WSN.trasmittingNodes = new LinkedList<>();
         WSN.listeningNodes = new LinkedList<>();
         WSN.status = CHANNEL_STATUS.FREE;
+
+        WSN.nodeTrace = new ArrayList<>();
 
         for (int i = 0; i < this.nodeCount; i++) {
 
@@ -222,7 +228,7 @@ public class WSN {
         WSN.printSlotNumber();
         WSN.printThroughput();
         WSN.printDelay();
-
+        WSN.printFairness(windowSize);
 
         System.exit(0);
     }
@@ -232,7 +238,6 @@ public class WSN {
         double collRate = 0;
         double avCollRate =0;
         double numb = WSN.nodes.size();
-
         System.out.println("\n Node ||  Coll/Transm  ||  Collision Rate [%] ");
 
         for (Node node : WSN.nodes) {
@@ -241,7 +246,6 @@ public class WSN {
             System.out.println(node.getId() + "\t\t\t" + node.getCollisionParam()[0] + " / " + node.getCollisionParam()[1] + "\t\t\t\t"+ collRate);
         }
         System.out.println("\n Average Collision Rate = " +avCollRate+" [%]");
-
     }
 
     public static void printSlotNumber(){
@@ -249,7 +253,6 @@ public class WSN {
         ArrayList<Integer> slotNumberList;
         double allAverageSlotNumber =0;
         double numb = WSN.nodes.size();
-
         System.out.println("\n Node ||  Average # of Contention Slots to successful transmit ");
 
         for (Node node : WSN.nodes) {
@@ -261,7 +264,6 @@ public class WSN {
             System.out.println(node.getId() + "\t\t\t\t" + avSlotNumber);
         }
         System.out.println("\n Total Average Number of Contention Slot = " +allAverageSlotNumber);
-
     }
 
     public static void printThroughput(){
@@ -269,21 +271,17 @@ public class WSN {
         ArrayList<Double> totalTimeList;
         double allAvThroughput =0;
         double numb = WSN.nodes.size();
-
         System.out.println("\n Node ||  Av. Total Time to success. delivery || Av. Throughput  ");
 
         for (Node node : WSN.nodes) {
-
             totalTimeList = node.getTotalTimeList();
             //System.out.println(node.getId() + "\t\t" + totalTimeList.toString());
             double avTotalTime = calculateAverageDouble(totalTimeList);
             double avThroughput = (WSN.DIFS + WSN.txTime + WSN.tACK + WSN.SIFS)/ avTotalTime;
             allAvThroughput +=  avThroughput / numb;
             System.out.println(node.getId() + "\t\t\t\t" +  avTotalTime+ "\t\t\t\t" +  avThroughput);
-
         }
         System.out.println("\n Total Average Throughput = " +allAvThroughput);
-
     }
 
     public static void printDelay(){
@@ -305,6 +303,71 @@ public class WSN {
         System.out.println("\n Total Average Delay = " +allAvDelay+" [us]");
 
     }
+
+
+    private static void printFairness(int windowSize){
+        // fairness calculation with Jain's fairness index and sliding windows
+
+        // -- -- -- --
+        boolean debugFairness = false;      // if true more useful information are displayed
+        // -- -- -- --
+        double[] windowResults = new double[nodes.size()];
+        List<Boolean>  tempWindow = new ArrayList<Boolean>();
+        double[] windowsFairness =  new double[0];
+        try {
+            windowsFairness = new double[WSN.nodeTrace.size() - windowSize + 1];
+        }
+        catch (Exception e){
+            System.out.println("\n"+ e + "\nERROR!! More computation time is needed with windowSize = " + windowSize + "\nSystem exit... ");
+            System.exit(1);
+        }
+        if(debugFairness){ System.out.println("\n \n Node Trace "); }
+        for (Node node : WSN.nodes) { node.setListIterator(); }
+
+        for (int i=0; i<WSN.nodeTrace.size(); i++  ) {
+            if(debugFairness){  System.out.println("\n[i= " + i+"]"); }
+
+            Node node = WSN.nodeTrace.get(i);
+            boolean res = node.getLog();
+            int id = node.getId();
+            if(debugFairness){ System.out.println("Node "+id + "\ttransmission result: " + res);}
+            tempWindow.add(res);
+
+            if (res) {
+                windowResults[id] += (double) 1 / (double) windowSize;
+                if(debugFairness){ System.out.println("tempResult  " + windowResults[id]); }
+            }
+            if (((i + 1) == windowSize) || ((i + 1) > windowSize)){
+                double num = 0;
+                for (double entry : windowResults) {
+                    num += entry;
+                }
+                double den = 0;
+                for (double entry : windowResults) {
+                    den += Math.pow(entry, 2);
+                }
+                windowsFairness[i+1 - windowSize] = Math.pow(num, 2) / (den * nodes.size());            ///!!!
+
+                if(debugFairness){ System.out.println("Fairness of window " + (i+1 - windowSize)+":\t" + windowsFairness[(i + 1) - windowSize]); }
+
+                Node headNode = WSN.nodeTrace.get(i+1 - windowSize);
+                int headId = headNode.getId();
+                if (tempWindow.remove(0)) {
+                    windowResults[headId] -= (double) 1 / (double) windowSize;
+                }
+                if(debugFairness){  System.out.println(tempWindow); }
+            }
+        }
+        double sum = 0;
+        for (double entry : windowsFairness) {
+            sum += entry;
+            if(debugFairness){  System.out.println(entry); }
+        }
+        System.out.println("\n \nAverage Fairness [trace size: "+WSN.nodeTrace.size()+"]: "+sum/(windowsFairness.length)+"\n");
+    }
+
+
+
 
     private static double calculateAverage(List <Integer> list) {
         Integer sum = 0;

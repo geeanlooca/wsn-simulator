@@ -16,7 +16,7 @@ public class Main {
         H = 500;
         topologyID = 1;
 
-        double seconds = 1e6;
+        double seconds = 1e7;
         double minutes = seconds * 60;
         double simulationTime =  60 * minutes;
 
@@ -25,7 +25,7 @@ public class Main {
 
         WSN netw = new WSN(15, W, H,topologyID);
         netw.debugging(false);
-        netw.setAnimationDelay(200);
+        netw.setAnimationDelay(0);
 
 
 

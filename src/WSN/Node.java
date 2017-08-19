@@ -40,6 +40,10 @@ public class Node {
     private ArrayList<Double> delayList;
 
 
+    private ArrayList<Boolean> nodeLog;
+    private ListIterator<Boolean> iterator;
+
+
     public Node(int id, double X, double Y){
         this.X = X;
         this.Y = Y;
@@ -57,6 +61,7 @@ public class Node {
         this.slotCounterList = new ArrayList<Integer>();
         this.totalTimeList = new ArrayList<Double>();
         this.delayList = new ArrayList<Double>();
+        this.nodeLog = new ArrayList<Boolean>();
 
 
         Random r = new Random();
@@ -145,21 +150,37 @@ public class Node {
     }
 
 
-    // methods to calculate collision rate
+    // methods to calculate Collision Rate and Fairness
 
-    public void addTransmission(){ this.transCounter++; }
+    public void addTransmission(){
+        this.transCounter++;
+        this.nodeLog.add(true);
+    }
 
-    public void addCollision(){ this.collCounter ++; }
+    public void addCollision(){
+        this.collCounter ++;
+        this.nodeLog.set(this.nodeLog.size()-1, false);
+    }
 
     public int[] getCollisionParam(){
         int[] param = new int[2];
         param[0] = this.collCounter;
         param[1] = this.transCounter;
-
         return param;
     }
 
-    // methods to calculate the average number of contention slots
+    public void setListIterator(){
+        this.iterator = this.nodeLog.listIterator();
+    }
+
+    public Boolean getLog() {
+        return this.iterator.next();
+    }
+
+
+
+
+    // methods to calculate the Average Number of Contention Slots
 
     public void addContSlot(){
         this.slotCounter ++;
@@ -177,7 +198,7 @@ public class Node {
     public ArrayList<Integer> getSlotCounterList() { return this.slotCounterList; }
 
 
-    // methods to calculate the packet total transmission time useful for throughput and delay
+    // methods to calculate the packet total transmission time useful for Throughput and Delay
 
     public void addDIFS(){ this.totalTime += WSN.DIFS; }
     public void addtSlot(){ this.totalTime += WSN.tSlot; }

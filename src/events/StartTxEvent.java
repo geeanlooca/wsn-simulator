@@ -25,6 +25,8 @@ public class StartTxEvent extends events.Event {
 
         this.n.setSize(WSN.txSize);
 
+
+
         if (WSN.trasmittingNodes.isEmpty()){
             // no collision
             WSN.trasmittingNodes.add(n);

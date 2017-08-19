@@ -44,6 +44,7 @@ public class CheckChannelStatus extends Event{
                     if (WSN.debug){ System.out.println("-> This node will now start transmitting.");};
 
                     n.addTransmission();    // increment transmissions counter
+                    WSN.nodeTrace.add(this.n);
 
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
@@ -60,6 +61,8 @@ public class CheckChannelStatus extends Event{
                     // transmit
 
                     n.addTransmission();    // increment transmissions counter
+                    WSN.nodeTrace.add(this.n);
+
 
                     WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
