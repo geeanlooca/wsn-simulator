@@ -127,7 +127,7 @@ public class WSN {
         double[] coord = new double[2];
 
         double a, theta;
-        double maxRadius = 0.45 * Math.min(width,height);
+        double maxRadius = 0.5 * Math.min(width,height);
 
         switch (this.topologyID){
 

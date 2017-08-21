@@ -10,10 +10,10 @@ import javax.swing.*;
 public class Main {
     public static void main (String [] args){
 
-
-        int W, H, topologyID;
-        W = 500;
-        H = 500;
+        // network size and topology number
+        int netW, netH, topologyID;
+        netW = 1800;
+        netH = 1800;
         topologyID = 1;
 
         double seconds = 1e7;
@@ -23,17 +23,18 @@ public class Main {
 
         System.out.println("Starting simulation...");
 
-        WSN netw = new WSN(15, W, H,topologyID);
+        WSN netw = new WSN(15, netW, netH,topologyID);
         netw.debugging(false);
-        netw.setAnimationDelay(0);
+        netw.setAnimationDelay(50);
 
 
-
-
+        // panel to visualize the network nodes
+        int panelW = 500;
+        int panelH = 530;
         JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.getContentPane().add(new WSNWindow(netw));
-        f.setSize(W,H);
+        f.setSize(panelW,panelH);
         f.setLocation(200,200);
         f.setVisible(true);
 
@@ -61,18 +62,33 @@ class WSNWindow extends JPanel{
 
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+            // find the panel dimension
+            double panelH = getHeight();
+            double panelW = getWidth();
+
+            int topologyID = network.getTopologyID();
+            double[] networkSize = network.getNetworkSize();
+            double netW = networkSize[0];
+            double netH = networkSize[1];
+
+            // scaling factors only to draw the nodes
+            double scaleX = 0.9 * panelW/netW;
+            double scaleY = 0.9 * panelH/netH;
+
+            double nodeX, nodeY, nodeSize;
             for (int i = 0; i < network.nodeCount(); i++) {
 
                 Node n = network.getNodes().get(i);
                 Ellipse2D e = n.getEllipse();
+
+                nodeX = panelW/2 + (e.getX() - netW/2) * scaleX;
+                nodeY = panelH/2 + (e.getY() - netH/2) * scaleY;
+                nodeSize = n.getSize();
+
+                e = new Ellipse2D.Double(nodeX,nodeY,nodeSize,nodeSize);
                 g2.setPaint(n.getColor());
                 g2.fill(e);
             }
-
-            int topologyID = network.getTopologyID();
-            double[] networkSize = network.getNetworkSize();
-            double width = networkSize[0];
-            double height = networkSize[1];
 
             g2.setPaint(Color.black);
 
@@ -80,14 +96,14 @@ class WSNWindow extends JPanel{
                 // circular cell
                 case 0:
                     g2.setPaint(Color.black);
-                    g2.draw(new Ellipse2D.Double(0.05 * width,0.05 * height,0.9 * width, 0.9 * height));
+                    g2.draw(new Ellipse2D.Double(0.05 * panelW,0.05 * panelH,0.9 * panelW, 0.9 * panelH));
                     break;
 
                 // hexagonal cell
                 case 1:
                     Path2D hexagon = new Path2D.Double();
-                    Point2D center = new Point2D.Double(width/2, height/2);
-                    double r = 0.45 * Math.min(height, width);
+                    Point2D center = new Point2D.Double(panelW/2, panelH/2);
+                    double r = 0.48 * Math.min(panelH, panelW);
 
                     // initial point
                     hexagon.moveTo(center.getX() + r * Math.cos(Math.PI/6), center.getY() + r * Math.sin(Math.PI/6));
@@ -102,7 +118,7 @@ class WSNWindow extends JPanel{
 
                 default:
                     g2.setPaint(Color.black);
-                    g2.draw(new Rectangle2D.Double(1, 1, width - 2 , height - 3));
+                    g2.draw(new Rectangle2D.Double(1, 1,panelW - 2 , panelH - 3));
                     break;
 
             }
