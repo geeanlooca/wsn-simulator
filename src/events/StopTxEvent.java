@@ -61,7 +61,7 @@ public class StopTxEvent extends events.Event {
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
             this.n.storeContSlotNumber();           // save the contention slot counter (this round is successfully finished)
-            this.n.setTotalTime(time);              // save the overall packet transmission time useful for throughput and delay
+            this.n.setTotalTime(time);              // save the overall packet transmission time (useful to throughput and delay)
 
             // start new round after SIFS + tACK
             scheduler.schedule(new StartListeningEvent(n,time + WSN.tACK + WSN.SIFS));

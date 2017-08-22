@@ -193,6 +193,9 @@ public class WSN {
         this.run(Double.POSITIVE_INFINITY);
     }
     public void run(double maxTime){
+
+        setNeighborsList();
+
         Random r = new Random();
 
         Scheduler scheduler = Scheduler.getInstance();
@@ -232,6 +235,37 @@ public class WSN {
 
         System.exit(0);
     }
+
+    public void setNeighborsList(){
+
+         double PrxThreshold = 1e-16;
+         double Ptx = 100;
+
+        for (Node nodeA : WSN.nodes){
+            for (Node nodeB : WSN.nodes){
+                if (nodeB.getId() != nodeA.getId()){
+                    Channel channel = new Channel(nodeA, nodeB, Ptx);
+
+                    double Prx = channel.getPrx();
+                    //System.out.println(Prx);
+
+                    if (Prx >= PrxThreshold){
+                        nodeA.addNeighbor(nodeB);
+                    }
+                }
+            }
+
+            ArrayList<Node> neighborsList = nodeA.getNeighborList();
+            System.out.println("\n \nNode "+nodeA.getId()+" neighbors list: ");
+            for (Node entry : neighborsList){
+                System.out.print(entry.getId()+"\t");
+            }
+
+        }
+
+    }
+
+
 
     public static void printCollisionRate(){
 
@@ -314,11 +348,12 @@ public class WSN {
         double[] windowResults = new double[nodes.size()];
         List<Boolean>  tempWindow = new ArrayList<Boolean>();
         double[] windowsFairness =  new double[0];
+
         try {
             windowsFairness = new double[WSN.nodeTrace.size() - windowSize + 1];
         }
         catch (Exception e){
-            System.out.println("\n"+ e + "\nERROR!! More computation time is needed with windowSize = " + windowSize + "\nSystem exit... ");
+            System.out.println("\n"+ e + "\nERROR!! More simulation time is needed with windowSize = " + windowSize + "\nSystem exit... ");
             System.exit(1);
         }
         if(debugFairness){ System.out.println("\n \n Node Trace "); }

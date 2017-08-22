@@ -28,7 +28,7 @@ public class StartListeningEvent extends Event{
             n.freeChannel = true;
             scheduler.schedule(new CheckChannelStatus(n,time+WSN.DIFS, WSN.DIFS));
 
-            // save transmission initial time (delay)
+            // save transmission initial time (useful to Delay)
             this.n.startTXTime(time);
         }
     }

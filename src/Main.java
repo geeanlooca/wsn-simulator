@@ -88,6 +88,12 @@ class WSNWindow extends JPanel{
                 e = new Ellipse2D.Double(nodeX,nodeY,nodeSize,nodeSize);
                 g2.setPaint(n.getColor());
                 g2.fill(e);
+
+                Font font = new Font("Serif", Font.PLAIN, 18);
+                g2.setFont(font);
+                g2.setColor(Color.black);
+                g2.drawString(String.valueOf(n.getId()), (int) nodeX, ((int) nodeY)-3);
+
             }
 
             g2.setPaint(Color.black);

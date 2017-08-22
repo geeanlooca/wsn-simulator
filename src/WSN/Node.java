@@ -44,6 +44,9 @@ public class Node {
     private ListIterator<Boolean> iterator;
 
 
+    private ArrayList<Node> neighborList;
+
+
     public Node(int id, double X, double Y){
         this.X = X;
         this.Y = Y;
@@ -62,6 +65,8 @@ public class Node {
         this.totalTimeList = new ArrayList<Double>();
         this.delayList = new ArrayList<Double>();
         this.nodeLog = new ArrayList<Boolean>();
+
+        this.neighborList = new ArrayList<Node>();
 
 
         Random r = new Random();
@@ -147,6 +152,14 @@ public class Node {
 
     public void setCW(int CW){
         this.CW = CW;
+    }
+
+    public void addNeighbor( Node node){
+        this.neighborList.add(node);
+    }
+
+    public ArrayList<Node> getNeighborList(){
+        return this.neighborList;
     }
 
 
