@@ -236,7 +236,7 @@ public class WSN {
 
     public void setNeighborsList(){
 
-        double PrxThreshold = 0; //1e-17;
+        double PrxThreshold = 1e-17;
         double Ptx = 100;
 
         for (Node nodeA : WSN.nodes){
