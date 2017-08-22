@@ -16,7 +16,7 @@ public class Main {
         netH = 1800;
         topologyID = 1;
 
-        double seconds = 1e7;
+        double seconds = 1e8;
         double minutes = seconds * 60;
         double simulationTime =  60 * minutes;
 
@@ -24,8 +24,8 @@ public class Main {
         System.out.println("Starting simulation...");
 
         WSN netw = new WSN(15, netW, netH,topologyID);
-        netw.debugging(false);
-        netw.setAnimationDelay(50);
+        netw.debugging(true);
+        netw.setAnimationDelay(20);
 
 
         // panel to visualize the network nodes

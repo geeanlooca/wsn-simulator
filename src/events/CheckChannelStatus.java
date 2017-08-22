@@ -38,15 +38,14 @@ public class CheckChannelStatus extends Event{
                 if (bo > 0){
                     scheduler.schedule(new CheckChannelStatus(n,time + WSN.tSlot, WSN.tSlot));
 
-
                 }else{
                     // transmit
-                    if (WSN.debug){ System.out.println("-> This node will now start transmitting.");};
+                    if (WSN.debug){ System.out.println("-> This node ("+n.getId()+") will now start transmitting.");};
 
                     n.addTransmission();    // increment transmissions counter
-                    WSN.nodeTrace.add(this.n);
+                    WSN.nodeTrace.add(this.n);      // add transmitting node to the trace (useful to Fairness calculation)
 
-                    WSN.listeningNodes.remove(n);
+                    //WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
                     scheduler.schedule(new StartTxEvent(n, p, time));
                 }
@@ -57,14 +56,14 @@ public class CheckChannelStatus extends Event{
 
                 // restart BO counter
                 if (n.getBOcounter() == 0){
-                    if (WSN.debug){ System.out.println("-> This node will now start transmitting.");};
+                    if (WSN.debug){ System.out.println("-> This node (\"+n.getId()+\") will now start transmitting.");};
                     // transmit
 
                     n.addTransmission();    // increment transmissions counter
                     WSN.nodeTrace.add(this.n);
 
 
-                    WSN.listeningNodes.remove(n);
+                    //WSN.listeningNodes.remove(n);
                     Packet p = new Packet(n, n);
                     scheduler.schedule(new StartTxEvent(n, p, time));
                 }else {

@@ -73,7 +73,6 @@ public class Node {
         CW = WSN.CWmin;
 
         BOcounter = r.nextInt(CW + 1);
-        //BOcounter = 3;
     }
 
     public double getX(){
@@ -163,6 +162,13 @@ public class Node {
     }
 
 
+    public boolean findNeighbor(Node node){
+        for (Node neighbor : this.neighborList){
+            if (node.getId() == neighbor.getId()){ return true;}
+        }
+       return false;
+    }
+
     // methods to calculate Collision Rate and Fairness
 
     public void addTransmission(){
@@ -197,7 +203,7 @@ public class Node {
 
     public void addContSlot(){
         this.slotCounter ++;
-        if (WSN.debug){ System.out.println("Slot Counter: \t"+ this.slotCounter);}
+        if (WSN.debug){ System.out.println("Contention Slot Counter: \t"+ this.slotCounter);}
     }
 
     public void resetContSlot(){ this.slotCounter=0; }
@@ -205,7 +211,7 @@ public class Node {
     public void storeContSlotNumber() {
         this.slotCounterList.add(this.slotCounter);
         this.slotCounter = 0;
-        if (WSN.debug){ System.out.println("Slot Counter List: \t"+ this.slotCounterList);}
+        if (WSN.debug){ System.out.println("Contention Slot Counter List: \t"+ this.slotCounterList);}
 
     }
     public ArrayList<Integer> getSlotCounterList() { return this.slotCounterList; }

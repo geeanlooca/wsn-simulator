@@ -1,5 +1,8 @@
 package events;
 import WSN.*;
+
+import java.util.LinkedList;
+
 /**
  * Created by Gianluca on 16/07/2017.
  */
@@ -26,8 +29,7 @@ public class StartTxEvent extends events.Event {
         this.n.setSize(WSN.txSize);
 
 
-
-        if (WSN.trasmittingNodes.isEmpty()){
+   /*     if (WSN.trasmittingNodes.isEmpty()){
             // no collision
             WSN.trasmittingNodes.add(n);
             n.collided = false;
@@ -38,8 +40,23 @@ public class StartTxEvent extends events.Event {
 
             }
         }
-
         WSN.listeningNodes.remove(n);
+        n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
+        scheduler.schedule(new StopTxEvent(this, time + WSN.txTime));
+        */
+
+        LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
+        if (transmittingNodes.isEmpty()){
+            // no collision
+            n.collided = false;
+        }else{
+            n.collided = true;
+            for (Node t : transmittingNodes) {
+                t.collided = true;
+            }
+        }
+
+
         n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
         scheduler.schedule(new StopTxEvent(this, time + WSN.txTime));
 
@@ -51,7 +68,18 @@ public class StartTxEvent extends events.Event {
         // SOLUTION: modify the priority queue in order to extract older events if more than one event with the
         // same time is present. In this way we first decrease all the BO counters and then start the transmission
         // for all those with BO = 0. -> SOLVED
-        for (Node listening : WSN.listeningNodes) {
+
+
+/*        for (Node listening : WSN.listeningNodes) {
+
+            if (WSN.debug){ System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");}
+            listening.freeChannel = false;
+
+        }*/
+
+        LinkedList<Node> listeningNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.LISTENING);
+
+        for (Node listening : listeningNodes) {
 
             if (WSN.debug){ System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");}
             listening.freeChannel = false;

@@ -1,6 +1,7 @@
 package events;
 import WSN.*;
 
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -26,9 +27,12 @@ public class StopTxEvent extends events.Event {
 
         Scheduler scheduler = Scheduler.getInstance();
 
-
         this.n.setSize(WSN.normSize);
-        WSN.trasmittingNodes.remove(n);
+
+        //WSN.trasmittingNodes.remove(n);
+
+        n.setStatus(WSN.NODE_STATUS.IDLING);
+
         Random r = new Random();
 
         this.n.addTX();             // add txTime to the total packet transmission time
@@ -56,7 +60,7 @@ public class StopTxEvent extends events.Event {
             scheduler.schedule(new StartListeningEvent(n, time));
         }else{
 
-            if (WSN.debug){ System.out.println("Tranmission successful");};
+            if (WSN.debug){ System.out.println("->Tranmission successful!");};
             n.setCW(WSN.CWmin);
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
@@ -70,10 +74,14 @@ public class StopTxEvent extends events.Event {
         // if the end of this transmission frees up the channel then notify all of the listening nodes
         // and make them start listening for DIFS seconds of silence
 
-        if (WSN.trasmittingNodes.isEmpty()){
-            WSN.status = WSN.CHANNEL_STATUS.FREE;
+        LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
+        LinkedList<Node> listeningNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.LISTENING);
 
-            for (Node listening : WSN.listeningNodes) {
+
+        if (transmittingNodes.isEmpty()){
+            //WSN.status = WSN.CHANNEL_STATUS.FREE;           // Useless parameter, I can check the channel status looking at the number of transmitting nodes in the local range
+
+            for (Node listening : listeningNodes) {
                 scheduler.schedule(new CheckChannelStatus(listening, time + WSN.DIFS, WSN.DIFS));
 
                 listening.freeChannel = true;
@@ -81,7 +89,7 @@ public class StopTxEvent extends events.Event {
             }
         }
 
-        n.setStatus(WSN.NODE_STATUS.IDLING);
+       // n.setStatus(WSN.NODE_STATUS.IDLING);
     }
 
     public Packet getPacket(){

@@ -18,7 +18,7 @@ public class WSN {
     private int nodeCount;                       // number of nodes in the network
     private long sleepDelay = 0;                      // delay used to extract events
     final double maxIndex = Math.pow(10, 6);        // max available number of events; used to exit the script and debug results (use Double.POSITIVE_INFINITY to never exit) 1000000000
-    public static boolean debug = true;            // printing extra information useful for debugging
+    public static boolean debug = false;            // printing extra information useful for debugging
 
     final static double maxAvailableThroughput = 11;    // Mb/s
     final static double frameSize = 1500;               // bytes
@@ -77,8 +77,8 @@ public class WSN {
     }
     private static List<Node> nodes;
 
-    public static List<Node> trasmittingNodes;
-    public static List<Node> listeningNodes;
+    //public static List<Node> trasmittingNodes;
+    //public static List<Node> listeningNodes;
 
     public static ArrayList<Node> nodeTrace;
 
@@ -97,9 +97,9 @@ public class WSN {
 
         Scheduler scheduler = Scheduler.getInstance();
 
-        WSN.trasmittingNodes = new LinkedList<>();
-        WSN.listeningNodes = new LinkedList<>();
-        WSN.status = CHANNEL_STATUS.FREE;
+        //WSN.trasmittingNodes = new LinkedList<>();
+        //WSN.listeningNodes = new LinkedList<>();
+        //WSN.status = CHANNEL_STATUS.FREE;
 
         WSN.nodeTrace = new ArrayList<>();
 
@@ -186,7 +186,7 @@ public class WSN {
     }
 
     public void debugging(boolean enable){
-        debug = enable;
+        //debug = enable;
     }
 
     public void run(){
@@ -210,8 +210,6 @@ public class WSN {
             {
                 Thread.currentThread().interrupt();
             }
-
-
             Event e = scheduler.remove();
             currentTime += e.getTime();
 
@@ -238,8 +236,8 @@ public class WSN {
 
     public void setNeighborsList(){
 
-         double PrxThreshold = 1e-16;
-         double Ptx = 100;
+        double PrxThreshold = 0; //1e-17;
+        double Ptx = 100;
 
         for (Node nodeA : WSN.nodes){
             for (Node nodeB : WSN.nodes){
@@ -249,20 +247,30 @@ public class WSN {
                     double Prx = channel.getPrx();
                     //System.out.println(Prx);
 
-                    if (Prx >= PrxThreshold){
+                    if (Prx >= PrxThreshold && !(nodeB.findNeighbor(nodeA))){
                         nodeA.addNeighbor(nodeB);
+                        nodeB.addNeighbor(nodeA);
                     }
                 }
             }
-
             ArrayList<Node> neighborsList = nodeA.getNeighborList();
-            System.out.println("\n \nNode "+nodeA.getId()+" neighbors list: ");
+            System.out.print("\n \nNode "+nodeA.getId()+" neighbors list:\t");
             for (Node entry : neighborsList){
                 System.out.print(entry.getId()+"\t");
             }
-
         }
+        System.out.println("\n");
+    }
 
+    public static LinkedList<Node> getNeighborsStatus(Node n, NODE_STATUS status ){
+
+        LinkedList<Node> list = new LinkedList<Node>();
+        for (Node neighbor : n.getNeighborList()){
+            if (neighbor.getStatus() == status){ list.add(neighbor); }
+        }
+        if(WSN.debug){ System.out.println(status+": "+list.size()); }
+
+        return list;
     }
 
 
