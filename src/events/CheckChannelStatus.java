@@ -25,14 +25,12 @@ public class CheckChannelStatus extends Event{
 
         Scheduler scheduler = Scheduler.getInstance();
 
-        //System.out.println("n.freeChannel "+n.freeChannel+ " - (n.getNextPacket().getDestination().freeChannel) "+ (n.getNextPacket().getDestination().freeChannel));
+        // if the sender node (this) and the destination node sense the channel free new events are scheduled
 
         if (n.freeChannel && (n.getNextPacket().getDestination().freeChannel)){
+
             if (WSN.debug){ System.out.println("Channel has been free for: " + duration);}
             if (duration == WSN.tSlot){
-
-                this.n.addContSlot();       // increment contention slot counter
-                this.n.addtSlot();          // add a tSLOT to the packet transmission time
 
                 // decrease BO counter
                 int bo = n.decreaseCounter();
@@ -45,42 +43,33 @@ public class CheckChannelStatus extends Event{
                     // transmit
                     if (WSN.debug){ System.out.println("-> This node (" + this.n.getId() + ") will now start transmitting.");};
 
-                    n.addTransmission();    // increment transmissions counter
-                    WSN.nodeTrace.add(this.n);      // add transmitting node to the trace (useful to Fairness calculation)
-
-                    //WSN.listeningNodes.remove(n);
+                    n.addTransmission();             // increment transmissions counter
+                    WSN.nodeTrace.add(this.n);          // keep track of the nodes that start a transmission (useful to Fairness calculation)
 
 
-                    // NEW! the packet has a destination node
-
-                    //Random rand = new Random();
-                    //ArrayList<Node> neighbors = n.getNeighborList();
-
-                    //Packet p = new Packet(n, neighbors.get(rand.nextInt(neighbors.size())));
-                    Packet p = new Packet(n, n);
-                    scheduler.schedule(new StartTxEvent(n, p, time));
+                    scheduler.schedule(new StartTxEvent(n, n.getNextPacket(), time));
                 }
+
+                this.n.addContSlot();       // increment contention slot counter
+                this.n.addSlotTime();          // add a tSLOT to the packet transmission time
             }
             else if (duration == WSN.DIFS){
 
-                n.addDIFS();            // add a DIFS to the packet trasmission time
-
                 // restart BO counter
                 if (n.getBOcounter() == 0){
-                    if (WSN.debug){ System.out.println("-> This node (\"+n.getId()+\") will now start transmitting.");};
+                    if (WSN.debug){ System.out.println("-> This node (" + this.n.getId() + ") will now start transmitting.");};
                     // transmit
 
-                    n.addTransmission();    // increment transmissions counter
-                    WSN.nodeTrace.add(this.n);
+                    n.addTransmission();               // increment transmissions counter
+                    WSN.nodeTrace.add(this.n);         // keep track of the nodes that start a transmission (useful to Fairness calculation)
 
-
-                    //WSN.listeningNodes.remove(n);
-                    Packet p = new Packet(n, n);
-                    scheduler.schedule(new StartTxEvent(n, p, time));
+                    scheduler.schedule(new StartTxEvent(n,  n.getNextPacket(), time));
                 }else {
 
                     scheduler.schedule(new CheckChannelStatus(n, time + WSN.tSlot, WSN.tSlot));
                 }
+
+                n.addDIFStime();            // add a DIFS time to the packet transmission time
             }
         }
     }

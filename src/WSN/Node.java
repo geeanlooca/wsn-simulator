@@ -24,13 +24,16 @@ public class Node {
     private int BOcounter;
     private int CW;
 
+    // channel access parameters
     public boolean freeChannel;
     public boolean collided;
     public ArrayList<Node> collidedNodes = new ArrayList<Node>();
     public ArrayList<Node> resumingNodes = new ArrayList<Node>();
     public Node lastBOstopped;
 
+    private ArrayList<Node> neighborList;
 
+    // output parameters
     private int transCounter;
     private int collCounter;
 
@@ -43,12 +46,8 @@ public class Node {
     private double startTX;
     private ArrayList<Double> delayList;
 
-
     private ArrayList<Boolean> nodeLog;
     private ListIterator<Boolean> iterator;
-
-
-    private ArrayList<Node> neighborList;
 
 
     public Node(int id, double X, double Y){
@@ -61,6 +60,10 @@ public class Node {
         buffer = new LinkedList<Packet>();
         collided = false;
 
+        collidedNodes = new ArrayList<Node>();
+        resumingNodes = new ArrayList<Node>();
+        this.neighborList = new ArrayList<Node>();
+
         transCounter = 0;
         collCounter = 0;
         slotCounter = 0;
@@ -69,9 +72,6 @@ public class Node {
         this.totalTimeList = new ArrayList<Double>();
         this.delayList = new ArrayList<Double>();
         this.nodeLog = new ArrayList<Boolean>();
-
-        this.neighborList = new ArrayList<Node>();
-
 
         Random r = new Random();
         CW = WSN.CWmin;
@@ -159,6 +159,8 @@ public class Node {
         this.CW = CW;
     }
 
+    // methods to handle neighbors
+
     public void addNeighbor( Node node){
         this.neighborList.add(node);
     }
@@ -167,7 +169,6 @@ public class Node {
         return this.neighborList;
     }
 
-
     public boolean findNeighbor(Node node){
         for (Node neighbor : this.neighborList){
             if (node.getId() == neighbor.getId()){ return true;}
@@ -175,16 +176,18 @@ public class Node {
        return false;
     }
 
+    // output parameters
+
     // methods to calculate Collision Rate and Fairness
 
     public void addTransmission(){
         this.transCounter++;
-        this.nodeLog.add(true);
+        this.nodeLog.add(true);         // keep track of the result of the transmissions for this node
     }
 
     public void addCollision(){
         this.collCounter ++;
-        this.nodeLog.set(this.nodeLog.size()-1, false);
+        this.nodeLog.set(this.nodeLog.size()-1, false);     // keep track of the result of the transmissions for this node
     }
 
     public int[] getCollisionParam(){
@@ -196,13 +199,11 @@ public class Node {
 
     public void setListIterator(){
         this.iterator = this.nodeLog.listIterator();
-    }
+    }  // iterator needed to scan the nodeLog list at different times
 
     public Boolean getLog() {
         return this.iterator.next();
     }
-
-
 
 
     // methods to calculate the Average Number of Contention Slots
@@ -225,11 +226,11 @@ public class Node {
 
     // methods to calculate the packet total transmission time useful for Throughput and Delay
 
-    public void addDIFS(){ this.totalTime += WSN.DIFS; }
-    public void addtSlot(){ this.totalTime += WSN.tSlot; }
-    public void addTX(){ this.totalTime += WSN.txTime; }
+    public void addDIFStime(){ this.totalTime += WSN.DIFS; }
+    public void addSlotTime(){ this.totalTime += WSN.tSlot; }
+    public void addTXtime(){ this.totalTime += WSN.txTime; }
 
-    public void startTXTime(double time){
+    public void startTXTime(double time){           // catch the current time when the contention begins
         if (!collided){ this.startTX = time; }
     }
 

@@ -23,9 +23,9 @@ public class Main {
 
         System.out.println("Starting simulation...");
 
-        WSN netw = new WSN(15, netW, netH,topologyID);
+        WSN netw = new WSN(20, netW, netH,topologyID);
         netw.debugging(true);
-        netw.setAnimationDelay(20);
+        netw.setAnimationDelay(0);
 
 
         // panel to visualize the network nodes
