@@ -1,15 +1,14 @@
-package events;
+package protocols.DCF;
 
 import WSN.Node;
 import WSN.WSN;
 import WSN.Scheduler;
-
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 /**
  * Created by gianluca on 28/07/17.
  */
-public class StartListeningEvent extends Event{
+public class StartListeningEvent extends protocols.Event {
 
 
 
@@ -26,7 +25,7 @@ public class StartListeningEvent extends Event{
         n.setStatus(WSN.NODE_STATUS.LISTENING);
         //WSN.listeningNodes.add(n);
 
-        LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
+        ArrayList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
 
        // if (WSN.status == WSN.CHANNEL_STATUS.FREE){
         if (transmittingNodes.isEmpty()){

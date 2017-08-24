@@ -1,12 +1,14 @@
-package events;
+package protocols.DCF;
 import WSN.*;
+import protocols.*;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
  * Created by Gianluca on 16/07/2017.
  */
-public class StartTxEvent extends events.Event {
+public class StartTxEvent extends protocols.Event {
 
     private Packet p;
 
@@ -45,7 +47,7 @@ public class StartTxEvent extends events.Event {
         scheduler.schedule(new StopTxEvent(this, time + WSN.txTime));
         */
 
-        LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
+        ArrayList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
         if (transmittingNodes.isEmpty()){
             // no collision
             n.collided = false;
@@ -77,7 +79,7 @@ public class StartTxEvent extends events.Event {
 
         }*/
 
-        LinkedList<Node> listeningNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.LISTENING);
+        ArrayList<Node> listeningNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.LISTENING);
 
         for (Node listening : listeningNodes) {
 

@@ -1,15 +1,17 @@
-package events;
+package protocols.DCF;
 
 import WSN.Node;
 import WSN.WSN;
 import WSN.Packet;
 import WSN.Scheduler;
+import protocols.Event;
+import protocols.DCF.*;
 
 /**
  * Created by gianluca on 28/07/17.
  */
 
-public class CheckChannelStatus extends Event{
+public class CheckChannelStatus extends Event {
 
     private double duration;
 

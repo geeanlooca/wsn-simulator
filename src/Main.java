@@ -16,30 +16,51 @@ public class Main {
         netH = 1800;
         topologyID = 1;
 
-        double seconds = 1e8;
+        double seconds = 1e6;
         double minutes = seconds * 60;
-        double simulationTime =  60 * minutes;
+        double simulationTime =  1 * minutes;
 
 
         System.out.println("Starting simulation...");
 
-        WSN netw = new WSN(15, netW, netH,topologyID);
-        netw.debugging(true);
-        netw.setAnimationDelay(20);
+        WSN netw = new WSN(25, netW, netH,topologyID);
+
+
+        boolean gui = false;
+        boolean debugging = false;
+        int delay = 0;
 
 
         // panel to visualize the network nodes
         int panelW = 500;
         int panelH = 530;
-        JFrame f = new JFrame();
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.getContentPane().add(new WSNWindow(netw));
-        f.setSize(panelW,panelH);
-        f.setLocation(200,200);
-        f.setVisible(true);
 
 
-        netw.run(simulationTime);
+        if (gui) {
+            JFrame f = new JFrame();
+            f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            f.getContentPane().add(new WSNWindow(netw));
+            f.setSize(panelW,panelH);
+            f.setLocation(200,200);
+            f.setVisible(true);
+
+            debugging = true;
+            delay = 100;
+        }
+
+        netw.debugging(false);
+        netw.setAnimationDelay(delay);
+
+
+        long startTime = System.currentTimeMillis();
+
+        netw.run(simulationTime/5.0);
+
+        long endTime   = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        System.out.println(totalTime);
+
+        WSN.printCollisionRate();
     }
 }
 
@@ -126,7 +147,6 @@ class WSNWindow extends JPanel{
                     g2.setPaint(Color.black);
                     g2.draw(new Rectangle2D.Double(1, 1,panelW - 2 , panelH - 3));
                     break;
-
             }
 
         repaint();

@@ -1,13 +1,15 @@
-package events;
+package protocols.DCF;
 import WSN.*;
+import WSN.RNG;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
 /**
  * Created by Gianluca on 16/07/2017.
  */
-public class StopTxEvent extends events.Event {
+public class StopTxEvent extends protocols.Event {
 
 
     private Packet p;
@@ -33,7 +35,7 @@ public class StopTxEvent extends events.Event {
 
         n.setStatus(WSN.NODE_STATUS.IDLING);
 
-        Random r = new Random();
+        RNG r = RNG.getInstance();
 
         this.n.addTX();             // add txTime to the total packet transmission time
 
@@ -74,8 +76,8 @@ public class StopTxEvent extends events.Event {
         // if the end of this transmission frees up the channel then notify all of the listening nodes
         // and make them start listening for DIFS seconds of silence
 
-        LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
-        LinkedList<Node> listeningNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.LISTENING);
+        ArrayList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
+        ArrayList<Node> listeningNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.LISTENING);
 
 
         if (transmittingNodes.isEmpty()){

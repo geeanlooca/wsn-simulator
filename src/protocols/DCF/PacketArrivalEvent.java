@@ -1,11 +1,11 @@
-package events;
+package protocols.DCF;
 
 import WSN.*;
 
 /**
  * Created by Gianluca on 17/07/2017.
  */
-public class PacketArrivalEvent extends Event {
+public class PacketArrivalEvent extends protocols.Event {
 
     private Node destination;
 

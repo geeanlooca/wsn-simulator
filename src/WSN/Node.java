@@ -3,6 +3,7 @@ package WSN;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.util.*;
+import WSN.RNG;
 
 /**
  * Created by Gianluca on 16/07/2017.
@@ -43,9 +44,17 @@ public class Node {
     private ArrayList<Boolean> nodeLog;
     private ListIterator<Boolean> iterator;
 
-
     private ArrayList<Node> neighborList;
 
+
+    // CONTI
+    public int CONTIslotNumber = 0;
+    public double[] CONTIp = {0.2563, 0.36715, 0.4245, 0.4314, 0.5};
+
+
+    //
+    //  Methods
+    //
 
     public Node(int id, double X, double Y){
         this.X = X;
@@ -69,7 +78,7 @@ public class Node {
         this.neighborList = new ArrayList<Node>();
 
 
-        Random r = new Random();
+        RNG r = RNG.getInstance();
         CW = WSN.CWmin;
 
         BOcounter = r.nextInt(CW + 1);
@@ -163,10 +172,7 @@ public class Node {
 
 
     public boolean findNeighbor(Node node){
-        for (Node neighbor : this.neighborList){
-            if (node.getId() == neighbor.getId()){ return true;}
-        }
-       return false;
+        return (neighborList.indexOf(node) > 0);
     }
 
     // methods to calculate Collision Rate and Fairness

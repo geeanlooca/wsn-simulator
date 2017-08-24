@@ -1,11 +1,12 @@
 package WSN;
 
-import events.*;
-import events.Event;
+import protocols.Event;
+import protocols.DCF.StartListeningEvent;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import WSN.RNG;
 
 
 /**
@@ -27,7 +28,7 @@ public class WSN {
     // ------------------------------------//
 
     public enum NODE_STATUS {
-      SLEEPING, TRANSMITTING, IDLING, RECEIVING, LISTENING
+      SLEEPING, TRANSMITTING, IDLING, RECEIVING, LISTENING, JAMMING
     };
 
     public enum CHANNEL_STATUS{
@@ -64,7 +65,7 @@ public class WSN {
     private double width, height;
 
     public static double getPoisson(double mean) {
-        Random r = new Random();
+        RNG r = RNG.getInstance();
         double L = Math.exp(-mean);
         double k = 0.0;
         double p = 1.0;
@@ -83,9 +84,20 @@ public class WSN {
     public static ArrayList<Node> nodeTrace;
 
 
+
+    //
+    // CONTI
+    //
+
+    public static double CONTIslotTime = 50;
+
+    //
+    // Methods
+    //
+
     public WSN(int nodeCount, double width, double height, int topologyID){
 
-        Random r = new Random();
+        RNG r = RNG.getInstance();
         nodes = new LinkedList<>();
         this.nodeCount = nodeCount;
 
@@ -117,13 +129,13 @@ public class WSN {
             Node n = new Node(i,X,Y);
             nodes.add(n);
 
-            scheduler.schedule(new StartListeningEvent(n,0));
+            scheduler.schedule(new protocols.CONTI.StartRound(n,0));
         }
     }
 
     private double[] nodePosition()
     {
-        Random r = new Random();
+        RNG r = RNG.getInstance();
         double[] coord = new double[2];
 
         double a, theta;
@@ -186,7 +198,7 @@ public class WSN {
     }
 
     public void debugging(boolean enable){
-        //debug = enable;
+        debug = enable;
     }
 
     public void run(){
@@ -196,7 +208,7 @@ public class WSN {
 
         setNeighborsList();
 
-        Random r = new Random();
+        RNG r = RNG.getInstance();
 
         Scheduler scheduler = Scheduler.getInstance();
         double currentTime = 0;
@@ -211,33 +223,36 @@ public class WSN {
                 Thread.currentThread().interrupt();
             }
             Event e = scheduler.remove();
-            currentTime += e.getTime();
+            currentTime = e.getTime();
 
             if (debug){
                 System.out.println(e);
                 //System.out.println("Number of transmitting nodes: " + trasmittingNodes.size());
             }
+
+
             e.run();
 
             if (debug){
                 System.out.println("\n");
             };
 
+            System.out.format("Progress: %f %%\n", currentTime/maxTime);
         }
 
-        WSN.printCollisionRate();
+/*        WSN.printCollisionRate();
         WSN.printSlotNumber();
         WSN.printThroughput();
         WSN.printDelay();
-        WSN.printFairness(windowSize);
+        WSN.printFairness(windowSize);*/
 
-        System.exit(0);
+        //System.exit(0);
     }
 
     public void setNeighborsList(){
 
-        double PrxThreshold = 1e-17;
-        double Ptx = 100;
+        double PrxThreshold = 0;
+        double Ptx = 10000;
 
         for (Node nodeA : WSN.nodes){
             for (Node nodeB : WSN.nodes){
@@ -262,9 +277,9 @@ public class WSN {
         System.out.println("\n");
     }
 
-    public static LinkedList<Node> getNeighborsStatus(Node n, NODE_STATUS status ){
+    public static ArrayList<Node> getNeighborsStatus(Node n, NODE_STATUS status ){
 
-        LinkedList<Node> list = new LinkedList<Node>();
+        ArrayList<Node> list = new ArrayList<Node>();
         for (Node neighbor : n.getNeighborList()){
             if (neighbor.getStatus() == status){ list.add(neighbor); }
         }
