@@ -4,11 +4,9 @@ import WSN.Node;
 import WSN.Packet;
 import WSN.Scheduler;
 import WSN.WSN;
-import protocols.CONTI.StopTxEvent;
 import protocols.Event;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * Created by Gianluca on 24/08/2017.

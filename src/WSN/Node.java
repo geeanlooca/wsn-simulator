@@ -45,6 +45,7 @@ public class Node {
     private ListIterator<Boolean> iterator;
 
     private ArrayList<Node> neighborList;
+    public ArrayList<Integer> windows;
 
 
     // CONTI
@@ -76,10 +77,11 @@ public class Node {
         this.nodeLog = new ArrayList<Boolean>();
 
         this.neighborList = new ArrayList<Node>();
+        this.windows = new ArrayList<>();
 
 
         RNG r = RNG.getInstance();
-        CW = WSN.CWmin;
+        this.setCW(WSN.CWmin);
 
         BOcounter = r.nextInt(CW + 1);
     }
@@ -159,6 +161,7 @@ public class Node {
     }
 
     public void setCW(int CW){
+        windows.add(CW);
         this.CW = CW;
     }
 

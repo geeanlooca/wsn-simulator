@@ -1,10 +1,7 @@
 package protocols.DCF;
 import WSN.*;
-import WSN.RNG;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Random;
 
 /**
  * Created by Gianluca on 16/07/2017.
@@ -84,7 +81,7 @@ public class StopTxEvent extends protocols.Event {
             //WSN.status = WSN.CHANNEL_STATUS.FREE;           // Useless parameter, I can check the channel status looking at the number of transmitting nodes in the local range
 
             for (Node listening : listeningNodes) {
-                scheduler.schedule(new CheckChannelStatus(listening, time + WSN.DIFS, WSN.DIFS));
+                scheduler.schedule(new CheckChannelStatus(listening, time + WSN.tACK + WSN.SIFS + WSN.DIFS, WSN.DIFS));
 
                 listening.freeChannel = true;
                 listening.resetContSlot();      //  reset the contention slot counter for all the listening nodes (the round is finished)

@@ -1,12 +1,8 @@
 package protocols.CONTI;
 
-import WSN.Node;
 import WSN.Packet;
 import WSN.Scheduler;
 import WSN.WSN;
-
-import java.util.LinkedList;
-import java.util.Random;
 
 /**
  * Created by Gianluca on 16/07/2017.

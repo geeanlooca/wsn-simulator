@@ -1,7 +1,6 @@
 package WSN;
 
 import protocols.Event;
-import protocols.DCF.StartListeningEvent;
 
 import java.awt.*;
 import java.util.*;
@@ -129,7 +128,7 @@ public class WSN {
             Node n = new Node(i,X,Y);
             nodes.add(n);
 
-            scheduler.schedule(new protocols.CONTI.StartRound(n,0));
+            scheduler.schedule(new protocols.DCF.StartListeningEvent(n,0));
         }
     }
 
@@ -233,11 +232,12 @@ public class WSN {
 
             e.run();
 
+            System.out.format("Progress: %f %%\n", currentTime/maxTime);
             if (debug){
                 System.out.println("\n");
             };
 
-            System.out.format("Progress: %f %%\n", currentTime/maxTime);
+
         }
 
 /*        WSN.printCollisionRate();
@@ -247,6 +247,11 @@ public class WSN {
         WSN.printFairness(windowSize);*/
 
         //System.exit(0);
+
+        for (Node n :
+                this.getNodes()) {
+            System.out.println(n.windows);
+        }
     }
 
     public void setNeighborsList(){
@@ -262,12 +267,13 @@ public class WSN {
                     double Prx = channel.getPrx();
                     //System.out.println(Prx);
 
-                    if (Prx >= PrxThreshold && !(nodeB.findNeighbor(nodeA))){
+                    if (Prx >= PrxThreshold)
+                    {
                         nodeA.addNeighbor(nodeB);
-                        nodeB.addNeighbor(nodeA);
                     }
                 }
             }
+
             ArrayList<Node> neighborsList = nodeA.getNeighborList();
             System.out.print("\n \nNode "+nodeA.getId()+" neighbors list:\t");
             for (Node entry : neighborsList){

@@ -4,7 +4,6 @@ import protocols.Event;
 import WSN.*;
 
 import java.awt.*;
-import java.util.Random;
 
 /**
  * Created by Gianluca on 23/08/2017.

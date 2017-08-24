@@ -8,8 +8,6 @@ import WSN.Scheduler;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Random;
 
 /**
  * Created by Gianluca on 23/08/2017.

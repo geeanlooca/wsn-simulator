@@ -18,12 +18,14 @@ public class Main {
 
         double seconds = 1e6;
         double minutes = seconds * 60;
-        double simulationTime =  1 * minutes;
+        double simulationTime =  0.25 * minutes;
+
+        int nodeCount = 10;
 
 
         System.out.println("Starting simulation...");
 
-        WSN netw = new WSN(25, netW, netH,topologyID);
+        WSN netw = new WSN(nodeCount, netW, netH,topologyID);
 
 
         boolean gui = false;
@@ -45,10 +47,10 @@ public class Main {
             f.setVisible(true);
 
             debugging = true;
-            delay = 100;
+            delay = 500;
         }
 
-        netw.debugging(false);
+        netw.debugging(debugging);
         netw.setAnimationDelay(delay);
 
 
