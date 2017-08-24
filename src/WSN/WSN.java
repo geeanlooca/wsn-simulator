@@ -128,7 +128,7 @@ public class WSN {
             Node n = new Node(i,X,Y);
             nodes.add(n);
 
-            scheduler.schedule(new protocols.DCF.StartListeningEvent(n,0));
+            scheduler.schedule(new protocols.CONTI.StartRound(n,0));
         }
     }
 
