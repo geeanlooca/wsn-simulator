@@ -26,6 +26,10 @@ public class Node {
 
     public boolean freeChannel;
     public boolean collided;
+    public ArrayList<Node> collidedNodes = new ArrayList<Node>();
+    public ArrayList<Node> resumingNodes = new ArrayList<Node>();
+    public Node lastBOstopped;
+
 
     private int transCounter;
     private int collCounter;
@@ -119,6 +123,8 @@ public class Node {
     public Packet dequeue(){
         return this.buffer.remove();
     }
+
+    public Packet getNextPacket() {return this.buffer.element(); }
 
     public boolean backlogged(){
         return !this.buffer.isEmpty();

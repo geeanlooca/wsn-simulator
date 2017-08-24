@@ -17,22 +17,30 @@ public class WSN {
 
     private int nodeCount;                       // number of nodes in the network
     private long sleepDelay = 0;                      // delay used to extract events
-    final double maxIndex = Math.pow(10, 6);        // max available number of events; used to exit the script and debug results (use Double.POSITIVE_INFINITY to never exit) 1000000000
+    final double maxIndex = Math.pow(10, 7);        // max available number of events; used to exit the script and debug results (use Double.POSITIVE_INFINITY to never exit) 1000000000
     public static boolean debug = false;            // printing extra information useful for debugging
 
     final static double maxAvailableThroughput = 11;    // Mb/s
     final static double frameSize = 1500;               // bytes
 
     private int windowSize = 1000;                 //  window size used in Fairness calculation
+
+    private double PrxThreshold = 1e-16;
+    private double Ptx = 100;
+
     // ------------------------------------//
 
     public enum NODE_STATUS {
-      SLEEPING, TRANSMITTING, IDLING, RECEIVING, LISTENING
-    };
+        SLEEPING, TRANSMITTING, IDLING, RECEIVING, LISTENING
+    }
 
-    public enum CHANNEL_STATUS{
+    ;
+
+    public enum CHANNEL_STATUS {
         FREE, BUSY
-    };
+    }
+
+    ;
 
     public static CHANNEL_STATUS status;
 
@@ -75,6 +83,7 @@ public class WSN {
         return k - 1;
 
     }
+
     private static List<Node> nodes;
 
     //public static List<Node> trasmittingNodes;
@@ -83,7 +92,7 @@ public class WSN {
     public static ArrayList<Node> nodeTrace;
 
 
-    public WSN(int nodeCount, double width, double height, int topologyID){
+    public WSN(int nodeCount, double width, double height, int topologyID) {
 
         Random r = new Random();
         nodes = new LinkedList<>();
@@ -114,45 +123,44 @@ public class WSN {
             double X = coord[0];
             double Y = coord[1];
 
-            Node n = new Node(i,X,Y);
+            Node n = new Node(i, X, Y);
             nodes.add(n);
 
-            scheduler.schedule(new StartListeningEvent(n,0));
+            scheduler.schedule(new StartListeningEvent(n, 0));
         }
     }
 
-    private double[] nodePosition()
-    {
+    private double[] nodePosition() {
         Random r = new Random();
         double[] coord = new double[2];
 
         double a, theta;
-        double maxRadius = 0.5 * Math.min(width,height);
+        double maxRadius = 0.5 * Math.min(width, height);
 
-        switch (this.topologyID){
+        switch (this.topologyID) {
 
             // circular cell
             case 0:
                 a = maxRadius * Math.sqrt(r.nextDouble());
                 theta = 2 * Math.PI * r.nextDouble();
-                coord[0] = width/2 + a * Math.cos(theta);
-                coord[1] = height/2 + a * Math.sin(theta);
+                coord[0] = width / 2 + a * Math.cos(theta);
+                coord[1] = height / 2 + a * Math.sin(theta);
                 break;
 
             // hexagonal cell
             case 1:
-                double c = Math.cos(Math.PI/6);
+                double c = Math.cos(Math.PI / 6);
 
                 do {
                     a = Math.sqrt(r.nextDouble());
-                    theta = - Math.PI/6 + Math.PI/3 * r.nextDouble();
-                }while((a * Math.cos(theta)) > c);
+                    theta = -Math.PI / 6 + Math.PI / 3 * r.nextDouble();
+                } while ((a * Math.cos(theta)) > c);
 
                 a = a * maxRadius;
-                theta = theta + Math.PI/3 * r.nextInt(6);
+                theta = theta + Math.PI / 3 * r.nextInt(6);
 
-                coord[0] = width/2 + a * Math.cos(theta);
-                coord[1] = height/2 + a * Math.sin(theta);
+                coord[0] = width / 2 + a * Math.cos(theta);
+                coord[1] = height / 2 + a * Math.sin(theta);
                 break;
             default:
                 coord[0] = width * r.nextDouble();
@@ -162,37 +170,43 @@ public class WSN {
 
         return coord;
     }
-    public List<Node> getNodes(){
+
+    public List<Node> getNodes() {
         return nodes;
     }
 
-    public int getNodeCount(){
+    public int getNodeCount() {
         return nodes.size();
     }
 
-    public int getTopologyID() { return topologyID; };
+    public int getTopologyID() {
+        return topologyID;
+    }
+
+    ;
 
     public double[] getNetworkSize() {
         double[] size = {width, height};
         return size;
     }
 
-    public int nodeCount(){
+    public int nodeCount() {
         return WSN.nodes.size();
     }
 
-    public void setAnimationDelay(int ms){
+    public void setAnimationDelay(int ms) {
         this.sleepDelay = ms;
     }
 
-    public void debugging(boolean enable){
+    public void debugging(boolean enable) {
         //debug = enable;
     }
 
-    public void run(){
+    public void run() {
         this.run(Double.POSITIVE_INFINITY);
     }
-    public void run(double maxTime){
+
+    public void run(double maxTime) {
 
         setNeighborsList();
 
@@ -201,27 +215,27 @@ public class WSN {
         Scheduler scheduler = Scheduler.getInstance();
         double currentTime = 0;
 
-        while ((!scheduler.isEmpty()) && (currentTime < maxTime)){
-            try
-            {
+        while ((!scheduler.isEmpty()) && (currentTime < maxTime)) {
+
+            try {
                 Thread.sleep(sleepDelay);
-            }
-            catch (InterruptedException ex)
-            {
+            } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
             Event e = scheduler.remove();
             currentTime += e.getTime();
 
-            if (debug){
+            if (debug) {
                 System.out.println(e);
                 //System.out.println("Number of transmitting nodes: " + trasmittingNodes.size());
             }
             e.run();
 
-            if (debug){
+            if (debug) {
+                //System.out.println("Scheduler size: "+scheduler.size()+" - currentTime " +currentTime+" < maxTime "+maxTime+": "+ (currentTime < maxTime));
                 System.out.println("\n");
-            };
+            }
+            ;
 
         }
 
@@ -234,33 +248,41 @@ public class WSN {
         System.exit(0);
     }
 
-    public void setNeighborsList(){
+    public void setNeighborsList() {
 
-        double PrxThreshold = 1e-17;
-        double Ptx = 100;
-
-        for (Node nodeA : WSN.nodes){
-            for (Node nodeB : WSN.nodes){
-                if (nodeB.getId() != nodeA.getId()){
+        for (Node nodeA : WSN.nodes) {
+            for (Node nodeB : WSN.nodes) {
+                if (nodeB.getId() != nodeA.getId()) {
                     Channel channel = new Channel(nodeA, nodeB, Ptx);
 
                     double Prx = channel.getPrx();
                     //System.out.println(Prx);
 
-                    if (Prx >= PrxThreshold && !(nodeB.findNeighbor(nodeA))){
+                    if (Prx >= PrxThreshold && !(nodeB.findNeighbor(nodeA))) {
                         nodeA.addNeighbor(nodeB);
                         nodeB.addNeighbor(nodeA);
                     }
                 }
             }
-            ArrayList<Node> neighborsList = nodeA.getNeighborList();
-            System.out.print("\n \nNode "+nodeA.getId()+" neighbors list:\t");
-            for (Node entry : neighborsList){
-                System.out.print(entry.getId()+"\t");
+        }
+
+        printNeighbors();
+
+    }
+
+    public static void printNeighbors() {
+
+        for(Node node :WSN.nodes){
+            ArrayList<Node> neighborsList = node.getNeighborList();
+            System.out.print("\n \nNode " + node.getId() + " neighbors list:\t");
+            for (Node entry : neighborsList) {
+                System.out.print(entry.getId() + "\t");
             }
         }
         System.out.println("\n");
     }
+
+
 
     public static LinkedList<Node> getNeighborsStatus(Node n, NODE_STATUS status ){
 
@@ -361,7 +383,7 @@ public class WSN {
             windowsFairness = new double[WSN.nodeTrace.size() - windowSize + 1];
         }
         catch (Exception e){
-            System.out.println("\n"+ e + "\nERROR!! More simulation time is needed with windowSize = " + windowSize + "\nSystem exit... ");
+            System.out.println("\n"+ e + "\nFairness Error!! More simulation time is needed with windowSize = " + windowSize + "\nSystem exit... ");
             System.exit(1);
         }
         if(debugFairness){ System.out.println("\n \n Node Trace "); }

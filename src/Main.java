@@ -16,7 +16,7 @@ public class Main {
         netH = 1800;
         topologyID = 1;
 
-        double seconds = 1e8;
+        double seconds = 1e12;
         double minutes = seconds * 60;
         double simulationTime =  60 * minutes;
 

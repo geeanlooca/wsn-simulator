@@ -4,6 +4,8 @@ import WSN.Node;
 import WSN.WSN;
 import WSN.Packet;
 import WSN.Scheduler;
+import java.util.*;
+
 
 /**
  * Created by gianluca on 28/07/17.
@@ -23,8 +25,9 @@ public class CheckChannelStatus extends Event{
 
         Scheduler scheduler = Scheduler.getInstance();
 
+        //System.out.println("n.freeChannel "+n.freeChannel+ " - (n.getNextPacket().getDestination().freeChannel) "+ (n.getNextPacket().getDestination().freeChannel));
 
-        if (n.freeChannel){
+        if (n.freeChannel && (n.getNextPacket().getDestination().freeChannel)){
             if (WSN.debug){ System.out.println("Channel has been free for: " + duration);}
             if (duration == WSN.tSlot){
 
@@ -40,12 +43,20 @@ public class CheckChannelStatus extends Event{
 
                 }else{
                     // transmit
-                    if (WSN.debug){ System.out.println("-> This node ("+n.getId()+") will now start transmitting.");};
+                    if (WSN.debug){ System.out.println("-> This node (" + this.n.getId() + ") will now start transmitting.");};
 
                     n.addTransmission();    // increment transmissions counter
                     WSN.nodeTrace.add(this.n);      // add transmitting node to the trace (useful to Fairness calculation)
 
                     //WSN.listeningNodes.remove(n);
+
+
+                    // NEW! the packet has a destination node
+
+                    //Random rand = new Random();
+                    //ArrayList<Node> neighbors = n.getNeighborList();
+
+                    //Packet p = new Packet(n, neighbors.get(rand.nextInt(neighbors.size())));
                     Packet p = new Packet(n, n);
                     scheduler.schedule(new StartTxEvent(n, p, time));
                 }
@@ -67,6 +78,7 @@ public class CheckChannelStatus extends Event{
                     Packet p = new Packet(n, n);
                     scheduler.schedule(new StartTxEvent(n, p, time));
                 }else {
+
                     scheduler.schedule(new CheckChannelStatus(n, time + WSN.tSlot, WSN.tSlot));
                 }
             }

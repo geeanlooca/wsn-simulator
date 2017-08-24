@@ -24,6 +24,9 @@ public class StartTxEvent extends events.Event {
     public void run(){
         super.run();
 
+        n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
+
+
         Scheduler scheduler = Scheduler.getInstance();
 
         this.n.setSize(WSN.txSize);
@@ -53,6 +56,11 @@ public class StartTxEvent extends events.Event {
             n.collided = true;
             for (Node t : transmittingNodes) {
                 t.collided = true;
+                while (!transmittingNodes.isEmpty()){
+                    Node node = transmittingNodes.remove();
+                    if (WSN.debug){ System.out.println("Collision Node "+node.getId()); }
+                    n.collidedNodes.add(node);
+                }
             }
         }
 
@@ -83,6 +91,8 @@ public class StartTxEvent extends events.Event {
 
             if (WSN.debug){ System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");}
             listening.freeChannel = false;
+
+            listening.lastBOstopped = this.n;       // save the Node that freezes the backoff to discriminate among multiple backoff resumes
 
         }
     }
