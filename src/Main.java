@@ -30,10 +30,10 @@ public class Main {
 
         System.out.println("Starting simulation...");
 
-        Protocol p = new CONTI();
+        Protocol p = new DCF();
         WSN netw = new WSN(nodeCount, netW, netH, p, topologyID);
 
-        boolean gui = false;
+        boolean gui = true;
         boolean debugging = false;
         int delay = 0;
 
@@ -104,13 +104,21 @@ class WSNWindow extends JPanel{
             for (int i = 0; i < network.nodeCount(); i++) {
 
                 Node n = network.getNodes().get(i);
-                Ellipse2D e = n.getEllipse();
 
                 nodeX = panelW/2 + (n.getX() - netW/2) * scaleX;
                 nodeY = panelH/2 + (n.getY() - netH/2) * scaleY;
                 nodeSize = n.getSize();
 
-                e = new Ellipse2D.Double(nodeX,nodeY,nodeSize,nodeSize);
+                for (Node neigh :
+                        n.getNeighborList()) {
+                    g2.setColor(n.getLineColor());
+
+                    double neighX = panelW/2 + (neigh.getX() - netW/2) * scaleX;
+                    double neighY = panelH/2 + (neigh.getY() - netH/2) * scaleY;
+                    g2.draw(new Line2D.Double(nodeX, nodeY, neighX, neighY));
+                }
+
+                Ellipse2D e = new Ellipse2D.Double(nodeX-nodeSize/2,nodeY-nodeSize/2,nodeSize,nodeSize);
                 g2.setPaint(n.getColor());
                 g2.fill(e);
 
@@ -118,7 +126,6 @@ class WSNWindow extends JPanel{
                 g2.setFont(font);
                 g2.setColor(Color.black);
                 g2.drawString(String.valueOf(n.getId()), (int) nodeX, ((int) nodeY)-3);
-
             }
 
             g2.setPaint(Color.black);

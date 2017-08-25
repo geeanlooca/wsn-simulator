@@ -30,6 +30,8 @@ public class RNG {
         return rnd.nextInt();
     }
 
+    public float nextFloat(){return rnd.nextFloat();}
+
     public double nextGaussian(){
         return rnd.nextGaussian();
     }

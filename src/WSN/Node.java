@@ -18,6 +18,16 @@ public class Node {
     private java.awt.Color c;
     private double size;
 
+    public Color getLineColor() {
+        return lineColor;
+    }
+
+    public void setLineColor(Color lineColor) {
+        this.lineColor = lineColor;
+    }
+
+    private Color lineColor;
+
     private WSN.NODE_STATUS status;
     private java.util.Queue<Packet> buffer;
     private java.util.List<Packet> transmittedPackets;
@@ -73,6 +83,10 @@ public class Node {
         this.id = id;
         this.size = 10;
         c = Color.blue;
+
+        RNG random = RNG.getInstance();
+
+        setLineColor(Color.lightGray);
         e = new Ellipse2D.Double(X-size/2, Y-size/2, size, size);
         buffer = new LinkedList<Packet>();
         collided = false;
@@ -140,7 +154,7 @@ public class Node {
 
     public void setSize(double size){
         this.size = size;
-        e = new Ellipse2D.Double(X-size/2, Y-size/2, size, size);
+        //e = new Ellipse2D.Double(X-size/2, Y-size/2, size, size);
     }
 
     public void enqueuePacket(Packet p){
