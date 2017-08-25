@@ -8,11 +8,9 @@ import java.util.LinkedList;
  */
 public class StartTxEvent extends events.Event {
 
-    private Packet p;
 
-    public StartTxEvent(Node n, Packet p, double time){
+    public StartTxEvent(Node n, double time){
         super(n, time, WSN.txColor);
-        this.p = p;
     }
 
     @Override
@@ -65,7 +63,4 @@ public class StartTxEvent extends events.Event {
         }
     }
 
-    public Packet getPacket(){
-        return this.p;
-    }
 }

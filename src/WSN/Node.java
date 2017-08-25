@@ -31,6 +31,8 @@ public class Node {
     public ArrayList<Node> resumingNodes = new ArrayList<Node>();
     public Node lastBOstopped;
 
+
+
     private ArrayList<Node> neighborList;
 
     // output parameters

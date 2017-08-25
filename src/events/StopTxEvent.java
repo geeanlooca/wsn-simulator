@@ -11,11 +11,9 @@ import java.util.Random;
  */
 public class StopTxEvent extends events.Event {
 
-    private Packet p;
 
     public StopTxEvent(StartTxEvent e, double time){
         super(e.getNode(), time, WSN.normColor);
-        this.p = e.getPacket();
     }
 
     @Override
@@ -158,9 +156,6 @@ public class StopTxEvent extends events.Event {
 
     }
 
-    public Packet getPacket(){
-        return this.p;
-    }
 
     private LinkedList<Node> removeDuplicate (LinkedList<Node> list){
         // merging the previous listening nodes and the current listening nodes (that both need rescheduling) it is necessary to remove possible duplicates

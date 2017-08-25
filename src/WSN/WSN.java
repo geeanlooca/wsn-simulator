@@ -49,7 +49,9 @@ public class WSN {
     public static Color listenColor = Color.cyan;
 
     //public static double txTime = 200; // microseconds
-    public static double txTime = (frameSize * 8) / (maxAvailableThroughput); // txTime in microsecond
+
+    // txTime in microsecond
+    public static double txTime = (frameSize * 8) / (maxAvailableThroughput);
 
     public static double meanInterarrivalTime = 20.0;
     public static double meanBackoff = 200.0;
@@ -85,7 +87,8 @@ public class WSN {
 
     private static List<Node> nodes;
 
-    public static ArrayList<Node> nodeTrace;    // log of nodes that have transmitted (useful to fairness calculation)
+    // log of nodes that have transmitted (useful to fairness calculation)
+    public static ArrayList<Node> nodeTrace;
 
 
     public WSN(int nodeCount, double width, double height, int topologyID) {
@@ -286,6 +289,7 @@ public class WSN {
 
         return list;
     }
+
 
 
     // output parameters

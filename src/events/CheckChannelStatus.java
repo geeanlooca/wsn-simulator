@@ -4,6 +4,8 @@ import WSN.Node;
 import WSN.WSN;
 import WSN.Packet;
 import WSN.Scheduler;
+
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -26,7 +28,9 @@ public class CheckChannelStatus extends Event{
         Scheduler scheduler = Scheduler.getInstance();
 
         // if both the sender node (this) and the destination node sense the channel free new events are scheduled
-        if (n.freeChannel && (n.getNextPacket().getDestination().freeChannel)){
+
+        // if (n.freeChannel && (n.getNextPacket().getDestination().freeChannel)){          -> last modified
+        if (n.freeChannel && (!checkDestNeighbors())){
 
             if (WSN.debug){ System.out.println("Channel has been free for: " + duration);}
             if (duration == WSN.tSlot){
@@ -47,7 +51,7 @@ public class CheckChannelStatus extends Event{
                     // keep track of the nodes that start a transmission (useful to Fairness calculation)
                     WSN.nodeTrace.add(this.n);
 
-                    scheduler.schedule(new StartTxEvent(n, n.getNextPacket(), time));
+                    scheduler.schedule(new StartTxEvent(n, time));
                 }
                 // increment contention slot counter
                 this.n.addContSlot();
@@ -66,7 +70,7 @@ public class CheckChannelStatus extends Event{
                     // keep track of the nodes that start a transmission (useful to Fairness calculation)
                     WSN.nodeTrace.add(this.n);
 
-                    scheduler.schedule(new StartTxEvent(n,  n.getNextPacket(), time));
+                    scheduler.schedule(new StartTxEvent(n,  time));
                 }else {
 
                     scheduler.schedule(new CheckChannelStatus(n, time + WSN.tSlot, WSN.tSlot));
@@ -76,6 +80,22 @@ public class CheckChannelStatus extends Event{
                 n.addDIFStime();
             }
         }
+    }
+
+    private boolean checkDestNeighbors(){
+        // check if the destination node is already the destination node of a neighbor of him
+        boolean statement = false;
+        Node dest = n.getNextPacket().getDestination();
+        LinkedList<Node> destNeighbors = WSN.getNeighborsStatus(dest, WSN.NODE_STATUS.TRANSMITTING);
+        if (!dest.freeChannel) {
+            for (Node entry : destNeighbors) {
+                if (entry.getNextPacket().getDestination().getId() == dest.getId()) {
+                    statement = true;
+                    break;
+                }
+            }
+        }
+        return statement;
     }
 
     @Override
