@@ -1,4 +1,4 @@
-package events;
+package protocols;
 
 import java.awt.*;
 import WSN.*;

@@ -1,6 +1,7 @@
-package events;
+package protocols.DCF;
 
 import WSN.*;
+import protocols.Event;
 
 /**
  * Created by Gianluca on 17/07/2017.

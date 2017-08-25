@@ -1,7 +1,7 @@
-package events;
+package protocols.DCF;
 import WSN.*;
+import protocols.Event;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
@@ -9,7 +9,7 @@ import java.util.Random;
 /**
  * Created by Gianluca on 16/07/2017.
  */
-public class StopTxEvent extends events.Event {
+public class StopTxEvent extends Event {
 
 
     public StopTxEvent(StartTxEvent e, double time){

@@ -1,7 +1,7 @@
 package WSN;
 
-import events.*;
-import events.Event;
+import protocols.DCF.StartListeningEvent;
+import protocols.Event;
 
 import java.awt.*;
 import java.util.*;

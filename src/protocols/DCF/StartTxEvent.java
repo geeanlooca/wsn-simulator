@@ -1,12 +1,13 @@
-package events;
+package protocols.DCF;
 import WSN.*;
+import protocols.Event;
 
 import java.util.LinkedList;
 
 /**
  * Created by Gianluca on 16/07/2017.
  */
-public class StartTxEvent extends events.Event {
+public class StartTxEvent extends Event {
 
 
     public StartTxEvent(Node n, double time){

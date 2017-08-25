@@ -1,9 +1,10 @@
-package events;
+package protocols.DCF;
 
 import WSN.Node;
 import WSN.WSN;
 import WSN.Scheduler;
 import WSN.Packet;
+import protocols.Event;
 
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.Random;
 /**
  * Created by gianluca on 28/07/17.
  */
-public class StartListeningEvent extends Event{
+public class StartListeningEvent extends Event {
 
 
     public StartListeningEvent(Node n, double time){
