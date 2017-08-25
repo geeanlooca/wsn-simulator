@@ -17,7 +17,7 @@ import java.util.Random;
 public class StartListeningEvent extends Event {
 
 
-    public StartListeningEvent(Node n, double time){
+    public StartListeningEvent(Node n, Double time){
         super(n, time, WSN.listenColor);
     }
 

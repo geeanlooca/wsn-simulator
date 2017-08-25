@@ -5,6 +5,7 @@ import WSN.Packet;
 import WSN.Scheduler;
 import WSN.WSN;
 import events.Event;
+import protocols.CONTI.StopTxEvent;
 
 import java.util.LinkedList;
 
@@ -39,7 +40,7 @@ public class StartTxEvent extends Event {
             n.addCollision();
         }
 
-        scheduler.schedule(new protocols.CONTI.StopTxEvent(this, time + WSN.txTime));
+        scheduler.schedule(new StopTxEvent(this, time + WSN.txTime));
 
     }
 

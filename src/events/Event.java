@@ -11,7 +11,7 @@ public class Event {
     protected double time;
     private Color c;
 
-    public Event(Node n, double time, Color c){
+    public Event(Node n, Double time, Color c){
         this.n = n;
         this.time = time;
         this.c = c;

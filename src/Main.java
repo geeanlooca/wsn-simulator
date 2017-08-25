@@ -1,15 +1,20 @@
 import WSN.*;
+import protocols.CONTI.CONTI;
+import protocols.DCF.DCF;
+import protocols.Protocol;
 
 import java.awt.*;
 import java.awt.geom.*;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.*;
 
 /**
  * Created by Gianluca on 16/07/2017.
  */
 public class Main {
-    public static void main (String [] args) throws IOException {
+    public static void main (String [] args) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 
         // network size and topology number
         int netW, netH, topologyID;
@@ -21,23 +26,20 @@ public class Main {
         double minutes = seconds * 60;
         double simulationTime =  5 * minutes;
 
-        int nodeCount = 10;
-
+        int nodeCount = 20;
 
         System.out.println("Starting simulation...");
 
-        WSN netw = new WSN(nodeCount, netW, netH,topologyID);
-
+        Protocol p = new CONTI();
+        WSN netw = new WSN(nodeCount, netW, netH, p, topologyID);
 
         boolean gui = false;
         boolean debugging = false;
         int delay = 0;
 
-
         // panel to visualize the network nodes
         int panelW = 500;
         int panelH = 530;
-
 
         if (gui) {
             JFrame f = new JFrame();
@@ -64,11 +66,8 @@ public class Main {
         long endTime   = System.currentTimeMillis();
         long totalTime = endTime - startTime;
         System.out.println("Simulation time: " + totalTime/1000.0 + "s");
-
-
     }
 }
-
 
 class WSNWindow extends JPanel{
 

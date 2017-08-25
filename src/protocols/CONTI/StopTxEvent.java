@@ -4,6 +4,7 @@ import WSN.Packet;
 import WSN.Scheduler;
 import WSN.WSN;
 import events.Event;
+import protocols.CONTI.StopTxEvent;
 
 /**
  * Created by Gianluca on 16/07/2017.
@@ -13,7 +14,7 @@ public class StopTxEvent extends Event {
 
     private Packet p;
 
-    public StopTxEvent(protocols.CONTI.StartTxEvent e, double time){
+    public StopTxEvent(StartTxEvent e, double time){
         super(e.getNode(), time, WSN.normColor);
         this.p = e.getPacket();
     }

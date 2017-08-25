@@ -11,7 +11,7 @@ import WSN.WSN;
  */
 public class StartRound extends Event {
 
-    public StartRound(Node n, double time){ super(n, time, WSN.normColor); }
+    public StartRound(Node n, Double time){ super(n, time, WSN.normColor); }
 
     public void run(){
 

@@ -1,10 +1,11 @@
 package WSN;
 
-import events.UpdatePosition;
 import protocols.DCF.StartListeningEvent;
 import events.Event;
+import protocols.Protocol;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 
@@ -97,7 +98,7 @@ public class WSN {
     // Methods
     //
 
-    public WSN(int nodeCount, double width, double height, int topologyID){
+    public WSN(int nodeCount, double width, double height, Protocol p, int topologyID) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 
         RNG r = RNG.getInstance();
         nodes = new LinkedList<>();
@@ -131,7 +132,8 @@ public class WSN {
             Node n = new Node(i, X, Y);
             nodes.add(n);
 
-            scheduler.schedule(new StartListeningEvent(n, 0));
+            Event e = (Event) p.entryPoint().newInstance(n,new Double(0));
+            scheduler.schedule(e);
             //scheduler.schedule(new UpdatePosition(n, 1000));
         }
     }
