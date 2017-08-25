@@ -182,12 +182,14 @@ public class Node {
 
     public void addTransmission(){
         this.transCounter++;
-        this.nodeLog.add(true);         // keep track of the result of the transmissions for this node
+        // keep track of the result of the transmissions for this node
+        this.nodeLog.add(true);
     }
 
     public void addCollision(){
         this.collCounter ++;
-        this.nodeLog.set(this.nodeLog.size()-1, false);     // keep track of the result of the transmissions for this node
+        // keep track of the result of the transmissions for this node
+        this.nodeLog.set(this.nodeLog.size()-1, false);
     }
 
     public int[] getCollisionParam(){
@@ -229,8 +231,8 @@ public class Node {
     public void addDIFStime(){ this.totalTime += WSN.DIFS; }
     public void addSlotTime(){ this.totalTime += WSN.tSlot; }
     public void addTXtime(){ this.totalTime += WSN.txTime; }
-
-    public void startTXTime(double time){           // catch the current time when the contention begins
+    // catch the current time when contention begins
+    public void startTXTime(double time){
         if (!collided){ this.startTX = time; }
     }
 

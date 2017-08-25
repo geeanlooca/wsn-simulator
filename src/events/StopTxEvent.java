@@ -31,8 +31,8 @@ public class StopTxEvent extends events.Event {
         this.n.setSize(WSN.normSize);
         n.setStatus(WSN.NODE_STATUS.IDLING);
         Random r = new Random();
-
-        this.n.addTXtime();             // add txTime to the total packet transmission time
+        // add txTime to the total packet transmission time
+        this.n.addTXtime();
 
 
         if (n.collided){
@@ -41,8 +41,10 @@ public class StopTxEvent extends events.Event {
                             System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                             System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"); }
 
-            this.n.addCollision();               // increment collision counter of this node
-            this.n.resetContSlot();              // reset the contention slot counter of this node (this round is finished)
+            // increment collision counter of this node
+            this.n.addCollision();
+            // reset the contention slot counter of this node (this round is finished)
+            this.n.resetContSlot();
 
             //       I'm not sure to put here the reset of the contention time slot counter. If a collision occurs the contention fails, thus we start a new contention. Right?
 
@@ -63,8 +65,10 @@ public class StopTxEvent extends events.Event {
 
             n.dequeue();
 
-            this.n.storeContSlotNumber();           // save the contention slot counter (this round is successfully finished)
-            this.n.setTotalTime(time);              // save the overall packet transmission time (useful to throughput and delay)
+            // save the contention slot counter (this round is successfully finished)
+            this.n.storeContSlotNumber();
+            // save the overall packet transmission time (useful to throughput and delay)
+            this.n.setTotalTime(time);
 
             // start new round after SIFS + tACK
             scheduler.schedule(new StartListeningEvent(n,time + WSN.tACK + WSN.SIFS));
@@ -73,8 +77,9 @@ public class StopTxEvent extends events.Event {
         LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
         LinkedList<Node> listeningNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.LISTENING);
 
+        // At the end of the StopTxEvent new CheckChannelEvents must be rescheduled for all the listening nodes (that have stopped the BO during the startTXEvent). However
+        //  if a collision occurs the whole rescheduling has to happen during the stopTXEvent associated to the last collided node, in order to avoid duplicated events and unwanted behaviors.
         if (transmittingNodes.isEmpty()) {
-            //WSN.status = WSN.CHANNEL_STATUS.FREE;           // Useless parameter, I can check the channel status looking at the number of transmitting nodes in the local range
 
             if (WSN.debug) {
                 for (Node entry : listeningNodes) {
@@ -82,9 +87,7 @@ public class StopTxEvent extends events.Event {
                 }
             }
 
-            // procedure to track the listening nodes that were stopped during a collided packet transmission. If there was a collision I have to reschedule events (resume)
-            //  for all the nodes that were listening in all the collision events.
-
+            // procedure to track the listening nodes that were stopped during a collided packet transmission and resume them in the correct way.
             if (!n.collidedNodes.isEmpty()) {
 
                 if (WSN.debug) {
@@ -122,19 +125,23 @@ public class StopTxEvent extends events.Event {
             // reschedule CheckChannelStatus event for all the stopped listening nodes. Pay attention to the order on which events are rescheduled.
             for (Node listening : listeningNodes) {
 
-                    if (!listening.freeChannel) {       //if true means already scheduled by a previous Node.
+                    // check if the rescheduled is already happened.
+                    if (!listening.freeChannel) {
+                        // If the transmission succeeds only the last Node that stops the BO counter for this node can resume it.
+                        if ((!n.collided) && (listening.lastBOstopped.getId() == this.n.getId())) {
 
-                        if ((!n.collided) && (listening.lastBOstopped.getId() == this.n.getId())) {     // If transmission succeeds only the last Node that stops the BO counter for this node can resume it
-                                                                                                                // in order to avoid that resuming happen before necessary.
                             scheduler.schedule(new CheckChannelStatus(listening, time + WSN.DIFS, WSN.DIFS));
                             listening.freeChannel = true;
-                            listening.resetContSlot();      //  reset the contention slot counter for all the listening nodes (the round is finished)
+                            //  reset the contention slot counter for all the listening nodes (the round is finished)
+                            listening.resetContSlot();
                             if(WSN.debug) { System.out.println("->CheckChStatus rescheduled for Node "+listening.getId()); }
                         }
-                        else if (n.collided){       // if collision occurs the BO resuming is already handled by the previous procedure
+                        // if collision occurs the BO resuming is already handled by the previous procedure thus I can schedule for the current listening nodes list.
+                        else if (n.collided){
 
                             scheduler.schedule(new CheckChannelStatus(listening, time + WSN.DIFS, WSN.DIFS));
                             listening.freeChannel = true;
+                            //  reset the contention slot counter for all the listening nodes (the round is finished)
                             listening.resetContSlot();
                             if(WSN.debug) { System.out.println("->CheckChStatus rescheduled for Node "+listening.getId()); }
                         }
@@ -142,13 +149,13 @@ public class StopTxEvent extends events.Event {
             }
         }
         else{
+            // if this is not the StopTxEvent of the last node that collided its listening nodes are saved to be resumed in the last StopTxEvent
             this.n.resumingNodes.addAll(listeningNodes);
             for (Node entry : listeningNodes){
                 if (WSN.debug) { System.out.println("To be resumed, Node: "+entry.getId()); }
             }
         }
 
-       // n.setStatus(WSN.NODE_STATUS.IDLING);
     }
 
     public Packet getPacket(){
@@ -156,7 +163,7 @@ public class StopTxEvent extends events.Event {
     }
 
     private LinkedList<Node> removeDuplicate (LinkedList<Node> list){
-
+        // merging the previous listening nodes and the current listening nodes (that both need rescheduling) it is necessary to remove possible duplicates
         for (int i=0; i<list.size(); i++){
            for (int j =i+1; j<list.size(); j++){
                if (list.get(j).getId()==list.get(i).getId()){
@@ -169,7 +176,7 @@ public class StopTxEvent extends events.Event {
     }
 
     private LinkedList<Node> removeOldCollided (LinkedList<Node> list, ArrayList<Node> collidedNodes) {
-
+        // remove from the whole listening nodes possible collided nodes for which it has already been scheduled a CheckChannelEvent.
         for (int i = 0; i < list.size(); i++) {
             for (int j = 0; j < collidedNodes.size(); j++) {
                 if (list.get(i).getId() == collidedNodes.get(j).getId() || list.get(i).getId() == this.n.getId()) {

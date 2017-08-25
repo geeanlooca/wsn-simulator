@@ -39,7 +39,8 @@ public class StartTxEvent extends events.Event {
             n.collided = true;
             for (Node t : transmittingNodes) {
                 t.collided = true;
-                while (!transmittingNodes.isEmpty()){       // save the collided nodes
+                // save the collided nodes
+                while (!transmittingNodes.isEmpty()){
                     Node node = transmittingNodes.remove();
                     n.collidedNodes.add(node);
                     if (WSN.debug){ System.out.println("Collision Node "+node.getId()); }
@@ -58,8 +59,8 @@ public class StartTxEvent extends events.Event {
 
             if (WSN.debug){ System.out.println("\tNode " + listening.getId() + " stopped its B0 counter.");}
             listening.freeChannel = false;
-
-            listening.lastBOstopped = this.n;       // save the Node that freezes the backoff to discriminate among multiple backoff resumes
+            // save the node that force the backoff freezing to discriminate among multiple backoff resumes
+            listening.lastBOstopped = this.n;
 
         }
     }

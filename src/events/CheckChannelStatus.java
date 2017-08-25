@@ -25,8 +25,7 @@ public class CheckChannelStatus extends Event{
 
         Scheduler scheduler = Scheduler.getInstance();
 
-        // if the sender node (this) and the destination node sense the channel free new events are scheduled
-
+        // if both the sender node (this) and the destination node sense the channel free new events are scheduled
         if (n.freeChannel && (n.getNextPacket().getDestination().freeChannel)){
 
             if (WSN.debug){ System.out.println("Channel has been free for: " + duration);}
@@ -43,15 +42,17 @@ public class CheckChannelStatus extends Event{
                     // transmit
                     if (WSN.debug){ System.out.println("-> This node (" + this.n.getId() + ") will now start transmitting.");};
 
-                    n.addTransmission();             // increment transmissions counter
-                    WSN.nodeTrace.add(this.n);          // keep track of the nodes that start a transmission (useful to Fairness calculation)
-
+                    // increment transmissions counter
+                    n.addTransmission();
+                    // keep track of the nodes that start a transmission (useful to Fairness calculation)
+                    WSN.nodeTrace.add(this.n);
 
                     scheduler.schedule(new StartTxEvent(n, n.getNextPacket(), time));
                 }
-
-                this.n.addContSlot();       // increment contention slot counter
-                this.n.addSlotTime();          // add a tSLOT to the packet transmission time
+                // increment contention slot counter
+                this.n.addContSlot();
+                // add a tSLOT to the packet transmission time
+                this.n.addSlotTime();
             }
             else if (duration == WSN.DIFS){
 
@@ -60,8 +61,10 @@ public class CheckChannelStatus extends Event{
                     if (WSN.debug){ System.out.println("-> This node (" + this.n.getId() + ") will now start transmitting.");};
                     // transmit
 
-                    n.addTransmission();               // increment transmissions counter
-                    WSN.nodeTrace.add(this.n);         // keep track of the nodes that start a transmission (useful to Fairness calculation)
+                    // increment transmissions counter
+                    n.addTransmission();
+                    // keep track of the nodes that start a transmission (useful to Fairness calculation)
+                    WSN.nodeTrace.add(this.n);
 
                     scheduler.schedule(new StartTxEvent(n,  n.getNextPacket(), time));
                 }else {
@@ -69,7 +72,8 @@ public class CheckChannelStatus extends Event{
                     scheduler.schedule(new CheckChannelStatus(n, time + WSN.tSlot, WSN.tSlot));
                 }
 
-                n.addDIFStime();            // add a DIFS time to the packet transmission time
+                // add a DIFS time to the packet transmission time
+                n.addDIFStime();
             }
         }
     }
