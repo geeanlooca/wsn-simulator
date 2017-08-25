@@ -18,7 +18,7 @@ public class Event {
     }
 
     public String toString(){
-        return "[" + time + "]" + " fired by node " + n.getId();
+        return "[" + time + "]" + "[Node " + n.getId() + "]";
     }
 
     public Node getNode(){

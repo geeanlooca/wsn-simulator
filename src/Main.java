@@ -16,30 +16,54 @@ public class Main {
         netH = 1800;
         topologyID = 1;
 
-        double seconds = 1e12;
+        double seconds = 1e6;
         double minutes = seconds * 60;
-        double simulationTime =  60 * minutes;
+        double simulationTime =  5 * minutes;
+
+        int nodeCount = 5;
 
 
         System.out.println("Starting simulation...");
 
-        WSN netw = new WSN(20, netW, netH,topologyID);
-        netw.debugging(true);
-        netw.setAnimationDelay(0);
+        WSN netw = new WSN(nodeCount, netW, netH,topologyID);
+
+
+        boolean gui = false;
+        boolean debugging = false;
+        int delay = 0;
 
 
         // panel to visualize the network nodes
         int panelW = 500;
         int panelH = 530;
-        JFrame f = new JFrame();
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.getContentPane().add(new WSNWindow(netw));
-        f.setSize(panelW,panelH);
-        f.setLocation(200,200);
-        f.setVisible(true);
 
 
-        netw.run(simulationTime);
+        if (gui) {
+            JFrame f = new JFrame();
+            f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            f.getContentPane().add(new WSNWindow(netw));
+            f.setSize(panelW,panelH);
+            f.setLocation(200,200);
+            f.setVisible(true);
+
+            debugging = true;
+            delay = 500;
+        }
+
+        netw.debugging(debugging);
+        netw.setAnimationDelay(delay);
+
+
+        long startTime = System.currentTimeMillis();
+
+        netw.run(simulationTime/5.0);
+        WSN.printCollisionRate();
+
+        long endTime   = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        System.out.println("Simulation time: " + totalTime/1000.0 + "s");
+
+
     }
 }
 
@@ -126,7 +150,6 @@ class WSNWindow extends JPanel{
                     g2.setPaint(Color.black);
                     g2.draw(new Rectangle2D.Double(1, 1,panelW - 2 , panelH - 3));
                     break;
-
             }
 
         repaint();

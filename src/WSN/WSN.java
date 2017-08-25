@@ -30,16 +30,12 @@ public class WSN {
     // ------------------------------------//
 
     public enum NODE_STATUS {
-        SLEEPING, TRANSMITTING, IDLING, RECEIVING, LISTENING
-    }
+      SLEEPING, TRANSMITTING, IDLING, RECEIVING, LISTENING, JAMMING
+    };
 
-    ;
-
-    public enum CHANNEL_STATUS {
+    public enum CHANNEL_STATUS{
         FREE, BUSY
-    }
-
-    ;
+    };
 
     public static CHANNEL_STATUS status;
 
@@ -49,9 +45,7 @@ public class WSN {
     public static Color listenColor = Color.cyan;
 
     //public static double txTime = 200; // microseconds
-
-    // txTime in microsecond
-    public static double txTime = (frameSize * 8) / (maxAvailableThroughput);
+    public static double txTime =  (double) Math.round((frameSize * 8) / (maxAvailableThroughput) * 100) / 100;; // txTime in microsecond
 
     public static double meanInterarrivalTime = 20.0;
     public static double meanBackoff = 200.0;
@@ -73,7 +67,7 @@ public class WSN {
     private double width, height;
 
     public static double getPoisson(double mean) {
-        Random r = new Random();
+        RNG r = RNG.getInstance();
         double L = Math.exp(-mean);
         double k = 0.0;
         double p = 1.0;
@@ -91,9 +85,20 @@ public class WSN {
     public static ArrayList<Node> nodeTrace;
 
 
-    public WSN(int nodeCount, double width, double height, int topologyID) {
 
-        Random r = new Random();
+    //
+    // CONTI
+    //
+
+    public static double CONTIslotTime = 50;
+
+    //
+    // Methods
+    //
+
+    public WSN(int nodeCount, double width, double height, int topologyID){
+
+        RNG r = RNG.getInstance();
         nodes = new LinkedList<>();
         this.nodeCount = nodeCount;
 
@@ -129,8 +134,9 @@ public class WSN {
         }
     }
 
-    private double[] nodePosition() {
-        Random r = new Random();
+    private double[] nodePosition()
+    {
+        RNG r = RNG.getInstance();
         double[] coord = new double[2];
 
         double a, theta;
@@ -182,8 +188,6 @@ public class WSN {
         return topologyID;
     }
 
-    ;
-
     public double[] getNetworkSize() {
         double[] size = {width, height};
         return size;
@@ -197,11 +201,11 @@ public class WSN {
         this.sleepDelay = ms;
     }
 
-    public void debugging(boolean enable) {
-        //debug = enable;
+    public void debugging(boolean enable){
+        debug = enable;
     }
 
-    public void run() {
+    public void run(){
         this.run(Double.POSITIVE_INFINITY);
     }
 
@@ -209,7 +213,7 @@ public class WSN {
 
         setNeighborsList();
 
-        Random r = new Random();
+        RNG r = RNG.getInstance();
 
         Scheduler scheduler = Scheduler.getInstance();
         double currentTime = 0;
@@ -222,20 +226,19 @@ public class WSN {
                 Thread.currentThread().interrupt();
             }
             Event e = scheduler.remove();
-            currentTime += e.getTime();
+            currentTime = e.getTime();
 
-            if (debug) {
+            if (debug){
                 System.out.println(e);
                 //System.out.println("Number of transmitting nodes: " + trasmittingNodes.size());
             }
 
             e.run();
 
-            if (debug) {
-                //System.out.println("Scheduler size: "+scheduler.size()+" - currentTime " +currentTime+" < maxTime "+maxTime+": "+ (currentTime < maxTime));
+            System.out.format("Progress: %.2f %%\n", (currentTime/maxTime*100.0));
+            if (debug){
                 System.out.println("\n");
             }
-
         }
 
         WSN.printCollisionRate();
@@ -243,11 +246,9 @@ public class WSN {
         WSN.printThroughput();
         WSN.printDelay();
         WSN.printFairness(windowSize);
-
-        System.exit(0);
     }
 
-    public void setNeighborsList() {
+    public void setNeighborsList(){
 
         for (Node nodeA : WSN.nodes) {
             for (Node nodeB : WSN.nodes) {
@@ -306,7 +307,10 @@ public class WSN {
             avCollRate = avCollRate + collRate / numb;
             System.out.println(node.getId() + "\t\t\t" + node.getCollisionParam()[0] + " / " + node.getCollisionParam()[1] + "\t\t\t\t"+ collRate);
         }
-        System.out.println("\n Average Collision Rate = " +avCollRate+" [%]");
+
+        double collPerc = avCollRate * 100;
+
+        System.out.println("\n Average Collision Rate = " + Math.round(collPerc * 100.0)/100.0 + " [%]");
     }
 
     public static void printSlotNumber(){

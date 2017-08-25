@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Channel {
 
-    private Random rnd = new Random();
+    private RNG rnd = RNG.getInstance();
 
     private double Ptx;         // transmitted power
     private double eta = 4;     // path loss exponent
@@ -40,7 +40,7 @@ public class Channel {
     {
         // generate shadowing term
         double xi = sigma * rnd.nextGaussian();
-        double shad = Math.exp(xi);
+        double shad = 1; //Math.exp(xi);
 
         // generate Rayleigh fading
         double R2 = - Math.log(rnd.nextDouble());
