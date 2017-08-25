@@ -22,7 +22,7 @@ public class StartTxEvent extends Event {
 
     @Override
     public String toString(){
-        return "[" + time + "][StartTxEvent] from node " +  this.n;
+        return "[" + time + "][StartTxEvent][Node " +  this.n.getId()+"]";
     }
 
 
@@ -42,8 +42,6 @@ public class StartTxEvent extends Event {
         scheduler.schedule(new protocols.CONTI.StopTxEvent(this, time + WSN.txTime));
 
     }
-
-
 
     public Packet getPacket(){
         return this.p;

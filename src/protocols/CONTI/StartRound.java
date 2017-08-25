@@ -23,6 +23,6 @@ public class StartRound extends Event {
 
     @Override
     public String toString(){
-        return "[" + time + "][StartRound] from node " +  this.n;
+        return "[" + time + "][StartRound][Node " +  this.n.getId() + "]";
     }
 }

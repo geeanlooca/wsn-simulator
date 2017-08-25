@@ -18,9 +18,9 @@ public class Main {
 
         double seconds = 1e6;
         double minutes = seconds * 60;
-        double simulationTime =  0.25 * minutes;
+        double simulationTime =  5 * minutes;
 
-        int nodeCount = 10;
+        int nodeCount = 5;
 
 
         System.out.println("Starting simulation...");
@@ -57,12 +57,13 @@ public class Main {
         long startTime = System.currentTimeMillis();
 
         netw.run(simulationTime/5.0);
+        WSN.printCollisionRate();
 
         long endTime   = System.currentTimeMillis();
         long totalTime = endTime - startTime;
-        System.out.println(totalTime);
+        System.out.println("Simulation time: " + totalTime/1000.0 + "s");
 
-        WSN.printCollisionRate();
+
     }
 }
 

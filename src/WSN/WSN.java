@@ -3,9 +3,9 @@ package WSN;
 import protocols.Event;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import WSN.RNG;
 
 
 /**
@@ -42,7 +42,7 @@ public class WSN {
     public static Color listenColor = Color.cyan;
 
     //public static double txTime = 200; // microseconds
-    public static double txTime = (frameSize * 8) / (maxAvailableThroughput); // txTime in microsecond
+    public static double txTime =  (double) Math.round((frameSize * 8) / (maxAvailableThroughput) * 100) / 100;; // txTime in microsecond
 
     public static double meanInterarrivalTime = 20.0;
     public static double meanBackoff = 200.0;
@@ -232,7 +232,7 @@ public class WSN {
 
             e.run();
 
-            System.out.format("Progress: %f %%\n", currentTime/maxTime);
+            System.out.format("Progress: %.2f %%\n", (currentTime/maxTime*100.0));
             if (debug){
                 System.out.println("\n");
             };
@@ -308,7 +308,10 @@ public class WSN {
             avCollRate = avCollRate + collRate / numb;
             System.out.println(node.getId() + "\t\t\t" + node.getCollisionParam()[0] + " / " + node.getCollisionParam()[1] + "\t\t\t\t"+ collRate);
         }
-        System.out.println("\n Average Collision Rate = " +avCollRate+" [%]");
+
+        double collPerc = avCollRate * 100;
+
+        System.out.println("\n Average Collision Rate = " + Math.round(collPerc * 100.0)/100.0 + " [%]");
     }
 
     public static void printSlotNumber(){

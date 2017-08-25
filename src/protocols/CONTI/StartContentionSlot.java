@@ -14,11 +14,6 @@ public class StartContentionSlot extends Event {
 
     public void run(){
 
-
-        if (WSN.debug){
-            System.out.println("[ContentionSlot " + (n.CONTIslotNumber+1) + "][Node " + n.getId() + "]");
-        }
-
         // obtain Scheduler instance
         Scheduler scheduler = Scheduler.getInstance();
 
@@ -31,12 +26,16 @@ public class StartContentionSlot extends Event {
             n.setStatus(WSN.NODE_STATUS.JAMMING);
             n.setColor(Color.RED);
             if (WSN.debug){
-                System.out.println("Node " + n.getId() + "");
+                System.out.println("\tNode " + n.getId() + " is jamming");
             }
         }else{
             // node listens
             n.setColor(Color.yellow);
             n.setStatus(WSN.NODE_STATUS.LISTENING);
+
+            if (WSN.debug){
+                System.out.println("\tNode " + n.getId() + " is listening");
+            }
         }
 
         scheduler.schedule(new EndContentionSlot(n, time + WSN.CONTIslotTime));
@@ -44,6 +43,6 @@ public class StartContentionSlot extends Event {
 
     @Override
     public String toString(){
-        return "";
+        return "["+this.time+"][ContentionSlot " + (n.CONTIslotNumber+1) + "/" + n.CONTIp.length + "][Node " + n.getId() + "]";
     }
 }
