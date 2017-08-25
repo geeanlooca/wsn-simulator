@@ -83,13 +83,14 @@ public class CheckChannelStatus extends Event{
     }
 
     private boolean checkDestNeighbors(){
-        // check if the destination node is already the destination node of a neighbor of him
+        // check if the destination node is already the destination node of a neighbor of him (surely I have to exclude (this) node from the neighbors)
         boolean statement = false;
         Node dest = n.getNextPacket().getDestination();
         LinkedList<Node> destNeighbors = WSN.getNeighborsStatus(dest, WSN.NODE_STATUS.TRANSMITTING);
+
         if (!dest.freeChannel) {
             for (Node entry : destNeighbors) {
-                if (entry.getNextPacket().getDestination().getId() == dest.getId()) {
+                if (entry.getNextPacket().getDestination().getId() == dest.getId() && (entry.getId() != this.n.getId())) {
                     statement = true;
                     break;
                 }
