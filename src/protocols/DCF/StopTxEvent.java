@@ -1,6 +1,6 @@
 package protocols.DCF;
 import WSN.*;
-import protocols.Event;
+import events.Event;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

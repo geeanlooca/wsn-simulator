@@ -1,6 +1,6 @@
 package protocols.DCF;
 import WSN.*;
-import protocols.Event;
+import events.Event;
 
 import java.util.LinkedList;
 
@@ -23,9 +23,9 @@ public class StartTxEvent extends Event {
     public void run(){
         super.run();
 
+
+
         n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
-
-
         Scheduler scheduler = Scheduler.getInstance();
         this.n.setSize(WSN.txSize);
 

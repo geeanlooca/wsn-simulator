@@ -1,6 +1,6 @@
 package protocols.CONTI;
 
-import protocols.Event;
+import events.Event;
 import WSN.*;
 
 import java.awt.*;

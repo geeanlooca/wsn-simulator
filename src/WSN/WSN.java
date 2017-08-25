@@ -1,7 +1,8 @@
 package WSN;
 
+import events.UpdatePosition;
 import protocols.DCF.StartListeningEvent;
-import protocols.Event;
+import events.Event;
 
 import java.awt.*;
 import java.util.*;
@@ -131,6 +132,7 @@ public class WSN {
             nodes.add(n);
 
             scheduler.schedule(new StartListeningEvent(n, 0));
+            //scheduler.schedule(new UpdatePosition(n, 1000));
         }
     }
 

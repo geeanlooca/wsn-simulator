@@ -40,10 +40,12 @@ public class Channel {
     {
         // generate shadowing term
         double xi = sigma * rnd.nextGaussian();
-        double shad = 1; //Math.exp(xi);
+        double shad = Math.exp(xi);
 
+        shad = 1;
         // generate Rayleigh fading
         double R2 = - Math.log(rnd.nextDouble());
+        R2 = 1;
 
         //compute the received power
         double Prx = Ptx * R2 * shad * K * Math.pow(d/d0,-eta);

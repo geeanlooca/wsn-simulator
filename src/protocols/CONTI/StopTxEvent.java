@@ -3,11 +3,12 @@ package protocols.CONTI;
 import WSN.Packet;
 import WSN.Scheduler;
 import WSN.WSN;
+import events.Event;
 
 /**
  * Created by Gianluca on 16/07/2017.
  */
-public class StopTxEvent extends protocols.Event {
+public class StopTxEvent extends Event {
 
 
     private Packet p;

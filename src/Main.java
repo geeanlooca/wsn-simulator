@@ -2,25 +2,26 @@ import WSN.*;
 
 import java.awt.*;
 import java.awt.geom.*;
+import java.io.IOException;
 import javax.swing.*;
 
 /**
  * Created by Gianluca on 16/07/2017.
  */
 public class Main {
-    public static void main (String [] args){
+    public static void main (String [] args) throws IOException {
 
         // network size and topology number
         int netW, netH, topologyID;
         netW = 1800;
         netH = 1800;
-        topologyID = 1;
+        topologyID = 0;
 
         double seconds = 1e6;
         double minutes = seconds * 60;
         double simulationTime =  5 * minutes;
 
-        int nodeCount = 5;
+        int nodeCount = 10;
 
 
         System.out.println("Starting simulation...");
@@ -47,7 +48,7 @@ public class Main {
             f.setVisible(true);
 
             debugging = true;
-            delay = 500;
+            delay = 20;
         }
 
         netw.debugging(debugging);
@@ -56,6 +57,7 @@ public class Main {
 
         long startTime = System.currentTimeMillis();
 
+        //System.in.read();
         netw.run(simulationTime/5.0);
         WSN.printCollisionRate();
 
@@ -105,8 +107,8 @@ class WSNWindow extends JPanel{
                 Node n = network.getNodes().get(i);
                 Ellipse2D e = n.getEllipse();
 
-                nodeX = panelW/2 + (e.getX() - netW/2) * scaleX;
-                nodeY = panelH/2 + (e.getY() - netH/2) * scaleY;
+                nodeX = panelW/2 + (n.getX() - netW/2) * scaleX;
+                nodeY = panelH/2 + (n.getY() - netH/2) * scaleY;
                 nodeSize = n.getSize();
 
                 e = new Ellipse2D.Double(nodeX,nodeY,nodeSize,nodeSize);

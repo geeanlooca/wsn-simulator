@@ -11,7 +11,8 @@ import WSN.RNG;
 public class Node {
 
     // coordinates, color and size of the node
-    private double X, Y;
+    private double X;
+    private double Y;
     private int id;
     private Ellipse2D e;
     private java.awt.Color c;
@@ -65,8 +66,8 @@ public class Node {
     //
 
     public Node(int id, double X, double Y){
-        this.X = X;
-        this.Y = Y;
+        setX(X);
+        setY(Y);
         this.id = id;
         this.size = 10;
         c = Color.blue;
@@ -100,9 +101,15 @@ public class Node {
     public double getX(){
         return this.X;
     }
-
     public double getY(){
         return this.Y;
+    }
+    public void setX(double x) {
+        X = x;
+    }
+
+    public void setY(double y) {
+        Y = y;
     }
 
     public int getId(){

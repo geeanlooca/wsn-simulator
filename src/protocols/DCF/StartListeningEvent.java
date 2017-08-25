@@ -4,7 +4,7 @@ import WSN.Node;
 import WSN.WSN;
 import WSN.Scheduler;
 import WSN.Packet;
-import protocols.Event;
+import events.Event;
 
 
 import java.util.ArrayList;

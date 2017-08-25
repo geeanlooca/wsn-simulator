@@ -4,9 +4,9 @@ import WSN.Node;
 import WSN.Packet;
 import WSN.Scheduler;
 import WSN.WSN;
-import protocols.Event;
+import events.Event;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by Gianluca on 24/08/2017.
@@ -33,7 +33,7 @@ public class StartTxEvent extends Event {
 
         Scheduler scheduler = Scheduler.getInstance();
         n.addTransmission();
-        ArrayList<Node> transmitting = WSN.getNeighborsStatus(n, WSN.NODE_STATUS.TRANSMITTING);
+        LinkedList<Node> transmitting = WSN.getNeighborsStatus(n, WSN.NODE_STATUS.TRANSMITTING);
         if (transmitting.size() > 0){
             // collision occurs
             n.addCollision();

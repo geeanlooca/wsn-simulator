@@ -1,6 +1,6 @@
 package WSN;
 
-import protocols.Event;
+import events.Event;
 
 import java.util.PriorityQueue;
 import java.util.Queue;

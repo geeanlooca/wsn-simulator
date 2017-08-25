@@ -3,11 +3,11 @@ package protocols.CONTI;
 import WSN.Node;
 import WSN.WSN;
 import WSN.Packet;
-import protocols.Event;
+import events.Event;
 import WSN.Scheduler;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by Gianluca on 23/08/2017.
@@ -26,7 +26,7 @@ public class EndContentionSlot extends Event {
 
         // determine if node goes on with the contention or defers
         if (n.getStatus() == WSN.NODE_STATUS.LISTENING){
-            ArrayList<Node> jammingNodes = WSN.getNeighborsStatus(n, WSN.NODE_STATUS.JAMMING);
+            LinkedList<Node> jammingNodes = WSN.getNeighborsStatus(n, WSN.NODE_STATUS.JAMMING);
 
             if (WSN.debug){
                 System.out.println("\tNode " + n.getId() + " is listening.");
