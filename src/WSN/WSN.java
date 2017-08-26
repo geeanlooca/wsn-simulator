@@ -1,10 +1,12 @@
 package WSN;
 
-import protocols.DCF.StartListeningEvent;
 import events.Event;
+import events.UpdatePosition;
 import protocols.Protocol;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
@@ -26,8 +28,8 @@ public class WSN {
 
     private int windowSize = 1000;                 //  window size used in Fairness calculation
 
-    private double PrxThreshold = 1e-16;        // threshold on received power
-    private double Ptx = 100;                   // transmission power
+    public static double PrxThreshold = 1e-16;        // threshold on received power
+    public static double Ptx = 100;                   // transmission power
 
     // ------------------------------------//
 
@@ -35,16 +37,26 @@ public class WSN {
       SLEEPING, TRANSMITTING, IDLING, RECEIVING, LISTENING, JAMMING
     };
 
-    public enum CHANNEL_STATUS{
-        FREE, BUSY
-    };
+    /***********************************************
+     *                  GUI                        *
+     ***********************************************/
 
-    public static CHANNEL_STATUS status;
-
+    private boolean gui = false;
     public static Color txColor = Color.magenta;
     public static Color normColor = Color.blue;
     public static Color sleepColor = Color.pink;
     public static Color listenColor = Color.cyan;
+    private WSNWindow guiWindow;
+    private int panelW, panelH;
+    private JFrame f;
+
+    public void setPanelSize(int w, int h){
+        if (gui){
+            this.panelW = w;
+            this.panelH = h;
+            f.setSize(w, h);
+        }
+    }
 
     //public static double txTime = 200; // microseconds
     public static double txTime =  (double) Math.round((frameSize * 8) / (maxAvailableThroughput) * 100) / 100;; // txTime in microsecond
@@ -66,7 +78,9 @@ public class WSN {
     public static double tPLC = 192;
 
     private int topologyID;
-    private double width, height;
+
+    private static double width, height;
+    private static double maxRadius;
 
     public static double getPoisson(double mean) {
         RNG r = RNG.getInstance();
@@ -81,12 +95,10 @@ public class WSN {
 
     }
 
-    private static List<Node> nodes;
+    public static List<Node> nodes;
 
     // log of nodes that have transmitted (useful to fairness calculation)
     public static ArrayList<Node> nodeTrace;
-
-
 
     //
     // CONTI
@@ -98,7 +110,8 @@ public class WSN {
     // Methods
     //
 
-    public WSN(int nodeCount, double width, double height, Protocol p, int topologyID) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    /************************      CONSTRUCTOR      ***********************/
+    public WSN(int nodeCount, double width, double height, Protocol p, int topologyID, boolean gui) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 
         RNG r = RNG.getInstance();
         nodes = new LinkedList<>();
@@ -108,6 +121,7 @@ public class WSN {
         this.height = height;
 
         this.topologyID = topologyID;
+        this.gui = gui;
 
 
         Scheduler scheduler = Scheduler.getInstance();
@@ -133,9 +147,40 @@ public class WSN {
             nodes.add(n);
 
             Event e = (Event) p.entryPoint().newInstance(n,new Double(0));
-            scheduler.schedule(e);
-            //scheduler.schedule(new UpdatePosition(n, 1000));
+            //scheduler.schedule(e);
         }
+
+        scheduler.schedule(new UpdatePosition(1000));
+
+        // create GUI window
+        if (gui){
+            panelW = 500;
+            panelH = 530;
+            f = new JFrame();
+            f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            guiWindow = new WSNWindow(this);
+            f.getContentPane().add(guiWindow);
+            f.setSize(panelW,panelH);
+            f.setLocation(200,200);
+            f.setVisible(true);
+        }
+    }
+    /**********************************************************************/
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public static double getMaxRadius() {
+        return maxRadius;
+    }
+
+    private void setMaxRadius(double radius) {
+        this.maxRadius = radius;
     }
 
     private double[] nodePosition()
@@ -144,7 +189,7 @@ public class WSN {
         double[] coord = new double[2];
 
         double a, theta;
-        double maxRadius = 0.5 * Math.min(width, height);
+        setMaxRadius(0.5 * Math.min(width, height));
 
         switch (this.topologyID) {
 
@@ -152,8 +197,8 @@ public class WSN {
             case 0:
                 a = maxRadius * Math.sqrt(r.nextDouble());
                 theta = 2 * Math.PI * r.nextDouble();
-                coord[0] = width / 2 + a * Math.cos(theta);
-                coord[1] = height / 2 + a * Math.sin(theta);
+                coord[0] = a * Math.cos(theta);
+                coord[1] = a * Math.sin(theta);
                 break;
 
             // hexagonal cell
@@ -217,8 +262,6 @@ public class WSN {
 
         setNeighborsList();
 
-        RNG r = RNG.getInstance();
-
         Scheduler scheduler = Scheduler.getInstance();
         double currentTime = 0;
 
@@ -234,7 +277,6 @@ public class WSN {
 
             if (debug){
                 System.out.println(e);
-                //System.out.println("Number of transmitting nodes: " + trasmittingNodes.size());
             }
 
             e.run();
@@ -242,6 +284,11 @@ public class WSN {
             System.out.format("Progress: %.2f %%\n", (currentTime/maxTime*100.0));
             if (debug){
                 System.out.println("\n");
+            }
+
+            // repaint GUI panel
+            if (gui){
+                guiWindow.paint();
             }
         }
 
@@ -463,6 +510,109 @@ public class WSN {
             return sum / list.size();
         }
         return sum;
+    }
+
+
+    /*****************************
+     *          GUI              *
+     *****************************/
+    class WSNWindow extends JPanel{
+
+        Color selectedColor;
+
+        private WSN network;
+
+        public WSNWindow(WSN network){
+            setBackground(Color.white);
+            selectedColor = Color.blue;
+            this.network = network;
+        }
+
+        public void paint(){
+            repaint();
+        }
+
+        protected void paintComponent(Graphics g){
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g;
+
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // find the panel dimension
+            double panelH = getHeight();
+            double panelW = getWidth();
+
+            int topologyID = network.getTopologyID();
+            double[] networkSize = network.getNetworkSize();
+            double netW = networkSize[0];
+            double netH = networkSize[1];
+
+            // scaling factors only to draw the nodes
+            double scaleX = 0.9 * panelW/netW;
+            double scaleY = 0.9 * panelH/netH;
+
+            double nodeX, nodeY, nodeSize;
+            for (int i = 0; i < network.nodeCount(); i++) {
+
+                Node n = network.getNodes().get(i);
+
+//                nodeX = panelW/2 + (n.getX() - netW/2) * scaleX;
+//                nodeY = panelH/2 + (n.getY() - netH/2) * scaleY;
+
+                nodeX = panelW/2 + n.getX() * scaleX;
+                nodeY = panelH/2 + n.getY() * scaleY;
+                nodeSize = n.getSize();
+
+                for(Node neigh : n.getNeighborList()){
+                    g2.setColor(n.getLineColor());
+
+                    double neighX = panelW/2 + neigh.getX() * scaleX;
+                    double neighY = panelH/2 + neigh.getY() * scaleY;
+                    g2.draw(new Line2D.Double(nodeX, nodeY, neighX, neighY));
+                }
+
+                Ellipse2D e = new Ellipse2D.Double(nodeX-nodeSize/2,nodeY-nodeSize/2,nodeSize,nodeSize);
+                g2.setPaint(n.getColor());
+                g2.fill(e);
+
+                Font font = new Font("Serif", Font.PLAIN, 18);
+                g2.setFont(font);
+                g2.setColor(Color.black);
+                g2.drawString(String.valueOf(n.getId()), (int) nodeX, ((int) nodeY)-3);
+            }
+
+            g2.setPaint(Color.black);
+
+            switch (topologyID){
+                // circular cell
+                case 0:
+                    g2.setPaint(Color.black);
+                    g2.draw(new Ellipse2D.Double(0.05 * panelW,0.05 * panelH,0.9 * panelW, 0.9 * panelH));
+                    break;
+
+                // hexagonal cell
+                case 1:
+                    Path2D hexagon = new Path2D.Double();
+                    Point2D center = new Point2D.Double(panelW/2, panelH/2);
+                    double r = 0.48 * Math.min(panelH, panelW);
+
+                    // initial point
+                    hexagon.moveTo(center.getX() + r * Math.cos(Math.PI/6), center.getY() + r * Math.sin(Math.PI/6));
+
+                    for(int i=1; i<6; i++) {
+                        hexagon.lineTo(center.getX() + r * Math.cos((2*i+1)*Math.PI/6), center.getY() + r * Math.sin((2*i+1)*Math.PI/6));
+                    }
+                    hexagon.closePath();
+
+                    g2.draw(hexagon);
+                    break;
+
+                default:
+                    g2.setPaint(Color.black);
+                    g2.draw(new Rectangle2D.Double(1, 1,panelW - 2 , panelH - 3));
+                    break;
+            }
+        }
     }
 
 }

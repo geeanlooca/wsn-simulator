@@ -14,7 +14,6 @@ public class Node {
     private double X;
     private double Y;
     private int id;
-    private Ellipse2D e;
     private java.awt.Color c;
     private double size;
 
@@ -87,7 +86,6 @@ public class Node {
         RNG random = RNG.getInstance();
 
         setLineColor(Color.lightGray);
-        e = new Ellipse2D.Double(X-size/2, Y-size/2, size, size);
         buffer = new LinkedList<Packet>();
         collided = false;
 
@@ -130,10 +128,6 @@ public class Node {
 
     public int getId(){
         return this.id;
-    }
-
-    public Ellipse2D getEllipse(){
-        return this.e;
     }
 
     public void setColor(Color newColor){
@@ -214,6 +208,8 @@ public class Node {
     public boolean findNeighbor(Node node){
         return (neighborList.indexOf(node) > 0);
     }
+
+    public void clearNeighbors(){ this.neighborList.clear();}
 
     // output parameters
 

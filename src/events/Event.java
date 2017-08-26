@@ -11,6 +11,12 @@ public class Event {
     protected double time;
     private Color c;
 
+
+    public Event(Double time)
+    {
+        this.time = time;
+    }
+
     public Event(Node n, Double time, Color c){
         this.n = n;
         this.time = time;
