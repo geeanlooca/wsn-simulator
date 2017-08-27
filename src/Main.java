@@ -15,8 +15,8 @@ public class Main {
         int netW, netH, topologyID, mobilityID;
         netW = 1800;
         netH = 1800;
-        topologyID = 0;
-        mobilityID = 0;
+        topologyID = 1;
+        mobilityID = 1;
 
 
         double seconds = 1e6;

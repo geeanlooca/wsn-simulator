@@ -13,6 +13,7 @@ import WSN.RNG;
 public class Node {
 
     // coordinates, color and size of the node
+    private RNG rng = RNG.getInstance();
     public double X, X0;
     public double Y, Y0;
     private int id;
@@ -45,6 +46,17 @@ public class Node {
     public Node lastBOstopped;
 
     private ArrayList<Node> neighborList;
+
+    // mobility
+    double maxSpeed = 20;   // speed in m/s
+    double minSpeed = 10;   // speed in m/s
+    double avgSpeed = 15;   // speed in m/s
+    double avgDir = 80;     // direction in degree
+    double alphaS = 0.7;     // sensitivity factor
+    double alphaD = 0.7;     // sensitivity factor
+
+    double speed = minSpeed + rng.nextDouble() * (maxSpeed-minSpeed);       // initial value for the speed
+    double dir = rng.nextInt(360);         // initial value for the direction
 
     // output parameters
     private int transCounter;
@@ -296,8 +308,6 @@ public class Node {
     /********** mobility ******/
     public void move(int mobilityID)
     {
-        RNG rng = RNG.getInstance();
-
         double netRadius = WSN.getMaxRadius();
         double newX, newY, newDist;
 
@@ -332,32 +342,25 @@ public class Node {
                 break;
             case 1: // Gauss-Markov model
 
-                // mobility
-                double maxSpeed = 20;   // speed in m/s
-                double minSpeed = 10;   // speed in m/s
-                double avgSpeed = 25;   // speed in m/s
-                double avgDir = Math.PI/2;     // direction in degree
-                double alphaS = 0.7;     // sensitivity factor
-                double alphaD = 0.9;     // sensitivity factor
 
-                double speed = 0;       // initial value for the speed
-                double dir = 0;         // initial value for the direction
 
                 // compute new speed and direction
                 speed = alphaS * speed + (1-alphaS) * avgSpeed + Math.sqrt(1-Math.pow(alphaS,2)) * rng.nextGaussian();
-                //dir = alphaD * dir + (1-alphaD) * avgDir + Math.sqrt(1-Math.pow(alphaD,2)) * rng.nextGaussian();
-                //System.out.print(speed + "\n");
-                dir = alphaD * dir + Math.sqrt(1-Math.pow(alphaD,2)) * rng.nextGaussian();
-                System.out.print(Math.toDegrees(dir) + "\n");
-                // compute new candidate position
-                //newX = X + speed * Math.cos(Math.toRadians(dir));
-                //newY = Y + speed * Math.sin(Math.toRadians(dir));
+                dir = alphaD * dir + (1-alphaD) * avgDir + Math.sqrt(1-Math.pow(alphaD,2)) * rng.nextGaussian();
 
-                newX = X + speed * Math.cos(dir);
-                newY = Y + speed * Math.sin(dir);
+                if (Math.abs(dir) > 360) {
+                    dir = dir % 360;
+                }
+
+                System.out.print(id + " " + speed + " " + dir + "\n");
+                // compute new candidate position
+                newX = X + speed * Math.cos(Math.toRadians(dir));
+                newY = Y + speed * Math.sin(Math.toRadians(dir));
 
                 // compute the displacement of the node from the initial position
                 double range = Math.sqrt(Math.pow(newX-X0,2) + Math.pow(newY-Y0,2));
+                newDist = Math.sqrt(newX * newX + newY * newY);
+
                 double maxRange = netRadius/4;
 
                 // check if the new position is inside the network
@@ -365,22 +368,22 @@ public class Node {
 
                     case 0:     // circular topology
 
-                        newDist = Math.sqrt(newX * newX + newY * newY);
-
                         if (range > maxRange || newDist > netRadius) { // if point exceeds range of movement or network I move in the opposite direction
-                            //if (dir >= 0)
-                            //    dir -= 180;
-                            //else dir += 180;
 
-                            //newX = X + speed * Math.cos(Math.toRadians(dir));
-                            //newY = Y + speed * Math.sin(Math.toRadians(dir));
+                            do{
+                                dir = rng.nextInt(360);
+                                newX = X + speed * Math.cos(Math.toRadians(dir));
+                                newY = Y + speed * Math.sin(Math.toRadians(dir));
 
-                            if (dir >= 0)
-                                dir -= Math.PI;
-                            else dir += Math.PI;
+                                range = Math.sqrt(Math.pow(newX-X0,2) + Math.pow(newY-Y0,2));
+                                newDist = Math.sqrt(newX * newX + newY * newY);
 
-                            newX = X + speed * Math.cos(dir);
-                            newY = Y + speed * Math.sin(dir);
+                            }while(!(range <= maxRange && newDist <= netRadius));
+
+                            avgDir -= 180;
+                            if (Math.abs(avgDir) > 360) {
+                                avgDir = avgDir % 360;
+                            }
                         }
 
                         X = newX;
@@ -401,13 +404,36 @@ public class Node {
                         }
                         hexagon.closePath();
 
-                        if (range <= maxRange && hexagon.contains(newPos)) {
-                            X = newX;
-                            Y = newY;
-                        } else { // if point exceeds range of movement or network I move in the opposite direction
-                            X = X - speed * Math.cos(Math.toRadians(dir));
-                            Y = Y - speed * Math.sin(Math.toRadians(dir));
+                        if (range > maxRange || !hexagon.contains(newPos)) { // if point exceeds range of movement or network I move in the opposite direction
+
+                            do{
+                                dir = rng.nextInt(360);
+                                newX = X + speed * Math.cos(Math.toRadians(dir));
+                                newY = Y + speed * Math.sin(Math.toRadians(dir));
+
+                                range = Math.sqrt(Math.pow(newX-X0,2) + Math.pow(newY-Y0,2));
+
+                                hexagon = new Path2D.Double();
+                                newPos = new Point2D.Double(newX, newY);
+
+                                hexagon.moveTo(netRadius * Math.cos(Math.PI / 6), netRadius * Math.sin(Math.PI / 6));
+
+                                for (int i = 1; i < 6; i++) {
+                                    hexagon.lineTo(netRadius * Math.cos((2 * i + 1) * Math.PI / 6), netRadius * Math.sin((2 * i + 1) * Math.PI / 6));
+                                }
+                                hexagon.closePath();
+
+                            }while(!(range <= maxRange && hexagon.contains(newPos)));
+
+                            avgDir -= 180;
+                            if (Math.abs(avgDir) > 360) {
+                                avgDir = avgDir % 360;
+                            }
                         }
+
+                        X = newX;
+                        Y = newY;
+
                         break;
                     }
 

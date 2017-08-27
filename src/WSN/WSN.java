@@ -215,8 +215,8 @@ public class WSN {
                 a = a * maxRadius;
                 theta = theta + Math.PI / 3 * r.nextInt(6);
 
-                coord[0] = width / 2 + a * Math.cos(theta);
-                coord[1] = height / 2 + a * Math.sin(theta);
+                coord[0] = a * Math.cos(theta);
+                coord[1] = a * Math.sin(theta);
                 break;
             default:
                 coord[0] = width * r.nextDouble();
@@ -520,13 +520,13 @@ public class WSN {
 
         private WSN network;
 
-        public WSNWindow(WSN network){
+        private WSNWindow(WSN network){
             setBackground(Color.white);
             selectedColor = Color.blue;
             this.network = network;
         }
 
-        public void paint(){
+        private void paint(){
             repaint();
         }
 
@@ -540,7 +540,6 @@ public class WSN {
             double panelH = getHeight();
             double panelW = getWidth();
 
-            int topologyID = network.getTopologyID();
             double[] networkSize = network.getNetworkSize();
             double netW = networkSize[0];
             double netH = networkSize[1];
@@ -570,17 +569,15 @@ public class WSN {
                 g2.setPaint(n.getColor());
                 g2.fill(e);
 
-                /**
-                 * useful for William debug...don't delete
-                 *
-                 double X0 = panelW/2 + n.X0 * scaleX;
-                double Y0 = panelH/2 + n.Y0 * scaleY;
-                double range = WSN.getMaxRadius()/4;
+                if(mobilityID == 1) { // draw mobility range in case of Gauss-Markov model
+                    double X0 = panelW / 2 + n.X0 * scaleX;
+                    double Y0 = panelH / 2 + n.Y0 * scaleY;
+                    double range = WSN.getMaxRadius() / 4;
 
-                e = new Ellipse2D.Double(X0-range/2,Y0-range/2,range,range);
-                g2.setPaint(Color.red);
-                g2.draw(e);
-                 */
+                    e = new Ellipse2D.Double(X0 - range / 2, Y0 - range / 2, range, range);
+                    g2.setPaint(Color.red);
+                    g2.draw(e);
+                }
 
                 Font font = new Font("Serif", Font.PLAIN, 18);
                 g2.setFont(font);
