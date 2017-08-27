@@ -12,47 +12,36 @@ import WSN.Channel;
  */
 public class UpdatePosition extends Event {
 
-    public UpdatePosition(double time){ super(time); }
+    private int mobilityID;
+
+    public UpdatePosition(double time, int mobilityID){
+        super(time);
+        this.mobilityID = mobilityID;
+    }
 
     public void run(){
-        RNG r = RNG.getInstance();
+
         Scheduler sc = Scheduler.getInstance();
 
-        for (Node n :
-                WSN.nodes) {
+        // set the type of mobility
+        // 0 - gaussian noise
+        // 1 - Gauss-Markov model
+        // 2 - NO mobility
 
-            double X0 = n.getX();
-            double Y0 = n.getY();
 
-            // random displacement
-            double sX = 50*r.nextGaussian();
-            double sY = 50*r.nextGaussian();
+        // update the node position
+        for (Node n : WSN.nodes) {
 
-            double mag = Math.sqrt(sX*sX + sY*sY);
-
-            double newX = X0 + sX;
-            double newY = Y0 + sY;
-            double dist = Math.sqrt(X0*X0 + Y0*Y0);
-            double newDist = Math.sqrt(newX*newX + newY*newY);
-            double radius = WSN.getMaxRadius();
-
-            if (newDist > radius){
-                // get direction to center of the cell
-                double dirX = X0 / (dist*dist);
-                double dirY = Y0 / (dist*dist);
-
-                newX = X0 + mag * dirX;
-                newY = Y0 + mag * dirY;
-
-            }
-
-            n.setX(newX);
-            n.setY(newY);
-
-            n.clearNeighbors();
+            n.move(mobilityID);
         }
 
+        // update the node neighbors
         for (Node nodeA : WSN.nodes) {
+
+            // clear the current neighbor list
+            nodeA.clearNeighbors();
+
+            // find the neighbors based on the received power level
             for (Node nodeB : WSN.nodes) {
                 if (nodeB.getId() != nodeA.getId()) {
                     Channel channel = new Channel(nodeA, nodeB, WSN.Ptx);
@@ -60,15 +49,15 @@ public class UpdatePosition extends Event {
                     double Prx = channel.getPrx();
                     //System.out.println(Prx);
 
-                    if (Prx >= WSN.PrxThreshold && !(nodeB.findNeighbor(nodeA))) {
+                    if (Prx >= WSN.PrxThreshold) {
                         nodeA.addNeighbor(nodeB);
-                        nodeB.addNeighbor(nodeA);
                     }
                 }
             }
         }
 
-        sc.schedule(new UpdatePosition(time + 1000));
+        // schedule the new position update
+        sc.schedule(new UpdatePosition(time + 1000, mobilityID));
     }
 
     @Override

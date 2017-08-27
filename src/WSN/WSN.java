@@ -77,7 +77,8 @@ public class WSN {
     public static int CWmax = 1023;
     public static double tPLC = 192;
 
-    private int topologyID;
+    private static int topologyID;
+    private static int mobilityID;
 
     private static double width, height;
     private static double maxRadius;
@@ -111,7 +112,7 @@ public class WSN {
     //
 
     /************************      CONSTRUCTOR      ***********************/
-    public WSN(int nodeCount, double width, double height, Protocol p, int topologyID, boolean gui) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public WSN(int nodeCount, double width, double height, Protocol p, int topologyID, int mobilityID, boolean gui) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 
         RNG r = RNG.getInstance();
         nodes = new LinkedList<>();
@@ -121,6 +122,7 @@ public class WSN {
         this.height = height;
 
         this.topologyID = topologyID;
+        this.mobilityID = mobilityID;
         this.gui = gui;
 
 
@@ -134,10 +136,6 @@ public class WSN {
 
         for (int i = 0; i < this.nodeCount; i++) {
 
-            /**
-             * changed by William on 14/08/2017.
-             * default topology and circular topology added
-             */
             double[] coord = nodePosition();
 
             double X = coord[0];
@@ -150,7 +148,7 @@ public class WSN {
             //scheduler.schedule(e);
         }
 
-        scheduler.schedule(new UpdatePosition(1000));
+        scheduler.schedule(new UpdatePosition(1000, mobilityID));
 
         // create GUI window
         if (gui){
@@ -167,16 +165,20 @@ public class WSN {
     }
     /**********************************************************************/
 
-    public double getWidth() {
+    public static double getWidth() {
         return width;
     }
 
-    public double getHeight() {
+    public static double getHeight() {
         return height;
     }
 
     public static double getMaxRadius() {
         return maxRadius;
+    }
+
+    public static int getTopologyID() {
+        return topologyID;
     }
 
     private void setMaxRadius(double radius) {
@@ -231,10 +233,6 @@ public class WSN {
 
     public int getNodeCount() {
         return nodes.size();
-    }
-
-    public int getTopologyID() {
-        return topologyID;
     }
 
     public double[] getNetworkSize() {
@@ -556,9 +554,6 @@ public class WSN {
 
                 Node n = network.getNodes().get(i);
 
-//                nodeX = panelW/2 + (n.getX() - netW/2) * scaleX;
-//                nodeY = panelH/2 + (n.getY() - netH/2) * scaleY;
-
                 nodeX = panelW/2 + n.getX() * scaleX;
                 nodeY = panelH/2 + n.getY() * scaleY;
                 nodeSize = n.getSize();
@@ -575,6 +570,18 @@ public class WSN {
                 g2.setPaint(n.getColor());
                 g2.fill(e);
 
+                /**
+                 * useful for William debug...don't delete
+                 *
+                 double X0 = panelW/2 + n.X0 * scaleX;
+                double Y0 = panelH/2 + n.Y0 * scaleY;
+                double range = WSN.getMaxRadius()/4;
+
+                e = new Ellipse2D.Double(X0-range/2,Y0-range/2,range,range);
+                g2.setPaint(Color.red);
+                g2.draw(e);
+                 */
+
                 Font font = new Font("Serif", Font.PLAIN, 18);
                 g2.setFont(font);
                 g2.setColor(Color.black);
@@ -586,7 +593,6 @@ public class WSN {
             switch (topologyID){
                 // circular cell
                 case 0:
-                    g2.setPaint(Color.black);
                     g2.draw(new Ellipse2D.Double(0.05 * panelW,0.05 * panelH,0.9 * panelW, 0.9 * panelH));
                     break;
 

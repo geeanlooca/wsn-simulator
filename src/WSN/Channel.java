@@ -16,7 +16,7 @@ public class Channel {
 
     private double f = 2.4 * Math.pow(10,6);    // frequency in Hz
     private double lambda = 2 * Math.PI / f;
-    private double d0 = 1;      // reference distance
+    private double d0 = 50;      // reference distance
 
 
 
