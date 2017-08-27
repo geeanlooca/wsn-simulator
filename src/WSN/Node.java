@@ -342,8 +342,6 @@ public class Node {
                 break;
             case 1: // Gauss-Markov model
 
-
-
                 // compute new speed and direction
                 speed = alphaS * speed + (1-alphaS) * avgSpeed + Math.sqrt(1-Math.pow(alphaS,2)) * rng.nextGaussian();
                 dir = alphaD * dir + (1-alphaD) * avgDir + Math.sqrt(1-Math.pow(alphaD,2)) * rng.nextGaussian();
@@ -352,7 +350,7 @@ public class Node {
                     dir = dir % 360;
                 }
 
-                System.out.print(id + " " + speed + " " + dir + "\n");
+                //System.out.print(id + " " + speed + " " + dir + "\n");
                 // compute new candidate position
                 newX = X + speed * Math.cos(Math.toRadians(dir));
                 newY = Y + speed * Math.sin(Math.toRadians(dir));
