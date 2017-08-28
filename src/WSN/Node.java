@@ -232,6 +232,7 @@ public class Node {
     // methods to calculate Collision Rate and Fairness
 
     public void addTransmission(){
+        //System.out.println("qui!!");
         this.transCounter++;
         // keep track of the result of the transmissions for this node
         this.nodeLog.add(true);

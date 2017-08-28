@@ -12,12 +12,10 @@ public class Main {
     public static void main (String [] args) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 
         // network size and topology number
-        int netW, netH, topologyID, mobilityID;
+        int netW, netH, topologyID;
         netW = 1800;
         netH = 1800;
-        topologyID = 1;
-        mobilityID = 1;
-
+        topologyID = 0;
 
         double seconds = 1e6;
         double minutes = seconds * 60;
@@ -30,7 +28,7 @@ public class Main {
         int delay = 70;
 
         Protocol p = new DCF();
-        WSN netw = new WSN(nodeCount, netW, netH, p, topologyID, mobilityID, gui);
+        WSN netw = new WSN(nodeCount, netW, netH, p, topologyID, gui);
         netw.setPanelSize(600, 600);
 
 
