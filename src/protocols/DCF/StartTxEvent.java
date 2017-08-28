@@ -28,6 +28,7 @@ public class StartTxEvent extends Event {
         this.n.setSize(WSN.txSize);
 
         LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
+
         if (transmittingNodes.isEmpty()){
             // no collision
             n.collided = false;
@@ -36,21 +37,26 @@ public class StartTxEvent extends Event {
             n.collided = true;
             for (Node t : transmittingNodes) {
                 t.collided = true;
-                // save the collided nodes
-                while (!transmittingNodes.isEmpty()){
-                    Node node = transmittingNodes.remove();
-                    n.collidedNodes.add(node);
-                    if (WSN.debug){ System.out.println("Collision Node "+node.getId()); }
-                }
+                t.collidedNodes.add(this.n);
             }
+                // save the collided nodes
+            while (!transmittingNodes.isEmpty()){
+                Node node = transmittingNodes.remove();
+                n.collidedNodes.add(node);
+                if (WSN.debug){ System.out.println("Collision Node "+node.getId()); }
+            }
+
         }
 
 
-        n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
-        scheduler.schedule(new StopTxEvent(this, time + WSN.txTime));
 
+        n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
 
         LinkedList<Node> listeningNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.LISTENING);
+
+        scheduler.schedule(new StopTxEvent(this, time + WSN.txTime, listeningNodes));
+
+
 
         for (Node listening : listeningNodes) {
 

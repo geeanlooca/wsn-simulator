@@ -145,7 +145,7 @@ public class WSN {
             nodes.add(n);
 
             Event e = (Event) p.entryPoint().newInstance(n,new Double(0));
-            //scheduler.schedule(e);
+            scheduler.schedule(e);
         }
 
         scheduler.schedule(new UpdatePosition(1000, mobilityID));
@@ -295,6 +295,7 @@ public class WSN {
         WSN.printThroughput();
         WSN.printDelay();
         WSN.printFairness(windowSize);
+        WSN.printNoNeighbors();
     }
 
     public void setNeighborsList(){
@@ -307,7 +308,10 @@ public class WSN {
                     double Prx = channel.getPrx();
                     //System.out.println(Prx);
 
+                    //System.out.println("Node "+nodeB.getId()+" has neighbor Node "+nodeA.getId()+" ? "+(nodeB.findNeighbor(nodeA)));
+
                     if (Prx >= PrxThreshold && !(nodeB.findNeighbor(nodeA))) {
+                        //System.out.println(nodeA.getId() + "\t"+nodeB.getId());
                         nodeA.addNeighbor(nodeB);
                         nodeB.addNeighbor(nodeA);
                     }
@@ -349,7 +353,7 @@ public class WSN {
         double collRate;
         double avCollRate =0;
         double numb = WSN.nodes.size();
-        System.out.println("\n Node ||  Coll/Transm  ||  Collision Rate [%] ");
+        System.out.println("\n Node ||  Coll/Transm  ||  Normalized Collision Rate ");
 
         for (Node node : WSN.nodes) {
             collRate = ((double)node.getCollisionParam()[0])/((double)node.getCollisionParam()[1]);
@@ -508,6 +512,20 @@ public class WSN {
             return sum / list.size();
         }
         return sum;
+
+    }
+
+    private static void printNoNeighbors(){
+        // percentage of no neighbors events over the total transmission attempts
+        System.out.println("\nNo Neighbors events:    [%] \n");
+        double percentage;
+        double mean =0;
+        for (Node node : WSN.nodes) {
+            percentage  = node.getNoNeighbor()*100;
+            mean += percentage / (double) WSN.nodes.size();
+            System.out.println(" Node "+node.getId()+ ":\t" + percentage);
+        }
+        System.out.println("\n  Average number of No Neighbors events:  = " +mean+" [%] (max is 100) \n");
     }
 
 

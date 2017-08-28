@@ -29,18 +29,15 @@ public class UpdatePosition extends Event {
         // 2 - NO mobility
 
 
-        // update the node position
+        // update the node position and clear current neighbor list
         for (Node n : WSN.nodes) {
-
             n.move(mobilityID);
+            n.clearNeighbors();
+
         }
 
         // update the node neighbors
         for (Node nodeA : WSN.nodes) {
-
-            // clear the current neighbor list
-            nodeA.clearNeighbors();
-
             // find the neighbors based on the received power level
             for (Node nodeB : WSN.nodes) {
                 if (nodeB.getId() != nodeA.getId()) {
@@ -49,12 +46,15 @@ public class UpdatePosition extends Event {
                     double Prx = channel.getPrx();
                     //System.out.println(Prx);
 
-                    if (Prx >= WSN.PrxThreshold) {
+                    if (Prx >= WSN.PrxThreshold && !(nodeB.findNeighbor(nodeA))) {
                         nodeA.addNeighbor(nodeB);
+                        nodeB.addNeighbor(nodeA);
                     }
                 }
             }
         }
+
+        if (WSN.debug) { WSN.printNeighbors(); }
 
         // schedule the new position update
         sc.schedule(new UpdatePosition(time + 1000, mobilityID));

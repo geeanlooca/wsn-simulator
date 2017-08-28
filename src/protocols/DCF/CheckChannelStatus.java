@@ -82,6 +82,7 @@ public class CheckChannelStatus extends Event {
     }
 
     private boolean checkDestNeighbors(){
+        // handle the hidden terminal problem
         // check if the destination node is already the destination node of a neighbor of him (surely I have to exclude (this) node from the neighbors)
         boolean statement = false;
         Node dest = n.getNextPacket().getDestination();
@@ -91,6 +92,7 @@ public class CheckChannelStatus extends Event {
             for (Node entry : destNeighbors) {
                 if (entry.getNextPacket().getDestination().getId() == dest.getId() && (entry.getId() != this.n.getId())) {
                     statement = true;
+                    if (WSN.debug) {System.out.println(" Channel busy! Destination Node +"+dest.getId()+" is receving from Node: "+entry.getId()); }
                     break;
                 }
             }

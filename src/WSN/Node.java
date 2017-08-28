@@ -46,6 +46,7 @@ public class Node {
     public Node lastBOstopped;
 
     private ArrayList<Node> neighborList;
+    private int noNeighborCounter;
 
     // mobility
     double maxSpeed = 20;   // speed in m/s
@@ -110,6 +111,8 @@ public class Node {
         resumingNodes = new ArrayList<Node>();
         this.neighborList = new ArrayList<Node>();
 
+        noNeighborCounter = 0;
+
         transCounter = 0;
         collCounter = 0;
         slotCounter = 0;
@@ -119,7 +122,6 @@ public class Node {
         this.delayList = new ArrayList<Double>();
         this.nodeLog = new ArrayList<Boolean>();
 
-        this.neighborList = new ArrayList<Node>();
         this.windows = new ArrayList<>();
 
 
@@ -221,11 +223,23 @@ public class Node {
         return this.neighborList;
     }
 
+     /*public boolean findNeighbor(Node node){ return (neighborList.indexOf(node) > 0); }*/
+
     public boolean findNeighbor(Node node){
-        return (neighborList.indexOf(node) > 0);
+        for (Node neighbor : this.neighborList){
+            if (node.getId() == neighbor.getId()){ return true;}
+            }
+        return false;
     }
 
     public void clearNeighbors(){ this.neighborList.clear();}
+
+    public void increaseNoNeighbor() {this.noNeighborCounter ++; }
+
+    public double getNoNeighbor() {
+        //System.out.println(this.noNeighborCounter+ "  "+ this.transCounter);
+        return (((double)this.noNeighborCounter)/((double)(this.transCounter + this.noNeighborCounter)));
+    }
 
     // output parameters
 
