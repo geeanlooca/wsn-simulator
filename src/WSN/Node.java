@@ -49,10 +49,17 @@ public class Node {
     private int noNeighborCounter;
 
     // mobility
-    double maxSpeed = 20;   // speed in m/s
-    double minSpeed = 10;   // speed in m/s
-    double avgSpeed = 15;   // speed in m/s
-    double avgDir = 80;     // direction in degree
+    //private double maxSpeed = 20;   // speed in m/s
+    //private double minSpeed = 10;   // speed in m/s
+    //private double avgSpeed = 15;   // speed in m/s
+
+    private double pause = 1000;
+    private double second = 1e6;
+    private double maxSpeed = 40 * pause/second;     // speed in m/s
+    private double minSpeed = 30 * pause/second;     // speed in m/s
+    private double avgSpeed = 20 * pause/second;     // speed in m/s
+
+    double avgDir = rng.nextInt(360);;     // direction in degree
     double alphaS = 0.7;     // sensitivity factor
     double alphaD = 0.7;     // sensitivity factor
 
@@ -338,24 +345,63 @@ public class Node {
                 // compute new candidate position and new distance from center
                 newX = X + sX;
                 newY = Y + sY;
-                newDist = Math.sqrt(newX*newX + newY*newY);
 
-                if (newDist > netRadius){
-                    // get direction to center of the cell
-                    double dist = Math.sqrt(X*X + Y*Y);
-                    double dirX = X / (dist*dist);
-                    double dirY = Y / (dist*dist);
+                switch(WSN.getTopologyID()){
+                    case 0: // circular topology
 
-                    // move the position towards the center
-                    newX = X + mag * dirX;
-                    newY = Y + mag * dirY;
+                        newDist = Math.sqrt(newX*newX + newY*newY);
+
+                        if (newDist > netRadius){
+                            // get direction to center of the cell
+                            double dist = Math.sqrt(X*X + Y*Y);
+                            double dirX = X / (dist*dist);
+                            double dirY = Y / (dist*dist);
+
+                            // move the position towards the center
+                            newX = X + mag * dirX;
+                            newY = Y + mag * dirY;
+                        }
+
+                        X = newX;
+                        Y = newY;
+
+                        break;
+                    case 1: // hexagon topology
+
+                        Path2D hexagon = new Path2D.Double();
+                        Point2D newPos = new Point2D.Double(newX, newY);
+
+                        // initial point
+                        hexagon.moveTo(netRadius * Math.cos(Math.PI / 6), netRadius * Math.sin(Math.PI / 6));
+
+                        for (int i = 1; i < 6; i++) {
+                            hexagon.lineTo(netRadius * Math.cos((2 * i + 1) * Math.PI / 6), netRadius * Math.sin((2 * i + 1) * Math.PI / 6));
+                        }
+                        hexagon.closePath();
+
+                        if(!hexagon.contains(newPos)){
+                            // get direction to center of the cell
+                            double dist = Math.sqrt(X*X + Y*Y);
+                            double dirX = X / (dist*dist);
+                            double dirY = Y / (dist*dist);
+
+                            // move the position towards the center
+                            newX = X + mag * dirX;
+                            newY = Y + mag * dirY;
+                        }
+
+                        X = newX;
+                        Y = newY;
+                        break;
                 }
 
-                X = newX;
-                Y = newY;
+
+
 
                 break;
             case 1: // Gauss-Markov model
+
+                double maxRange = netRadius/4;
 
                 // compute new speed and direction
                 speed = alphaS * speed + (1-alphaS) * avgSpeed + Math.sqrt(1-Math.pow(alphaS,2)) * rng.nextGaussian();
@@ -372,15 +418,13 @@ public class Node {
 
                 // compute the displacement of the node from the initial position
                 double range = Math.sqrt(Math.pow(newX-X0,2) + Math.pow(newY-Y0,2));
-                newDist = Math.sqrt(newX * newX + newY * newY);
-
-                double maxRange = netRadius/4;
 
                 // check if the new position is inside the network
                 switch (WSN.getTopologyID()) {
 
                     case 0:     // circular topology
 
+                        newDist = Math.sqrt(newX * newX + newY * newY);
                         if (range > maxRange || newDist > netRadius) { // if point exceeds range of movement or network I move in the opposite direction
 
                             do{

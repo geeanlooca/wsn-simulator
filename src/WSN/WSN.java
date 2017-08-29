@@ -28,9 +28,9 @@ public class WSN {
 
     private int windowSize = 1000;                 //  window size used in Fairness calculation
 
-    public static double PrxThreshold = 1e-16;        // threshold on received power
-    public static double Ptx = 100;                   // transmission power
-
+    public static double PrxThreshold = -82;        // threshold on received power (dBm)
+    public static double Ptx = 20;                   // transmission power (dBm)
+    public static boolean indoor = false;           // indoor or outdoor scenario
     // ------------------------------------//
 
     public enum NODE_STATUS {
@@ -260,6 +260,8 @@ public class WSN {
     public void run(double maxTime) {
 
         setNeighborsList();
+        printNeighbors();
+
 
         Scheduler scheduler = Scheduler.getInstance();
         double currentTime = 0;
@@ -299,12 +301,12 @@ public class WSN {
         WSN.printNoNeighbors();
     }
 
-    public void setNeighborsList(){
+    public static void setNeighborsList(){
 
         for (Node nodeA : WSN.nodes) {
             for (Node nodeB : WSN.nodes) {
                 if (nodeB.getId() != nodeA.getId()) {
-                    Channel channel = new Channel(nodeA, nodeB, Ptx);
+                    Channel channel = new Channel(nodeA, nodeB, Ptx, indoor);
 
                     double Prx = channel.getPrx();
                     //System.out.println(Prx);
@@ -319,7 +321,7 @@ public class WSN {
                 }
             }
         }
-        printNeighbors();
+        //printNeighbors();
     }
 
     public static void printNeighbors() {
