@@ -13,8 +13,8 @@ public class Main {
 
         // network size and topology number
         int netW, netH, topologyID, mobilityID;
-        netW = 1800;
-        netH = 1800;
+        netW = 1000;
+        netH = 1000;
         topologyID = 0;
         mobilityID = 0;
 
@@ -27,7 +27,7 @@ public class Main {
 
         boolean gui = true;
         boolean debugging = false;
-        int delay =50;
+        int delay = 50;
 
         Protocol p = new protocols.CONTI.CONTI();
         WSN netw = new WSN(nodeCount, netW, netH, p, topologyID, mobilityID, gui);

@@ -6,10 +6,9 @@ public class Channel {
 
     private RNG rnd = RNG.getInstance();
 
-    private double Ptx;         // transmitted power
-    private double eta = 4;     // path loss exponent
-    private double K;           // free space loss
+    private double Ptx;         // transmitted power (dBm)
     private double d;           // distance between nodes
+    private boolean indoor;
 
     private double sigma_dB = 8;   // variance for shadowing in dB (dB spread in literature)
     private double sigma = 0.1*Math.log(10)*sigma_dB;   // variance for shadowing (relation from the paper)
@@ -20,10 +19,12 @@ public class Channel {
 
 
 
-    public Channel(Node nodeA, Node nodeB, double Ptx)
+    public Channel(Node nodeA, Node nodeB, double Ptx, boolean indoor)
     {
 
         this.Ptx = Ptx;
+
+        this.indoor = indoor;
 
         double xA = nodeA.getX();
         double yA = nodeA.getY();
@@ -31,24 +32,41 @@ public class Channel {
         double yB = nodeB.getY();
 
         d = Math.sqrt(Math.pow(xB-xA,2) + Math.pow(yB-yA,2));
-
-        K = lambda/(4 * Math.PI * d0);
-
     }
 
     public double getPrx()
     {
-        // generate shadowing term
-        double xi = sigma * rnd.nextGaussian();
-        double shad = Math.exp(xi);
+        double Prx = 0;
 
-        shad = 1;
-        // generate Rayleigh fading
-        double R2 = - Math.log(rnd.nextDouble());
-        R2 = 1;
+        if(indoor)
+        {
 
-        //compute the received power
-        double Prx = Ptx * R2 * shad * K * Math.pow(d/d0,-eta);
+        }
+        else {
+            double dbr = 35;
+            double n1 = 1.5;
+            double n2 = 3.7;
+            double L1 = 68;
+            double L2 = 65;
+            double sigma1_dB = 2.8;
+            double sigma1 = Math.pow(10,sigma1_dB/10);
+            double sigma2_dB = 1.6;
+            double sigma2 = Math.pow(10,sigma2_dB/10);
+
+            double x,L;
+
+            if (d <= dbr){
+                x = sigma1 * rnd.nextGaussian();
+                L = L1 + 10 * n1 * Math.log10(d/dbr) + x;
+            }
+            else{
+                x = sigma2 * rnd.nextGaussian();
+                L = L2 + 10 * n2 * Math.log10(d/dbr) + x;
+            }
+
+            Prx = Ptx - L;
+
+        }
 
         return Prx;
     }
@@ -56,11 +74,6 @@ public class Channel {
     public void setPtx(double Ptx)
     {
         this.Ptx = Ptx;
-    }
-
-    public void setEta(double eta)
-    {
-        this.eta = eta;
     }
 
     public double getDistance()

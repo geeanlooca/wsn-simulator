@@ -41,7 +41,7 @@ public class UpdatePosition extends Event {
             // find the neighbors based on the received power level
             for (Node nodeB : WSN.nodes) {
                 if (nodeB.getId() != nodeA.getId()) {
-                    Channel channel = new Channel(nodeA, nodeB, WSN.Ptx);
+                    Channel channel = new Channel(nodeA, nodeB, WSN.Ptx, WSN.indoor);
 
                     double Prx = channel.getPrx();
                     //System.out.println(Prx);
