@@ -42,24 +42,23 @@ public class StartListeningEvent extends Event {
             n.enqueuePacket(p);
             if (WSN.debug) { System.out.println("Next packet destination: Node " + n.getNextPacket().getDestination().getId()); }
 
-
             LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
 
-            if (WSN.debug) {
-                if (transmittingNodes.isEmpty()) {
-                    System.out.println("Channel is free. BO counter: " + n.getBOcounter());
-                } else {
-                    System.out.println("Channel is busy. BO counter: " + n.getBOcounter());
-                }
-            }
-
-            n.setStatus(WSN.NODE_STATUS.LISTENING);
-
-            if (transmittingNodes.isEmpty()) {
+            if (transmittingNodes.isEmpty() && n.getStatus() == WSN.NODE_STATUS.IDLING) {
+                // channel free
+                if( WSN.debug) { System.out.println("Channel is free. BO counter: " + n.getBOcounter()); }
+                n.setStatus(WSN.NODE_STATUS.LISTENING);
                 n.freeChannel = true;
                 scheduler.schedule(new CheckChannelStatus(n, time + WSN.DIFS, WSN.DIFS));
                 // save transmission initial time (useful to Delay)
                 this.n.startTXTime(time);
+
+            }
+            else{
+                // channel busy (caused by an update of the neighbors). Reschedule this event
+                if( WSN.debug) { System.out.println("Channel is busy. BO counter: " + n.getBOcounter()+"\nReschedule StartListening Event..."); }
+                scheduler.schedule(new StartListeningEvent(n, time + WSN.DIFS));
+
             }
         }
     }

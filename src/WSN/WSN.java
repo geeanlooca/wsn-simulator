@@ -142,6 +142,7 @@ public class WSN {
             double Y = coord[1];
 
             Node n = new Node(i, X, Y);
+            n.setStatus(WSN.NODE_STATUS.IDLING);
             nodes.add(n);
 
             Event e = (Event) p.entryPoint().newInstance(n,new Double(0));
@@ -422,7 +423,6 @@ public class WSN {
 
         }
         System.out.println("\n Total Average Delay = " +allAvDelay+" [us] ( "+allAvDelay/1000+" [ms] )");
-        System.out.println(" N.B. probably there are some errors in the delay calculation... I'm checking ");
 
     }
 
@@ -517,7 +517,7 @@ public class WSN {
 
     private static void printNoNeighbors(){
         // percentage of no neighbors events over the total transmission attempts
-        System.out.println("\nNo Neighbors events:    [%] \n");
+        System.out.println("\nNo-Neighbors events:    [%] \n");
         double percentage;
         double mean =0;
         for (Node node : WSN.nodes) {

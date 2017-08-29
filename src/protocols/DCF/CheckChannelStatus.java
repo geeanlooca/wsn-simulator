@@ -28,8 +28,8 @@ public class CheckChannelStatus extends Event {
 
         // if both the sender node (this) and the destination node sense the channel free new events are scheduled
 
-        // if (n.freeChannel && (n.getNextPacket().getDestination().freeChannel)){          -> last modified
-        if (n.freeChannel && (!checkDestNeighbors())){
+        // if (n.freeChannel && (n.getNextPacket().getDestination().freeChannel)){
+        if (n.freeChannel && (!checkDestNeighbors(scheduler))){
 
             if (WSN.debug){ System.out.println("Channel has been free for: " + duration);}
             if (duration == WSN.tSlot){
@@ -81,7 +81,7 @@ public class CheckChannelStatus extends Event {
         }
     }
 
-    private boolean checkDestNeighbors(){
+    private boolean checkDestNeighbors(Scheduler scheduler){
         // handle the hidden terminal problem
         // check if the destination node is already the destination node of a neighbor of him (surely I have to exclude (this) node from the neighbors)
         boolean statement = false;
@@ -92,7 +92,9 @@ public class CheckChannelStatus extends Event {
             for (Node entry : destNeighbors) {
                 if (entry.getNextPacket().getDestination().getId() == dest.getId() && (entry.getId() != this.n.getId())) {
                     statement = true;
-                    if (WSN.debug) {System.out.println(" Channel busy! Destination Node +"+dest.getId()+" is receving from Node: "+entry.getId()); }
+                    if (WSN.debug) {System.out.println(" Channel busy! Destination Node "+dest.getId()+" is receiving from Node: "+entry.getId()); }
+                    scheduler.schedule(new CheckChannelStatus(n, time + WSN.DIFS, WSN.DIFS));
+                    if (duration == WSN.DIFS){this.n.addDIFStime();} else if (duration == WSN.tSlot){ this.n.addSlotTime();};
                     break;
                 }
             }

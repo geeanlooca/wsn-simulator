@@ -25,9 +25,9 @@ public class Main {
 
         int nodeCount = 15;
 
-        boolean gui = false;
+        boolean gui = true;
         boolean debugging = false;
-        int delay = 10;
+        int delay =50;
 
         Protocol p = new DCF();
         WSN netw = new WSN(nodeCount, netW, netH, p, topologyID, mobilityID, gui);

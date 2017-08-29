@@ -86,6 +86,7 @@ public class StopTxEvent extends Event {
                         System.out.println("To be resumed, Node: " + entry.getId());
                     }
                 }
+                n.collidedNodes.clear();
             } else {
                 // this is the StopTXEvent of the last collided Node
                 ArrayList<Node> collidedNodeSave = new ArrayList<Node>();
@@ -112,6 +113,7 @@ public class StopTxEvent extends Event {
                     for (Node entry : listeningAtTX) {
                         System.out.println(" Node " + entry.getId());
                     }
+                    if (listeningAtTX.isEmpty()) {System.out.println(" None");}
                 }
 
                 for (Node listening : listeningAtTX) {
@@ -128,7 +130,7 @@ public class StopTxEvent extends Event {
 
         } else {
             // sucessfull transmission
-            if (WSN.debug) { System.out.println("->Tranmission successful!"); }
+            if (WSN.debug) { System.out.println("->Tranmission successful!  \nDestination: Node "+this.n.getNextPacket().getDestination().getId()); }
 
             n.setCW(WSN.CWmin);
             n.setBOcounter(r.nextInt(n.getCW() + 1));
