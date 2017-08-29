@@ -2,6 +2,7 @@ package protocols.CONTI;
 
 import WSN.Packet;
 import WSN.Scheduler;
+import WSN.Node;
 import WSN.WSN;
 import events.Event;
 import protocols.CONTI.StopTxEvent;
@@ -27,20 +28,35 @@ public class StopTxEvent extends Event {
     public void run(){
         super.run();
 
-        if (n.collided){
-            if (WSN.debug) { System.out.println("  Transmission unsuccessful!!"); }
-            n.addCollision();
+        // retrieve destination of packet
+        Node dest = p.getDestination();
+
+
+        if (dest == null){
+            // collision -> lost packet
+            //n.addCollision();
             n.CONTIaddRound();
-
         }else{
-            if (WSN.debug) { System.out.println("  Transmission successful!"); }
-            n.CONTIsetTotalTime();
-        }
-        n.collided = false;
 
-        Scheduler scheduler = Scheduler.getInstance();
-        scheduler.schedule(new StartRound(n, time));
-        this.n.setSize(WSN.normSize);
+            n.addTransmission();
+
+            // number of neighbors of destination that were transmitting during this packet transmission
+            int transmittinNeigh = dest.transmittingNeighbors;
+
+            if (transmittinNeigh > 1){
+                // interference at receiver -> collision
+                if (WSN.debug) { System.out.println("  Transmission unsuccessful!!"); }
+                n.addCollision();
+                n.CONTIaddRound();
+            }else{
+                if (WSN.debug) { System.out.println("  Transmission successful!"); }
+                n.CONTIsetTotalTime();
+            }
+
+            Scheduler scheduler = Scheduler.getInstance();
+            scheduler.schedule(new StartRound(n, time + WSN.SIFS + WSN.tACK));
+            this.n.setSize(WSN.normSize);
+        }
     }
 
     public Packet getPacket(){

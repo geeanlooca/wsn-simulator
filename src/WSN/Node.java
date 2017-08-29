@@ -91,6 +91,8 @@ public class Node {
 
     public int CONTIroundCounter =0;
 
+    public int transmittingNeighbors = 0;
+
 
     //
     //  Methods
