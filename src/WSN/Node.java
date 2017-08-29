@@ -82,6 +82,8 @@ public class Node {
     public int CONTIslotNumber = 0;
     public double[] CONTIp = {0.2563, 0.36715, 0.4245, 0.4314, 0.5};
 
+    public int CONTIroundCounter =0;
+
 
     //
     //  Methods
@@ -223,8 +225,6 @@ public class Node {
         return this.neighborList;
     }
 
-     /*public boolean findNeighbor(Node node){ return (neighborList.indexOf(node) > 0); }*/
-
     public boolean findNeighbor(Node node){
         for (Node neighbor : this.neighborList){
             if (node.getId() == neighbor.getId()){ return true;}
@@ -320,7 +320,20 @@ public class Node {
     public ArrayList<Double> getDelayList() { return this.delayList; }
 
 
-    /********** mobility ******/
+    public void CONTIaddRound(){ this.CONTIroundCounter ++;}
+
+    public void CONTIsetTotalTime(){
+        CONTIaddRound();
+        if (WSN.debug) {System.out.println("Node "+this.getId()+" used "+this.CONTIroundCounter+" rounds to succeeds ");}
+        double totalTime = this.CONTIroundCounter * (CONTIp.length * WSN.CONTIslotTime  + WSN.txTime) ;
+        this.totalTimeList.add(totalTime);
+
+        this.CONTIroundCounter = 0;
+
+    }
+
+
+        /********** mobility ******/
     public void move(int mobilityID)
     {
         double netRadius = WSN.getMaxRadius();

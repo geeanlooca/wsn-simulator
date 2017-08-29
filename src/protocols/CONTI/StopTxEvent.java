@@ -27,6 +27,17 @@ public class StopTxEvent extends Event {
     public void run(){
         super.run();
 
+        if (n.collided){
+            if (WSN.debug) { System.out.println("  Transmission unsuccessful!!"); }
+            n.addCollision();
+            n.CONTIaddRound();
+
+        }else{
+            if (WSN.debug) { System.out.println("  Transmission successful!"); }
+            n.CONTIsetTotalTime();
+        }
+        n.collided = false;
+
         Scheduler scheduler = Scheduler.getInstance();
         scheduler.schedule(new StartRound(n, time));
         this.n.setSize(WSN.normSize);

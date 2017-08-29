@@ -27,17 +27,20 @@ public class StartTxEvent extends Event {
     }
 
 
+
     public void run() {
         super.run();
 
-
-
         Scheduler scheduler = Scheduler.getInstance();
+
+        // keep track of the nodes that start a transmission (useful to Fairness calculation)
+        WSN.nodeTrace.add(this.n);
         n.addTransmission();
+
         LinkedList<Node> transmitting = WSN.getNeighborsStatus(n, WSN.NODE_STATUS.TRANSMITTING);
         if (transmitting.size() > 0){
             // collision occurs
-            n.addCollision();
+            n.collided = true;
         }
 
         scheduler.schedule(new StopTxEvent(this, time + WSN.txTime));

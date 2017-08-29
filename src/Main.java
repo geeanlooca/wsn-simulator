@@ -23,13 +23,13 @@ public class Main {
         double minutes = seconds * 60;
         double simulationTime =  1 * minutes;
 
-        int nodeCount = 15;
+        int nodeCount = 20;
 
         boolean gui = true;
         boolean debugging = false;
         int delay =50;
 
-        Protocol p = new DCF();
+        Protocol p = new protocols.CONTI.CONTI();
         WSN netw = new WSN(nodeCount, netW, netH, p, topologyID, mobilityID, gui);
         netw.setPanelSize(600, 600);
 
