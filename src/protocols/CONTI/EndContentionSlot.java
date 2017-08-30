@@ -38,6 +38,8 @@ public class EndContentionSlot extends Event {
                 if (WSN.debug){
                     System.out.println("\tNode " + n.getId() + " will exit contention.");
                 }
+                // the round is finished for this node, next transmission attempt in the next round
+                n.CONTIaddRound();
 
                 n.setColor(Color.blue);
                 // determine time until start of new transmission round
