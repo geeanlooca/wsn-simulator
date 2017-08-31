@@ -49,15 +49,11 @@ public class Node {
     private int noNeighborCounter;
 
     // mobility
-    //private double maxSpeed = 20;   // speed in m/s
-    //private double minSpeed = 10;   // speed in m/s
-    //private double avgSpeed = 15;   // speed in m/s
-
-    private double pause = 1000;
-    private double second = 1e6;
-    private double maxSpeed = 40 * pause/second;     // speed in m/s
-    private double minSpeed = 30 * pause/second;     // speed in m/s
-    private double avgSpeed = 20 * pause/second;     // speed in m/s
+    private double pause = 1;
+    private double second = 1;
+    private double maxSpeed = 20 * pause/second;     // speed in m/s
+    private double minSpeed = 15 * pause/second;     // speed in m/s
+    private double avgSpeed = 10 * pause/second;     // speed in m/s
 
     double avgDir = rng.nextInt(360);;     // direction in degree
     double alphaS = 0.7;     // sensitivity factor
