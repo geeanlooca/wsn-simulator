@@ -16,7 +16,7 @@ public class StopTxEvent extends Event {
     private Packet p;
 
     public StopTxEvent(StartTxEvent e, double time){
-        super(e.getNode(), time, WSN.normColor);
+        super(e.getNode(), time, WSN.txColor);
         this.p = e.getPacket();
     }
 
@@ -26,7 +26,7 @@ public class StopTxEvent extends Event {
     }
 
     public void run(){
-        super.run();
+        //super.run();
 
         // retrieve destination of packet
         Node dest = p.getDestination();
@@ -41,9 +41,9 @@ public class StopTxEvent extends Event {
             n.addTransmission();
 
             // number of neighbors of destination that were transmitting during this packet transmission
-            int transmittinNeigh = dest.transmittingNeighbors;
+            int transmittingNeighbors = dest.transmittingNeighbors;
 
-            if (transmittinNeigh > 1){
+            if (transmittingNeighbors > 1){
                 // interference at receiver -> collision
                 if (WSN.debug) { System.out.println("  Transmission unsuccessful!!"); }
                 n.addCollision();
@@ -53,11 +53,12 @@ public class StopTxEvent extends Event {
                 if (WSN.debug) { System.out.println("  Transmission successful!"); }
                 n.CONTIsetTotalTime();
             }
-
-            Scheduler scheduler = Scheduler.getInstance();
-            scheduler.schedule(new StartRound(n, time + WSN.SIFS + WSN.tACK));
-            this.n.setSize(WSN.normSize);
         }
+
+        Scheduler scheduler = Scheduler.getInstance();
+        scheduler.schedule(new StartRound(n, time + WSN.SIFS + WSN.tACK));
+        this.n.setSize(WSN.normSize);
+        this.n.setColor(WSN.normColor);
     }
 
     public Packet getPacket(){

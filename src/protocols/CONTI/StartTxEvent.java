@@ -34,6 +34,8 @@ public class StartTxEvent extends Event {
     public void run() {
         super.run();
 
+        n.setColor(WSN.txColor);
+
         Scheduler scheduler = Scheduler.getInstance();
         RNG r = RNG.getInstance();
 
@@ -47,9 +49,6 @@ public class StartTxEvent extends Event {
         }catch (IllegalArgumentException exc){
             dest = null;
         }
-
-
-
 
         // create packet
         p = new Packet(n, dest);

@@ -16,9 +16,10 @@ public class StartRound extends Event {
     public void run(){
 
         super.run();
+        n.setColor(WSN.normColor);
         n.CONTIslotNumber = 0;
         Scheduler scheduler = Scheduler.getInstance();
-        scheduler.schedule(new StartContentionSlot(n, time));
+        scheduler.schedule(new StartContentionSlot(n, time + WSN.DIFS));
         n.transmittingNeighbors = 0;
     }
 

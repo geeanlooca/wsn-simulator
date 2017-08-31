@@ -2,6 +2,7 @@ package protocols.DCF;
 import WSN.*;
 import events.Event;
 
+import java.awt.*;
 import java.util.LinkedList;
 
 /**
@@ -26,6 +27,7 @@ public class StartTxEvent extends Event {
         n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
         Scheduler scheduler = Scheduler.getInstance();
         this.n.setSize(WSN.txSize);
+        this.n.setLineColor(Color.MAGENTA);
 
         // save the contention slot counter (this round is finished)
         this.n.storeContSlotNumber();

@@ -2,6 +2,7 @@ package protocols.DCF;
 import WSN.*;
 import events.Event;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
@@ -30,6 +31,7 @@ public class StopTxEvent extends Event {
 
         this.n.setSize(WSN.normSize);
         n.setStatus(WSN.NODE_STATUS.IDLING);
+        this.n.setLineColor(Color.lightGray);
         Random r = new Random();
         // add txTime to the total packet transmission time
         this.n.addTXtime();
@@ -154,9 +156,6 @@ public class StopTxEvent extends Event {
             }
 
         }
-
-
-
     }
 
 

@@ -2,11 +2,12 @@ package WSN;
 
 import events.Event;
 import events.UpdatePosition;
-import protocols.Protocol;
+import protocols.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
@@ -24,11 +25,11 @@ public class WSN {
     public static boolean debug = false;            // printing extra information useful for debugging
 
     final static double maxAvailableThroughput = 11;    // Mb/s
-    final static double frameSize = 1500;               // bytes
+    public static int frameSize = 1500;               // bytes
 
     private int windowSize = 1000;                 //  window size used in Fairness calculation
 
-    public static double PrxThreshold = -62;        // threshold on received power (dBm)
+    public static double PrxThreshold = -82;        // threshold on received power (dBm)
     public static double Ptx = 20;                   // transmission power (dBm)
     public static boolean indoor = false;           // indoor or outdoor scenario
     // ------------------------------------//
@@ -268,6 +269,7 @@ public class WSN {
 
         while ((!scheduler.isEmpty()) && (currentTime < maxTime)) {
 
+            //System.in.read();
             try {
                 Thread.sleep(sleepDelay);
             } catch (InterruptedException ex) {
@@ -578,8 +580,40 @@ public class WSN {
             return sum / list.size();
         }
         return sum;
-
     }
+
+    public static void saveToFile(String filename) throws IOException{
+
+        File f = new File(filename);
+
+        // automatically checks if file exists or not.
+        // if the file does not exist, it automatically creates it
+        boolean created = f.createNewFile();
+        boolean printColumns = created;
+
+        // if the file aleady existed, check wheter it's empty
+        if (!created){
+            // determine if file is empty. if it is save column names
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            printColumns = br.readLine() == null;
+            br.close();
+        }
+
+        // open file
+        FileWriter fw = new FileWriter(filename, true);
+
+        // print column names
+        if (printColumns){
+            fw.append(String.format("%s;%s;%s;%s;%s", "nodecount", "framesize", "width", "height", "tx-time"));
+        }
+
+        // save simulation parameters and results
+        fw.append(String.format("\n%d;%d;%f;%f;%.2f", nodes.size(), frameSize, width, height, txTime));
+
+        // close file
+        fw.close();
+    }
+
     /*****************************
      *          GUI              *
      *****************************/
