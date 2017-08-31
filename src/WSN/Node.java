@@ -286,7 +286,9 @@ public class Node {
         if (WSN.debug){ System.out.println("Contention Slot Counter: \t"+ this.slotCounter);}
     }
 
-    public void resetContSlot(){ this.slotCounter=0; }
+    public void resetContSlot(){ this.slotCounter=0;
+        if (WSN.debug){ System.out.println("Node "+this.getId()+" reset contention slot counter"); }
+    }
 
     public void storeContSlotNumber() {
         this.slotCounterList.add(this.slotCounter);

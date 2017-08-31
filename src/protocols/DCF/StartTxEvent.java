@@ -27,6 +27,9 @@ public class StartTxEvent extends Event {
         Scheduler scheduler = Scheduler.getInstance();
         this.n.setSize(WSN.txSize);
 
+        // save the contention slot counter (this round is finished)
+        this.n.storeContSlotNumber();
+
         LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
 
         if (transmittingNodes.isEmpty()){
@@ -64,6 +67,9 @@ public class StartTxEvent extends Event {
             listening.freeChannel = false;
             // save the node that force the backoff freezing to discriminate among multiple backoff resumes
             listening.lastBOstopped = this.n;
+
+            // reset the contention slot counter of this node (this round is finished)
+            listening.resetContSlot();
 
         }
     }

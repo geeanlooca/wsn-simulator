@@ -48,8 +48,7 @@ public class StopTxEvent extends Event {
 
             // increment collision counter of this node
             this.n.addCollision();
-            // reset the contention slot counter of this node (this round is finished)
-            this.n.resetContSlot();
+
 
             //       I'm not sure to put here the reset of the contention time slot counter. If a collision occurs the contention fails, thus we start a new contention. Right?
 
@@ -137,8 +136,6 @@ public class StopTxEvent extends Event {
 
             n.dequeue();
 
-            // save the contention slot counter (this round is successfully finished)
-            this.n.storeContSlotNumber();
             // save the overall packet transmission time (useful to throughput and delay)
             this.n.setTotalTime(time);
 
@@ -199,8 +196,7 @@ public class StopTxEvent extends Event {
         // schedule CheckChannelStatus event for the specified node
         scheduler.schedule(new CheckChannelStatus(node, time + WSN.DIFS, WSN.DIFS));
         node.freeChannel = true;
-        //  reset the contention slot counter for all the listening nodes (the round is finished)
-        node.resetContSlot();
+
         if (WSN.debug) {
             System.out.println("->CheckChStatus rescheduled for Node " + node.getId());
         }

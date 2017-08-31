@@ -294,7 +294,7 @@ public class WSN {
         }
 
         WSN.printCollisionRate();
-//        WSN.printSlotNumber();
+        WSN.printSlotNumber();
 //        WSN.printThroughput();
 //        WSN.CONTIprintThroughput();
 //        WSN.printDelay();
@@ -373,14 +373,14 @@ public class WSN {
     }
 
     public static void printSlotNumber(){
-        // calculate the average number of contention slot to successful transmit
-        //      (# of transmission slot from the first DIFS to the end of the transmission (successfully) ).
+        // calculate the average number of contention slot
+        //      (# of transmission slots that a node spends in a contention).
 
         ArrayList<Integer> slotNumberList;
         double allAverageSlotNumber =0;
         double numb = WSN.nodes.size();
         System.out.println("\n[ DCF ] ");
-        System.out.println(" Node ||  Average # of Contention Slots to successful transmit ");
+        System.out.println(" Node ||  Average # of Contention Slots ");
 
         for (Node node : WSN.nodes) {
             slotNumberList = node.getSlotCounterList();
