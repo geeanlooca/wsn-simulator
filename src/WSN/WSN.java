@@ -28,7 +28,7 @@ public class WSN {
 
     private int windowSize = 1000;                 //  window size used in Fairness calculation
 
-    public static double PrxThreshold = -82;        // threshold on received power (dBm)
+    public static double PrxThreshold = -62;        // threshold on received power (dBm)
     public static double Ptx = 20;                   // transmission power (dBm)
     public static boolean indoor = false;           // indoor or outdoor scenario
     // ------------------------------------//
@@ -294,13 +294,13 @@ public class WSN {
         }
 
         WSN.printCollisionRate();
-        WSN.printSlotNumber();
-        WSN.printThroughput();
-        WSN.CONTIprintThroughput();
-        WSN.printDelay();
-        WSN.CONTIprintDelay();
-        WSN.printFairness(windowSize);
-        WSN.printNoNeighbors();
+//        WSN.printSlotNumber();
+//        WSN.printThroughput();
+//        WSN.CONTIprintThroughput();
+//        WSN.printDelay();
+//        WSN.CONTIprintDelay();
+//        WSN.printFairness(windowSize);
+//        WSN.printNoNeighbors();
     }
 
     public static void setNeighborsList(){
@@ -626,12 +626,16 @@ public class WSN {
                 nodeY = panelH/2 + n.getY() * scaleY;
                 nodeSize = n.getSize();
 
-                for(Node neigh : n.getNeighborList()){
-                    g2.setColor(n.getLineColor());
+                try {
+                    for (Node neigh : n.getNeighborList()) {
+                        g2.setColor(n.getLineColor());
 
-                    double neighX = panelW/2 + neigh.getX() * scaleX;
-                    double neighY = panelH/2 + neigh.getY() * scaleY;
-                    g2.draw(new Line2D.Double(nodeX, nodeY, neighX, neighY));
+                        double neighX = panelW / 2 + neigh.getX() * scaleX;
+                        double neighY = panelH / 2 + neigh.getY() * scaleY;
+                        g2.draw(new Line2D.Double(nodeX, nodeY, neighX, neighY));
+                    }
+                }catch (ConcurrentModificationException exc){
+
                 }
 
                 Ellipse2D e = new Ellipse2D.Double(nodeX-nodeSize/2,nodeY-nodeSize/2,nodeSize,nodeSize);

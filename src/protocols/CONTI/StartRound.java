@@ -19,6 +19,7 @@ public class StartRound extends Event {
         n.CONTIslotNumber = 0;
         Scheduler scheduler = Scheduler.getInstance();
         scheduler.schedule(new StartContentionSlot(n, time));
+        n.transmittingNeighbors = 0;
     }
 
     @Override

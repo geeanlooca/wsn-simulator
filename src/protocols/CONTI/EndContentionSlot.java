@@ -38,10 +38,12 @@ public class EndContentionSlot extends Event {
                 if (WSN.debug){
                     System.out.println("\tNode " + n.getId() + " will exit contention.");
                 }
+                // the round is finished for this node, next transmission attempt in the next round
+                n.CONTIaddRound();
 
                 n.setColor(Color.blue);
                 // determine time until start of new transmission round
-                double remainingTime =  (maxSlots - n.CONTIslotNumber) * WSN.CONTIslotTime + WSN.txTime;
+                double remainingTime =  (maxSlots - n.CONTIslotNumber) * WSN.CONTIslotTime + WSN.txTime + WSN.SIFS + WSN.tACK;
                 // schedule beginning of a new tx round
                 scheduler.schedule(new StartRound(n, time + remainingTime));
             }
@@ -55,7 +57,8 @@ public class EndContentionSlot extends Event {
 
                     // but this is the last contention slot: transmit!
                     n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
-                    scheduler.schedule(new StartTxEvent(n, new Packet(n,n), time));
+                    scheduler.schedule(new StartTxEvent(n, time));
+                    n.transmittingNeighbors++; // add myself, if node picks me as destination it will result in collision
 
                 }else{
                     scheduler.schedule(new StartContentionSlot(n, time));
@@ -69,7 +72,8 @@ public class EndContentionSlot extends Event {
 
             if (n.CONTIslotNumber == maxSlots){
                 // transmission starts if node is still in contention
-                scheduler.schedule(new StartTxEvent(n, new Packet(n,n), time));
+                n.transmittingNeighbors++; // add myself, if node picks me as destination it will result in collision
+                scheduler.schedule(new StartTxEvent(n, time));
 
                 if (WSN.debug){
                     System.out.println("\tEnd of the last round. Node " + n.getId() + " will transmit.");
