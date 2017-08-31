@@ -73,6 +73,7 @@ public class Node {
     private ArrayList<Double> totalTimeList;
 
     private double startTX;
+    public boolean holdDelay;
     private ArrayList<Double> delayList;
 
     private ArrayList<Boolean> nodeLog;
@@ -91,7 +92,7 @@ public class Node {
 
 
     //
-    //  Methods
+    //  Constructor
     //
 
     public Node(int id, double X, double Y){
@@ -127,6 +128,7 @@ public class Node {
         this.slotCounterList = new ArrayList<Integer>();
         this.totalTimeList = new ArrayList<Double>();
         this.delayList = new ArrayList<Double>();
+        this.holdDelay = false;
         this.nodeLog = new ArrayList<Boolean>();
 
         this.windows = new ArrayList<>();
@@ -137,6 +139,12 @@ public class Node {
 
         BOcounter = r.nextInt(CW + 1);
     }
+
+
+    //
+    //  Methods
+    //
+
 
     public double getX(){
         return this.X;
@@ -241,17 +249,14 @@ public class Node {
 
     public void increaseNoNeighbor() {this.noNeighborCounter ++; }
 
-    public double getNoNeighbor() {
-        //System.out.println(this.noNeighborCounter+ "  "+ this.transCounter);
-        return (((double)this.noNeighborCounter)/((double)(this.transCounter + this.noNeighborCounter)));
-    }
+    public int getNoNeighbor() { return this.noNeighborCounter; }
+
 
     // output parameters
 
     // methods to calculate Collision Rate and Fairness
 
     public void addTransmission(){
-        //System.out.println("qui!!");
         this.transCounter++;
         // keep track of the result of the transmissions for this node
         this.nodeLog.add(true);
@@ -261,6 +266,7 @@ public class Node {
         this.collCounter ++;
         // keep track of the result of the transmissions for this node
         this.nodeLog.set(this.nodeLog.size()-1, false);
+        this.holdDelay = true;
     }
 
     public int[] getCollisionParam(){
@@ -301,42 +307,41 @@ public class Node {
 
     // methods to calculate the packet total transmission time useful for Throughput and Delay
 
-    public void addDIFStime(){ this.totalTime += WSN.DIFS; }
-    public void addSlotTime(){ this.totalTime += WSN.tSlot; }
-    public void addTXtime(){ this.totalTime += WSN.txTime; }
+    public void addDIFStime(){ this.totalTime += WSN.DIFS; }    // maybe useless
+    public void addSlotTime(){ this.totalTime += WSN.tSlot; }   // maybe useless
+    public void addTXtime(){ this.totalTime += WSN.txTime; }    // maybe useless
     // catch the current time when contention begins
     public void startTXTime(double time){
-        if (!collided){ this.startTX = time; }
+        if (!holdDelay){ this.startTX = time; }
     }
 
     public void setTotalTime( double time){
         // throughput
-        this.totalTime += WSN.SIFS + WSN.tACK;
-        this.totalTimeList.add(this.totalTime);
-        this.totalTime=0;
+        this.totalTime += WSN.SIFS + WSN.tACK;                   // maybe useless
+        this.totalTimeList.add(this.totalTime);                  // maybe useless
+        this.totalTime=0;                                        // maybe useless
 
         // delay
         double delay = (time + WSN.SIFS + WSN.tACK) - this.startTX;
         this.delayList.add(delay);
         this.startTX = 0;
+        this.holdDelay = false;
         if (WSN.debug){ System.out.println("Delay = "+ delay); }
-
     }
 
-    public ArrayList<Double> getTotalTimeList() { return this.totalTimeList; }
+    public ArrayList<Double> getTotalTimeList() { return this.totalTimeList; }   // maybe useless
     public ArrayList<Double> getDelayList() { return this.delayList; }
 
 
     public void CONTIaddRound(){ this.CONTIroundCounter ++;}
 
+    // delay CONTI
     public void CONTIsetTotalTime(){
         CONTIaddRound();
         if (WSN.debug) {System.out.println("Node "+this.getId()+" used "+this.CONTIroundCounter+" rounds to succeeds ");}
-        double totalTime = this.CONTIroundCounter * (CONTIp.length * WSN.CONTIslotTime  + WSN.txTime) ;
-        this.totalTimeList.add(totalTime);
-
+        double delay = this.CONTIroundCounter * (CONTIp.length * WSN.CONTIslotTime  + WSN.txTime) ;
+        this.delayList.add(delay);
         this.CONTIroundCounter = 0;
-
     }
 
 

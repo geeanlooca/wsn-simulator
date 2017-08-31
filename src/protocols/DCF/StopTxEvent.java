@@ -47,12 +47,9 @@ public class StopTxEvent extends Event {
             }
 
             n.collided = false;         // NB: check if it is useful or a problem !!
-
             // increment collision counter of this node
             this.n.addCollision();
 
-
-            //       I'm not sure to put here the reset of the contention time slot counter. If a collision occurs the contention fails, thus we start a new contention. Right?
 
             int oldCW = n.getCW();
             int newCW = Math.min(2 * (oldCW + 1) - 1, WSN.CWmax);
@@ -62,7 +59,7 @@ public class StopTxEvent extends Event {
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
             // start new round NOW
-            scheduler.schedule(new StartListeningEvent(n, time));
+            scheduler.schedule(new StartListeningEvent(n, time + WSN.tACK + WSN.SIFS));
 
             // At the end of the StopTxEvent new CheckChannelEvents must be rescheduled for all the listening nodes (that have stopped the BO during the startTXEvent). However
             //  if a collision occurs the whole rescheduling has to happen during the stopTXEvent associated to the last collided node, in order to avoid duplicated events and unwanted behaviors.

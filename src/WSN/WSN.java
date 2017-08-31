@@ -29,7 +29,7 @@ public class WSN {
 
     private int windowSize = 1000;                 //  window size used in Fairness calculation
 
-    public static double PrxThreshold = -82;        // threshold on received power (dBm)
+    public static double PrxThreshold = -62;        // threshold on received power (dBm)
     public static double Ptx = 20;                   // transmission power (dBm)
     public static boolean indoor = false;           // indoor or outdoor scenario
     // ------------------------------------//
@@ -129,9 +129,6 @@ public class WSN {
 
         Scheduler scheduler = Scheduler.getInstance();
 
-        //WSN.trasmittingNodes = new LinkedList<>();
-        //WSN.listeningNodes = new LinkedList<>();
-        //WSN.status = CHANNEL_STATUS.FREE;
 
         WSN.nodeTrace = new ArrayList<>();
 
@@ -284,7 +281,7 @@ public class WSN {
 
             e.run();
 
-            System.out.format("Progress: %.2f %%\n", (currentTime/maxTime*100.0));
+            //System.out.format("Progress: %.2f %%\n", (currentTime/maxTime*100.0));
             if (debug){
                 System.out.println("\n");
             }
@@ -295,14 +292,22 @@ public class WSN {
             }
         }
 
-        WSN.printCollisionRate();
-        WSN.printSlotNumber();
+//        WSN.printCollisionRate();
+//        WSN.printContentionSlot();
 //        WSN.printThroughput();
 //        WSN.CONTIprintThroughput();
+//        WSN.printThroughput2(currentTime);
 //        WSN.printDelay();
-//        WSN.CONTIprintDelay();
 //        WSN.printFairness(windowSize);
 //        WSN.printNoNeighbors();
+
+        System.out.println("Collision rate [%]: "+WSN.collisionRate());
+        System.out.println("Number of contention slot: "+WSN.contentionSlot());
+        System.out.println("Throughput: "+WSN.throughput(currentTime));
+        System.out.println("Delay [us]: "+WSN.delay());
+        System.out.println("Normalized fairness: "+WSN.fairness(windowSize));      // there is also the trace size to be considered...
+        System.out.println("No neighbors [%]: "+WSN.noNeighbors());
+
     }
 
     public static void setNeighborsList(){
@@ -325,7 +330,6 @@ public class WSN {
                 }
             }
         }
-        //printNeighbors();
     }
 
     public static void printNeighbors() {
@@ -357,24 +361,34 @@ public class WSN {
 
     public static void printCollisionRate(){
 
-        double collRate;
-        double avCollRate =0;
-        double numb = WSN.nodes.size();
+        int transmissions =0 ;
+        int collisions = 0;
         System.out.println("\n[ DCF / CONTI ] ");
         System.out.println(" Node ||  Coll/Transm  ||  Normalized Collision Rate ");
 
         for (Node node : WSN.nodes) {
-            collRate = ((double)node.getCollisionParam()[0])/((double)node.getCollisionParam()[1]);
-            avCollRate = avCollRate + collRate / numb;
-            System.out.println(node.getId() + "\t\t\t" + node.getCollisionParam()[0] + " / " + node.getCollisionParam()[1] + "\t\t\t\t"+ collRate);
+            collisions += node.getCollisionParam()[0];
+            transmissions += node.getCollisionParam()[1];
+            System.out.println(node.getId() + "\t\t\t" + node.getCollisionParam()[0] + " / " + node.getCollisionParam()[1] + "\t\t\t\t"+ ((double)node.getCollisionParam()[0])/((double)node.getCollisionParam()[1]));
+
         }
-
-        double collPerc = avCollRate * 100;
-
+        double collPerc = (double) collisions / (double) transmissions * 100;
         System.out.println("\n Average Collision Rate = " + Math.round(collPerc * 100.0)/100.0 + " [%]");
     }
 
-    public static void printSlotNumber(){
+    public static double collisionRate(){
+        int transmissions = 0;
+        int collisions = 0;
+        for (Node node : WSN.nodes) {
+            collisions += node.getCollisionParam()[0];
+            transmissions += node.getCollisionParam()[1];
+        }
+        double collPerc = (double) collisions / (double) transmissions * 100;
+        return  Math.round(collPerc * 100.0)/100.0;
+    }
+
+
+    public static void printContentionSlot(){
         // calculate the average number of contention slot
         //      (# of transmission slots that a node spends in a contention).
 
@@ -395,6 +409,21 @@ public class WSN {
         System.out.println("\n Total Average Number of Contention Slot = " +allAverageSlotNumber);
     }
 
+    public static double contentionSlot(){
+        // calculate the average number of contention slot (# of transmission slots that a node spends in a contention).
+        ArrayList<Integer> slotNumberList;
+        double allAverageSlotNumber =0;
+        double numb = WSN.nodes.size();
+        for (Node node : WSN.nodes) {
+            slotNumberList = node.getSlotCounterList();
+            if(debug){System.out.println(node.getId() + "\t\t" + slotNumberList.toString());}
+            double avSlotNumber = calculateAverage(slotNumberList);
+            allAverageSlotNumber +=  avSlotNumber / numb;
+        }
+        return allAverageSlotNumber;
+    }
+
+
     public static void printThroughput(){
         // ratio between time needed to successfully deliver a packet with a free channel (theoretical) and the overall time needed to successfully delivery (simulated)
 
@@ -413,6 +442,7 @@ public class WSN {
         }
         System.out.println("\n Total Average Normalized Throughput = " +allAvThroughput);
     }
+
 
     public static void CONTIprintThroughput(){
         // ratio between time needed to successfully deliver a packet with a free channel (theoretical) and the overall time needed to successfully delivery (simulated)
@@ -436,6 +466,36 @@ public class WSN {
     }
 
 
+
+    public static void printThroughput2(double currentTime) {
+        // [(total successfully transmitted packets * frameSize) / total simulation time  ]* maxAvailableThroughput
+        int transmissions = 0;
+        int collisions = 0;
+        for (Node node : WSN.nodes) {
+            collisions += node.getCollisionParam()[0];
+            transmissions += node.getCollisionParam()[1];
+        }
+        double throughput = ((double) (transmissions - collisions) * (double) (frameSize * 8)) / currentTime;       // Mb/s
+        double normThroughput = throughput / maxAvailableThroughput;
+        System.out.println("\n Normalized Throughput = " + normThroughput);
+    }
+
+
+    public static double throughput (double currentTime) {
+        // [(total successfully transmitted packets * frameSize) / total simulation time  ]* maxAvailableThroughput
+        int transmissions = 0;
+        int collisions = 0;
+        for (Node node : WSN.nodes) {
+            collisions += node.getCollisionParam()[0];
+            transmissions += node.getCollisionParam()[1];
+        }
+        double throughput = ((double) (transmissions - collisions) * (double) (frameSize * 8)) / currentTime;       // Mb/s
+        double normThroughput = throughput / maxAvailableThroughput;
+
+        return normThroughput;
+    }
+
+
     public static void printDelay(){
     // (average) time passed between the beginning of the contention to transmit a packet and its successfully delivery
         ArrayList<Double> delayList;
@@ -453,30 +513,24 @@ public class WSN {
             System.out.println(node.getId() + "\t\t\t\t" +  avDelay);
         }
         System.out.println("\n Total Average Delay = " +allAvDelay+" [us] ( "+allAvDelay/1000+" [ms] )");
-
     }
 
-    public static void CONTIprintDelay(){
-        // (average) time passed between the beginning of the contention to transmit a packet and its successfully delivery
-        ArrayList<Double> totalTimeList;
-        int cSlots;
-        double allAvDelay =0;
+
+    public static double delay(){
+        // (average) time passed between the contention beginning and the successful transmission
+        ArrayList<Double> delayList;
+        double allAvDelay = 0;
         double numb = WSN.nodes.size();
 
-        System.out.println("\n[ CONTI ] ");
-        System.out.println(" Node\t ||\t Av. Number of Rounds ||\t Av. Delays  ");
-
         for (Node node : WSN.nodes) {
-            cSlots = node.CONTIp.length;        // to be removed...
-            totalTimeList = node.getTotalTimeList();
-            double avDelay = calculateAverageDouble(totalTimeList);
+            delayList = node.getDelayList();
+            double avDelay = calculateAverageDouble(delayList);
             allAvDelay +=  avDelay / numb;
-            System.out.println(node.getId() + "\t\t\t\t" +  avDelay / (double) (cSlots * WSN.CONTIslotTime + WSN.txTime) + "\t\t\t" +  avDelay);
-
         }
-        System.out.println("\n Total Average Delay = " +allAvDelay+" [us] ( "+allAvDelay/1000+" [ms] )");
-
+        // delay in us
+        return allAvDelay;
     }
+
 
 
     private static void printFairness(int windowSize){
@@ -544,20 +598,99 @@ public class WSN {
     }
 
 
+    private static double fairness(int windowSize){
+        // fairness calculation with Jain's fairness index and sliding windows (like into the 2011 paper)
+
+        // -- -- -- --
+        boolean debugFairness = false;      // if true more useful information are displayed
+        // -- -- -- --
+        double[] windowResults = new double[nodes.size()];
+        List<Boolean>  tempWindow = new ArrayList<Boolean>();
+        double[] windowsFairness =  new double[0];
+
+        try {
+            windowsFairness = new double[WSN.nodeTrace.size() - windowSize + 1];
+        }
+        catch (Exception e){
+            System.out.println("\n"+ e + "\nFairness Error!! More simulation time is needed with windowSize = " + windowSize + "\nSystem exit... ");
+            System.exit(1);
+        }
+        if(debugFairness){ System.out.println("\n \n Node Trace "); }
+
+        for (Node node : WSN.nodes) { node.setListIterator(); }     // initialize an iterator to scan the nodeLog list of the node
+
+        for (int i=0; i<WSN.nodeTrace.size(); i++  ) {
+            if(debugFairness){  System.out.println("\n[i= " + i+"]"); }
+
+            Node node = WSN.nodeTrace.get(i);
+            boolean res = node.getLog();
+            int id = node.getId();
+            if(debugFairness){ System.out.println("Node "+id + "\ttransmission result: " + res);}
+            tempWindow.add(res);
+
+            if (res) {
+                windowResults[id] += (double) 1 / (double) windowSize;
+                if(debugFairness){ System.out.println("tempResult  " + windowResults[id]); }
+            }
+            if (((i + 1) == windowSize) || ((i + 1) > windowSize)){
+                double num = 0;
+                for (double entry : windowResults) {
+                    num += entry;
+                }
+                double den = 0;
+                for (double entry : windowResults) {
+                    den += Math.pow(entry, 2);
+                }
+                windowsFairness[i+1 - windowSize] = Math.pow(num, 2) / (den * nodes.size());
+
+                if(debugFairness){ System.out.println("Fairness of window " + (i+1 - windowSize)+":\t" + windowsFairness[(i + 1) - windowSize]); }
+
+                Node headNode = WSN.nodeTrace.get(i+1 - windowSize);
+                int headId = headNode.getId();
+                if (tempWindow.remove(0)) {
+                    windowResults[headId] -= (double) 1 / (double) windowSize;
+                }
+                if(debugFairness){  System.out.println(tempWindow); }
+            }
+        }
+        double sum = 0;
+        for (double entry : windowsFairness) {
+            sum += entry;
+            if(debugFairness){  System.out.println(entry); }
+        }
+
+        return sum/(windowsFairness.length);
+    }
+
 
     private static void printNoNeighbors(){
         // percentage of no neighbors events over the total transmission attempts
+        int transmissions = 0;
+        int noNeighborEvents = 0;
         System.out.println("\n[ DCF / CONTI ] ");
         System.out.println(" No-Neighbors events:    [%] \n");
-        double percentage;
-        double mean =0;
         for (Node node : WSN.nodes) {
-            percentage  = node.getNoNeighbor()*100;
-            mean += percentage / (double) WSN.nodes.size();
-            System.out.println(" Node "+node.getId()+ ":\t" + percentage);
+            transmissions += node.getCollisionParam()[1];
+            noNeighborEvents += node.getNoNeighbor();
+            System.out.println(" Node "+node.getId()+ " has "+node.getNoNeighbor()+" events");
         }
-        System.out.println("\n  Average number of No Neighbors events:  = " +mean+" [%] (max is 100) \n");
+        double avNoNeighbors = (double) (noNeighborEvents * 100) /(double)  (transmissions + noNeighborEvents);
+        System.out.println("\n  Average number of No Neighbors events:  = " +avNoNeighbors+" [%] (max is 100) \n");
     }
+
+
+    private static double noNeighbors(){
+        // percentage of no neighbors events over the total transmission attempts
+        int transmissions = 0;
+        int noNeighborEvents = 0;
+        for (Node node : WSN.nodes) {
+            transmissions += node.getCollisionParam()[1];
+            noNeighborEvents += node.getNoNeighbor();
+        }
+        double avNoNeighbors = (double) (noNeighborEvents * 100) /(double)  (transmissions + noNeighborEvents);
+        return avNoNeighbors;
+    }
+
 
 
     private static double calculateAverage(List <Integer> list) {
