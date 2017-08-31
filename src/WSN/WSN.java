@@ -588,6 +588,7 @@ public class WSN {
 
         // automatically checks if file exists or not.
         // if the file does not exist, it automatically creates it
+        f.getParentFile().mkdirs();
         boolean created = f.createNewFile();
         boolean printColumns = created;
 

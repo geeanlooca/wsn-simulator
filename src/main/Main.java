@@ -159,7 +159,7 @@ public class Main {
         // output file
         file = System.getProperty("output");
         if (file == null){
-            file = "./results/default.csv";
+            file = "./results/simulations/default.csv";
         }
 
         WSN netw = new WSN(nodeCount, networkWidth, networkHeight, p, topologyID, mobilityID, gui);
