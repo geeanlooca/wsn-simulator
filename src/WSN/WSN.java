@@ -119,11 +119,11 @@ public class WSN {
         nodes = new LinkedList<>();
         this.nodeCount = nodeCount;
 
-        this.width = width;
-        this.height = height;
+        WSN.width = width;
+        WSN.height = height;
 
-        this.topologyID = topologyID;
-        this.mobilityID = mobilityID;
+        WSN.topologyID = topologyID;
+        WSN.mobilityID = mobilityID;
         this.gui = gui;
 
 
@@ -154,7 +154,7 @@ public class WSN {
             panelW = 500;
             panelH = 530;
             f = new JFrame();
-            f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             guiWindow = new WSNWindow(this);
             f.getContentPane().add(guiWindow);
             f.setSize(panelW,panelH);
@@ -181,7 +181,7 @@ public class WSN {
     }
 
     private void setMaxRadius(double radius) {
-        this.maxRadius = radius;
+        maxRadius = radius;
     }
 
     private double[] nodePosition()
@@ -192,7 +192,7 @@ public class WSN {
         double a, theta;
         setMaxRadius(0.5 * Math.min(width, height));
 
-        switch (this.topologyID) {
+        switch (topologyID) {
 
             // circular cell
             case 0:
@@ -235,8 +235,7 @@ public class WSN {
     }
 
     public double[] getNetworkSize() {
-        double[] size = {width, height};
-        return size;
+        return new double[]{width, height};
     }
 
     public int nodeCount() {
