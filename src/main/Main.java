@@ -50,7 +50,7 @@ public class Main {
 
         // node count
         try{
-            nodeCount = Integer.getInteger(System.getProperty("time"));
+            nodeCount = Integer.parseInt(System.getProperty("nodes"));
             if (nodeCount < 2){
                 System.out.println("Invalide number of nodes.");
                 System.exit(1);
@@ -72,7 +72,7 @@ public class Main {
 
         // topology
         try{
-            topologyID = Integer.parseInt(System.getProperty("topologyID"));
+            topologyID = Integer.parseInt(System.getProperty("topology"));
             if (topologyID < 0 || mobilityID > 1){
                 System.out.println("Invalid topology model.");
                 System.exit(1);
@@ -155,11 +155,11 @@ public class Main {
             p = new DCF();
         }
 
-        String file = "";
         // output file
+        String file = "";
         file = System.getProperty("output");
         if (file == null){
-            file = "./results/default.csv";
+            file = "./results/simulations/default.csv";
         }
 
         WSN netw = new WSN(nodeCount, networkWidth, networkHeight, p, topologyID, mobilityID, gui);
