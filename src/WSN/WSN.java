@@ -348,7 +348,9 @@ public class WSN {
 
     public static LinkedList<Node> getNeighborsStatus(Node n, NODE_STATUS status ){
 
-        LinkedList<Node> list = new LinkedList<Node>();
+        LinkedList<Node> list = n.neighborStatus;
+        list.clear();
+
         for (Node neighbor : n.getNeighborList()){
             if (neighbor.getStatus() == status){ list.add(neighbor); }
         }
