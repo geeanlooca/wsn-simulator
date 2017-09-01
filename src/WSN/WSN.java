@@ -29,7 +29,7 @@ public class WSN {
 
     private int windowSize = 1000;                 //  window size used in Fairness calculation
 
-    public static double PrxThreshold = -62;        // threshold on received power (dBm)
+    public static double PrxThreshold = -52;        // threshold on received power (dBm)
     public static double Ptx = 20;                   // transmission power (dBm)
     public static boolean indoor = false;           // indoor or outdoor scenario
     // ------------------------------------//
@@ -280,7 +280,10 @@ public class WSN {
 
             e.run();
 
-            //System.out.format("Progress: %.2f %%\n", (currentTime/maxTime*100.0));
+            if ((((currentTime/maxTime)*100.0) % 5) == 0) {System.out.format("Progress: %.2f %%\n", ((currentTime/maxTime)*100.0)); }
+
+            //if (((currentTime/maxTime)*100.0)>70) {WSN.debug = true;}
+
             if (debug){
                 System.out.println("\n");
             }
@@ -551,7 +554,8 @@ public class WSN {
         }
         if(debugFairness){ System.out.println("\n \n Node Trace "); }
 
-        for (Node node : WSN.nodes) { node.setListIterator(); }     // initialize an iterator to scan the nodeLog list of the node
+        // initialize an iterator to scan the nodeLog list of the node
+        for (Node node : WSN.nodes) { node.setListIterator(); }
 
         for (int i=0; i<WSN.nodeTrace.size(); i++  ) {
             if(debugFairness){  System.out.println("\n[i= " + i+"]"); }

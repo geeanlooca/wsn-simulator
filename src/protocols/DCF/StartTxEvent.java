@@ -48,20 +48,16 @@ public class StartTxEvent extends Event {
             while (!transmittingNodes.isEmpty()){
                 Node node = transmittingNodes.remove();
                 n.collidedNodes.add(node);
-                if (WSN.debug){ System.out.println("Collision Node "+node.getId()); }
+                if (WSN.debug){ System.out.println("Collision with Node "+node.getId()); }
             }
 
         }
-
-
 
         n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
 
         LinkedList<Node> listeningNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.LISTENING);
 
         scheduler.schedule(new StopTxEvent(this, time + WSN.txTime, listeningNodes));
-
-
 
         for (Node listening : listeningNodes) {
 
@@ -75,5 +71,4 @@ public class StartTxEvent extends Event {
 
         }
     }
-
 }

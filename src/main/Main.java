@@ -110,7 +110,7 @@ public class Main {
         // debugging
         String debugString = "";
         try{
-            debugString = System.getProperty("gui");
+            debugString = System.getProperty("debug");
             debugging = debugString.equals("true");
         }catch (Exception e){
             debugging = false;
@@ -173,7 +173,6 @@ public class Main {
         long startTime = System.currentTimeMillis();
 
         netw.run(simulationTime);
-        WSN.printCollisionRate();
         WSN.saveToFile(file);
 
         long endTime   = System.currentTimeMillis();

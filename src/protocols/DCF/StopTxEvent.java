@@ -71,7 +71,7 @@ public class StopTxEvent extends Event {
 
             boolean lastEvent = true;
             for (Node entry : n.collidedNodes) {
-                if (entry.getStatus() == WSN.NODE_STATUS.TRANSMITTING) {
+                if ((entry.getStatus() == WSN.NODE_STATUS.TRANSMITTING) && checkCollided(entry)) {
                     lastEvent = false;
                 }
             }
@@ -132,7 +132,7 @@ public class StopTxEvent extends Event {
 
             n.setCW(WSN.CWmin);
             n.setBOcounter(r.nextInt(n.getCW() + 1));
-
+            // remove the packet from the queue
             n.dequeue();
 
             // save the overall packet transmission time (useful to throughput and delay)
@@ -198,4 +198,18 @@ public class StopTxEvent extends Event {
         }
     }
 
+
+    private boolean checkCollided(Node collided) {
+        // check if the other collision node still have this node in the collided node, because due to channel update can happen
+        //  that the other collision node has started again a transmission and the remaining listening nodes will never be resumed
+        ArrayList<Node> otherCollidedNodes = collided.collidedNodes;
+        boolean found = false;
+        for (Node entry : otherCollidedNodes) {
+            if (entry.getId() == this.n.getId()){
+                found = true;
+            }
+        }
+        return found;
+    }
 }
+

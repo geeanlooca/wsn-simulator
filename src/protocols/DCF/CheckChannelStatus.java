@@ -88,7 +88,7 @@ public class CheckChannelStatus extends Event {
         Node dest = n.getNextPacket().getDestination();
         LinkedList<Node> destNeighbors = WSN.getNeighborsStatus(dest, WSN.NODE_STATUS.TRANSMITTING);
 
-        if (!dest.freeChannel) {
+        if (!dest.freeChannel && this.n.freeChannel) {
             for (Node entry : destNeighbors) {
                 if (entry.getNextPacket().getDestination().getId() == dest.getId() && (entry.getId() != this.n.getId())) {
                     statement = true;
