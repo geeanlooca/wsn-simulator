@@ -315,8 +315,11 @@ public class Node {
     public void addTXtime(){ this.totalTime += WSN.txTime; }    // maybe useless
     // catch the current time when contention begins
     public void startTXTime(double time){
-        if (!holdDelay){ this.startTX = time; }
+        if (!holdDelay){
+            this.startTX = time;
+        }
     }
+
 
     public void setTotalTime( double time){
         // throughput

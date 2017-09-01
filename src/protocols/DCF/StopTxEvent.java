@@ -87,6 +87,14 @@ public class StopTxEvent extends Event {
                 n.collidedNodes.clear();
             } else {
                 // this is the StopTXEvent of the last collided Node
+
+                for (Node entry : listeningAtTX) {
+                    if (WSN.debug) {
+                        System.out.println("listeningAtTX " + entry.getId());
+                    }
+                }
+
+
                 ArrayList<Node> collidedNodeSave = new ArrayList<Node>();
                 collidedNodeSave.addAll(n.collidedNodes);
 
@@ -103,6 +111,7 @@ public class StopTxEvent extends Event {
                     }
                 }
 
+                collidedNodeSave.add(this.n);
                 listeningAtTX = removeDuplicate(listeningAtTX);
                 listeningAtTX = removeOldCollided(listeningAtTX, collidedNodeSave);
 
@@ -117,7 +126,7 @@ public class StopTxEvent extends Event {
                 for (Node listening : listeningAtTX) {
 
                     // check if the rescheduled is already happened.
-                    if (!listening.freeChannel) {
+                    if (!listening.freeChannel && listening.getStatus() == WSN.NODE_STATUS.LISTENING) {
                         reschedule(listening, scheduler);
 
                     }
@@ -173,6 +182,7 @@ public class StopTxEvent extends Event {
 
     private LinkedList<Node> removeOldCollided(LinkedList<Node> list, ArrayList<Node> collidedNodes) {
         // remove from the whole listening nodes possible collided nodes for which it has already been scheduled a CheckChannelEvent.
+
         for (int i = 0; i < list.size(); i++) {
             for (int j = 0; j < collidedNodes.size(); j++) {
                 if (list.get(i).getId() == collidedNodes.get(j).getId() || list.get(i).getId() == this.n.getId()) {
@@ -184,7 +194,9 @@ public class StopTxEvent extends Event {
                 }
             }
         }
+
         return list;
+
     }
 
 

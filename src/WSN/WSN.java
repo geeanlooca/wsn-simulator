@@ -473,29 +473,38 @@ public class WSN {
 
     public static void printThroughput2(double currentTime) {
         // [(total successfully transmitted packets * frameSize) / total simulation time  ]* maxAvailableThroughput
-        int transmissions = 0;
-        int collisions = 0;
+        double avThroughput = 0;
+        double numb = WSN.nodes.size();
+
         for (Node node : WSN.nodes) {
-            collisions += node.getCollisionParam()[0];
-            transmissions += node.getCollisionParam()[1];
+            int collisions = node.getCollisionParam()[0];
+            int transmissions =  node.getCollisionParam()[1];
+            ArrayList<Double> delayList = node.getDelayList();
+
+            double totalTime = 0;
+            for (double delay : delayList){ totalTime += delay; }
+            avThroughput += ((((double)(transmissions - collisions)) * (double) (frameSize * 8)) / totalTime ) / numb;
         }
-        double throughput = ((double) (transmissions - collisions) * (double) (frameSize * 8)) / currentTime;       // Mb/s
-        double normThroughput = throughput / maxAvailableThroughput;
+        double normThroughput = avThroughput / maxAvailableThroughput;
         System.out.println("\n Normalized Throughput = " + normThroughput);
     }
 
 
-    public static double throughput (double currentTime) {
+    public static double throughput(double currentTime) {
         // [(total successfully transmitted packets * frameSize) / total simulation time  ]* maxAvailableThroughput
-        int transmissions = 0;
-        int collisions = 0;
-        for (Node node : WSN.nodes) {
-            collisions += node.getCollisionParam()[0];
-            transmissions += node.getCollisionParam()[1];
-        }
-        double throughput = ((double) (transmissions - collisions) * (double) (frameSize * 8)) / currentTime;       // Mb/s
-        double normThroughput = throughput / maxAvailableThroughput;
+        double avThroughput = 0;
+        double numb = WSN.nodes.size();
 
+        for (Node node : WSN.nodes) {
+            int collisions = node.getCollisionParam()[0];
+            int transmissions =  node.getCollisionParam()[1];
+            ArrayList<Double> delayList = node.getDelayList();
+
+            double totalTime = 0;
+            for (double delay : delayList){ totalTime += delay; }
+            avThroughput += ((((double)(transmissions - collisions)) * (double) (frameSize * 8)) / totalTime ) / numb;
+        }
+        double normThroughput = avThroughput / maxAvailableThroughput;
         return normThroughput;
     }
 
