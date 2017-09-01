@@ -45,6 +45,7 @@ public class Node {
     public ArrayList<Node> resumingNodes = new ArrayList<Node>();
     public Node lastBOstopped;
 
+    public LinkedList<Node> neighborStatus;
     private ArrayList<Node> neighborList;
     private int noNeighborCounter;
 
@@ -114,6 +115,8 @@ public class Node {
         setLineColor(Color.lightGray);
         buffer = new LinkedList<Packet>();
         collided = false;
+
+        neighborStatus = new LinkedList<Node>();
 
         collidedNodes = new ArrayList<Node>();
         resumingNodes = new ArrayList<Node>();
