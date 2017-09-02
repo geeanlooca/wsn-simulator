@@ -281,10 +281,15 @@ public class Node {
 
     public void setListIterator(){
         this.iterator = this.nodeLog.listIterator();
+
     }  // iterator needed to scan the nodeLog list at different times
 
     public Boolean getLog() {
-        return this.iterator.next();
+        //System.out.println("nodeLog size: "+nodeLog.size());
+
+        if (this.iterator.hasNext()){
+            return this.iterator.next();
+        }else{ return null; }
     }
 
 
@@ -328,18 +333,20 @@ public class Node {
         this.totalTime=0;                                        // maybe useless
 
         // delay
+
         double delay = (time + WSN.SIFS + WSN.tACK) - this.startTX;
 
         this.delayList.add(Math.floor(delay * 100) /100);
 
 
-        if (WSN.debug) {
+        if (true) {
             double totalTimeTemp = 0;
             for (double field : delayList) {
                 totalTimeTemp = Math.floor((totalTimeTemp + field) * 100) / 100;
             }
-            if (totalTimeTemp > (time + WSN.SIFS + WSN.tACK)) {
-                System.out.println("ops, problem with delay! \t total time " + totalTimeTemp + " currentTime " + (time + WSN.SIFS + WSN.tACK));
+            double current = Math.ceil((time + WSN.SIFS + WSN.tACK)*100)/100;
+            if (totalTimeTemp > current) {
+                System.out.println("ops, problem with delay! \t total time " + totalTimeTemp + " currentTime " +current);
                 System.exit(1);
             }
         }

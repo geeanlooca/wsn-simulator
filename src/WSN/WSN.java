@@ -29,7 +29,7 @@ public class WSN {
 
     private int windowSize = 1000;                 //  window size used in Fairness calculation
 
-    public static double PrxThreshold = -52;        // threshold on received power (dBm)
+    public static double PrxThreshold = -82;        // threshold on received power (dBm)
     public static double Ptx = 20;                   // transmission power (dBm)
     public static boolean indoor = false;           // indoor or outdoor scenario
     // ------------------------------------//
@@ -430,69 +430,10 @@ public class WSN {
     }
 
 
-    public static void printThroughput(){
-        // ratio between time needed to successfully deliver a packet with a free channel (theoretical) and the overall time needed to successfully delivery (simulated)
 
-        ArrayList<Double> totalTimeList;
-        double allAvThroughput =0;
-        double numb = WSN.nodes.size();
-        System.out.println("\n[ DCF ] ");
-        System.out.println(" Node ||  Av. Total Time to success. delivery || Av. Nomalized Throughput  ");
+    public static double throughput2() {
+        // [OLD] used in presence of multiple parallels channels
 
-        for (Node node : WSN.nodes) {
-            totalTimeList = node.getTotalTimeList();
-            double avTotalTime = calculateAverageDouble(totalTimeList);
-            double avThroughput = (WSN.DIFS + WSN.txTime + WSN.tACK + WSN.SIFS)/ avTotalTime;
-            allAvThroughput +=  avThroughput / numb;
-            System.out.println(node.getId() + "\t\t\t\t" +  avTotalTime+ "\t\t\t\t" +  avThroughput);
-        }
-        System.out.println("\n Total Average Normalized Throughput = " +allAvThroughput);
-    }
-
-
-    public static void CONTIprintThroughput(){
-        // ratio between time needed to successfully deliver a packet with a free channel (theoretical) and the overall time needed to successfully delivery (simulated)
-
-        ArrayList<Double> totalTimeList;
-        int cSlots;
-        double allAvThroughput =0;
-        double numb = WSN.nodes.size();
-        System.out.println("\n[ CONTI ] ");
-        System.out.println(" Node || Av. Total Time to success. delivery || Av. Nomalized Throughput  ");
-
-        for (Node node : WSN.nodes) {
-            cSlots = node.CONTIp.length;        // to be removed...
-            totalTimeList = node.getTotalTimeList();
-            double avTotalTime = calculateAverageDouble(totalTimeList);
-            double avThroughput = ((double)(cSlots * WSN.CONTIslotTime + WSN.txTime))/ avTotalTime;
-            allAvThroughput +=  avThroughput / numb;
-            System.out.println(node.getId()  + "\t\t\t\t" +  avTotalTime+ "\t\t\t\t" +  avThroughput);
-        }
-        System.out.println("\n Total Average Normalized Throughput = " +allAvThroughput);
-    }
-
-
-
-    public static void printThroughput2(double currentTime) {
-        // [(total successfully transmitted packets * frameSize) / total simulation time  ]* maxAvailableThroughput
-        double avThroughput = 0;
-        double numb = WSN.nodes.size();
-
-        for (Node node : WSN.nodes) {
-            int collisions = node.getCollisionParam()[0];
-            int transmissions =  node.getCollisionParam()[1];
-            ArrayList<Double> delayList = node.getDelayList();
-
-            double totalTime = 0;
-            for (double delay : delayList){ totalTime = Math.floor((totalTime + delay)*100)/100; }
-            avThroughput += ((((double)(transmissions - collisions)) * (double) (frameSize * 8)) / totalTime ) / numb;
-        }
-        double normThroughput = avThroughput / maxAvailableThroughput;
-        System.out.println("\n Normalized Throughput = " + normThroughput);
-    }
-
-
-    public static double throughput(double currentTime) {
         // [(total successfully transmitted packets * frameSize) / total simulation time  ]* maxAvailableThroughput
         double avThroughput = 0;
         double numb = WSN.nodes.size();
@@ -509,6 +450,22 @@ public class WSN {
         double normThroughput = avThroughput / maxAvailableThroughput;
         return normThroughput;
     }
+
+
+    public static double throughput(double currentTime) {
+        // [(total successfully transmitted packets * frameSize) / total simulation time  ]* maxAvailableThroughput
+        int collisions = 0;
+        int transmissions = 0;
+
+        for (Node node : WSN.nodes) {
+            collisions += node.getCollisionParam()[0];
+            transmissions +=  node.getCollisionParam()[1];
+        }
+        double avThroughput = (((double)(transmissions - collisions)) * (double) (frameSize * 8)) / currentTime;
+        return avThroughput / maxAvailableThroughput;
+    }
+
+
 
 
     public static void printDelay(){
@@ -616,7 +573,7 @@ public class WSN {
 
     private static double fairness(int windowSize){
         // fairness calculation with Jain's fairness index and sliding windows (like into the 2011 paper)
-
+        windowSize = 5;
         // -- -- -- --
         boolean debugFairness = false;      // if true more useful information are displayed
         // -- -- -- --
@@ -632,6 +589,7 @@ public class WSN {
             System.exit(1);
         }
         if(debugFairness){ System.out.println("\n \n Node Trace "); }
+
 
         for (Node node : WSN.nodes) { node.setListIterator(); }     // initialize an iterator to scan the nodeLog list of the node
 

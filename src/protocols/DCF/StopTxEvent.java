@@ -216,7 +216,6 @@ public class StopTxEvent extends Event {
     private LinkedList<Node> filterListeningAtTX (LinkedList<Node> listeningAtTX ){
 
         LinkedList<Node> newListeningAtTX= new LinkedList<Node>();
-
         for (Node entry : listeningAtTX){
             if (entry.lastBOstopped.getId() == this.n.getId()){
                 newListeningAtTX.add(entry);

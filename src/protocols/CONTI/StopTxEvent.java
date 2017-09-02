@@ -31,6 +31,9 @@ public class StopTxEvent extends Event {
         // retrieve destination of packet
         Node dest = p.getDestination();
 
+        WSN.nodeTrace.add(this.n);
+
+        n.addTransmission();
 
         if (dest == null){
             // collision -> lost packet
@@ -38,7 +41,7 @@ public class StopTxEvent extends Event {
             n.CONTIaddRound();
         }else{
 
-            n.addTransmission();
+            //n.addTransmission();
 
             // number of neighbors of destination that were transmitting during this packet transmission
             int transmittingNeighbors = dest.transmittingNeighbors;
