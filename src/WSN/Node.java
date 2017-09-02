@@ -329,7 +329,17 @@ public class Node {
 
         // delay
         double delay = (time + WSN.SIFS + WSN.tACK) - this.startTX;
-        this.delayList.add(delay);
+
+        this.delayList.add(Math.floor(delay * 100) /100);
+
+
+        double totalTimeTemp = 0;
+        for (double field : delayList){ totalTimeTemp= Math.floor((totalTimeTemp + field)*100)/100; }
+        if(totalTimeTemp>(time  + WSN.SIFS + WSN.tACK)) {
+            System.out.println("ops, problem with delay! \t total time "+totalTimeTemp+" currentTime "+(time  + WSN.SIFS + WSN.tACK));
+            System.exit(1);
+        }
+
         this.startTX = 0;
         this.holdDelay = false;
         if (WSN.debug){ System.out.println("Delay = "+ delay); }

@@ -256,6 +256,8 @@ public class WSN {
 
     public void run(double maxTime) {
 
+        System.out.println("tx time: "+txTime);
+
         setNeighborsList();
         printNeighbors();
 
@@ -482,7 +484,7 @@ public class WSN {
             ArrayList<Double> delayList = node.getDelayList();
 
             double totalTime = 0;
-            for (double delay : delayList){ totalTime += delay; }
+            for (double delay : delayList){ totalTime = Math.floor((totalTime + delay)*100)/100; }
             avThroughput += ((((double)(transmissions - collisions)) * (double) (frameSize * 8)) / totalTime ) / numb;
         }
         double normThroughput = avThroughput / maxAvailableThroughput;
@@ -501,7 +503,7 @@ public class WSN {
             ArrayList<Double> delayList = node.getDelayList();
 
             double totalTime = 0;
-            for (double delay : delayList){ totalTime += delay; }
+            for (double delay : delayList){ totalTime = Math.floor((totalTime + delay)*100)/100; }
             avThroughput += ((((double)(transmissions - collisions)) * (double) (frameSize * 8)) / totalTime ) / numb;
         }
         double normThroughput = avThroughput / maxAvailableThroughput;

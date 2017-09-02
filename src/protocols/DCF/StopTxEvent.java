@@ -78,6 +78,7 @@ public class StopTxEvent extends Event {
 
             if (!lastEvent) {
                 // if this is not the StopTxEvent of the last node that has collided its listening nodes are saved to be resumed in the last StopTxEvent
+                listeningAtTX = filterListeningAtTX(listeningAtTX);
                 this.n.resumingNodes.addAll(listeningAtTX);
                 for (Node entry : listeningAtTX) {
                     if (WSN.debug) {
@@ -88,11 +89,13 @@ public class StopTxEvent extends Event {
             } else {
                 // this is the StopTXEvent of the last collided Node
 
+                listeningAtTX = filterListeningAtTX(listeningAtTX);
                 for (Node entry : listeningAtTX) {
                     if (WSN.debug) {
                         System.out.println("listeningAtTX " + entry.getId());
                     }
                 }
+
 
 
                 ArrayList<Node> collidedNodeSave = new ArrayList<Node>();
@@ -210,6 +213,17 @@ public class StopTxEvent extends Event {
         }
     }
 
+    private LinkedList<Node> filterListeningAtTX (LinkedList<Node> listeningAtTX ){
+
+        LinkedList<Node> newListeningAtTX= new LinkedList<Node>();
+
+        for (Node entry : listeningAtTX){
+            if (entry.lastBOstopped.getId() == this.n.getId()){
+                newListeningAtTX.add(entry);
+            }
+        }
+        return newListeningAtTX;
+    }
 
     private boolean checkCollided(Node collided) {
         // check if the other collision node still have this node in the collided node, because due to channel update can happen
