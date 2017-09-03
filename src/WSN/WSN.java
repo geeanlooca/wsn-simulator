@@ -324,6 +324,7 @@ public class WSN {
 //        WSN.printNoNeighbors();
 
         System.out.println("Collision rate [%]: "+WSN.collisionRate());
+        System.out.println("Alternate Collision rate [%]: "+WSN.alternateCollisionRate());
         System.out.println("Number of contention slot: "+WSN.contentionSlot());
         System.out.println("Throughput: "+WSN.throughput(currentTime));
         System.out.println("Delay [us]: "+WSN.delay());
@@ -609,7 +610,6 @@ public class WSN {
 
     private static double fairness(int windowSize){
         // fairness calculation with Jain's fairness index and sliding windows (like into the 2011 paper)
-        windowSize = 5;
         // -- -- -- --
         boolean debugFairness = false;      // if true more useful information are displayed
         // -- -- -- --

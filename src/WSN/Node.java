@@ -340,7 +340,7 @@ public class Node {
         this.delayList.add(Math.floor(delay * 100) /100);
 
 
-        if (true) {
+        if (WSN.debug) {
             double totalTimeTemp = 0;
             for (double field : delayList) {
                 totalTimeTemp = Math.floor((totalTimeTemp + field) * 100) / 100;
