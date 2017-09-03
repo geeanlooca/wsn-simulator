@@ -34,6 +34,8 @@ public class StartTxEvent extends Event {
     public void run() {
         super.run();
 
+        WSN.attempted.add(time);
+
         n.setColor(WSN.txColor);
 
         Scheduler scheduler = Scheduler.getInstance();

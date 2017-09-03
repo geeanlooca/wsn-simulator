@@ -1,8 +1,6 @@
 package WSN;
 
-import events.Event;
-import events.UpdatePosition;
-import protocols.*;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +10,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 
+import events.Event;
+import events.UpdatePosition;
+import protocols.*;
 
 /**
  * Created by Gianluca on 16/07/2017.
@@ -20,6 +21,9 @@ public class WSN {
 
     // --------- MAIN SIMULATION PARAMETERS ----------//
 
+    private static long runningTime = 0;
+    private static Protocol p;
+    private static double simulationTime;
     private int nodeCount;                       // number of nodes in the network
     private long sleepDelay = 0;                      // delay used to extract events
     public static boolean debug = false;            // printing extra information useful for debugging
@@ -59,8 +63,6 @@ public class WSN {
         }
     }
 
-    //public static double txTime = 200; // microseconds
-    public static double txTime =  (double) Math.round((frameSize * 8) / (maxAvailableThroughput) * 100) / 100;; // txTime in microsecond
 
     public static double meanInterarrivalTime = 20.0;
     public static double meanBackoff = 200.0;
@@ -69,14 +71,16 @@ public class WSN {
     public static double normSize = 10;
     public static double txSize = 15;
 
+    public static double tPLC = 192;
     public static double SIFS = 10;
     public static double DIFS = 50;
     public static double tSlot = 20;
-    public static double tACK = 20;
+    public static double tACK = 20 + tPLC;
+    public static double txTime =  (double) Math.round((frameSize * 8)
+            / (maxAvailableThroughput) * 100) / 100 + tPLC;
 
     public static int CWmin = 15;
     public static int CWmax = 1023;
-    public static double tPLC = 192;
 
     private static int topologyID;
     private static int mobilityID;
@@ -99,6 +103,14 @@ public class WSN {
 
     public static List<Node> nodes;
 
+
+    // Collison rates
+    public static HashSet<Double> collided = new HashSet<>();
+    public static HashSet<Double> attempted = new HashSet<>();
+    public static ArrayList<Node> transmitting = new ArrayList<Node>();
+    public static int access = 0;
+    public static int collisions = 0;
+
     // log of nodes that have transmitted (useful to fairness calculation)
     public static ArrayList<Node> nodeTrace;
 
@@ -106,7 +118,7 @@ public class WSN {
     // CONTI
     //
 
-    public static double CONTIslotTime = 50;
+    public static double CONTIslotTime = 20;
 
     //
     // Methods
@@ -129,7 +141,7 @@ public class WSN {
 
         Scheduler scheduler = Scheduler.getInstance();
 
-
+        this.p = p;
         WSN.nodeTrace = new ArrayList<>();
 
         for (int i = 0; i < this.nodeCount; i++) {
@@ -147,7 +159,7 @@ public class WSN {
             scheduler.schedule(e);
         }
 
-        scheduler.schedule(new UpdatePosition(1000, mobilityID));
+        //scheduler.schedule(new UpdatePosition(1000, mobilityID));
 
         // create GUI window
         if (gui){
@@ -261,18 +273,20 @@ public class WSN {
         setNeighborsList();
         printNeighbors();
 
-
         Scheduler scheduler = Scheduler.getInstance();
         double currentTime = 0;
-
+        long startTime = System.currentTimeMillis();
         while ((!scheduler.isEmpty()) && (currentTime < maxTime)) {
 
             //System.in.read();
-            try {
-                Thread.sleep(sleepDelay);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+            if (sleepDelay > 0){
+                try {
+                    Thread.sleep(sleepDelay);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
             }
+
             Event e = scheduler.remove();
             currentTime = e.getTime();
 
@@ -282,7 +296,9 @@ public class WSN {
 
             e.run();
 
-            if ((((currentTime/maxTime)*100.0) % 5) == 0) {System.out.format("Progress: %.2f %%\n", ((currentTime/maxTime)*100.0)); }
+            //if ((((currentTime/maxTime)*100.0) % 5) == 0) {System.out.format("Progress: %.2f %%\n", ((currentTime/maxTime)*100.0)); }
+
+            //System.out.format("Progress: %.2f %%\n", ((currentTime/maxTime)*100.0));
 
             //if (((currentTime/maxTime)*100.0)>70) {WSN.debug = true;}
 
@@ -295,6 +311,8 @@ public class WSN {
                 guiWindow.paint();
             }
         }
+
+        simulationTime = currentTime;
 
 //        WSN.printCollisionRate();
 //        WSN.printContentionSlot();
@@ -311,6 +329,9 @@ public class WSN {
         System.out.println("Delay [us]: "+WSN.delay());
         System.out.println("Normalized fairness: "+WSN.fairness(windowSize));      // there is also the trace size to be considered...
         System.out.println("No neighbors [%]: "+WSN.noNeighbors());
+
+        long endTime   = System.currentTimeMillis();
+        runningTime = (endTime-startTime)/1000;
 
     }
 
@@ -380,6 +401,20 @@ public class WSN {
         }
         double collPerc = (double) collisions / (double) transmissions * 100;
         System.out.println("\n Average Collision Rate = " + Math.round(collPerc * 100.0)/100.0 + " [%]");
+    }
+
+    public static double alternateCollisionRate(){
+
+        double rate;
+        if (p.getClass().getSimpleName().equals("CONTI")){
+            double coll = collided.size();
+            double att = attempted.size();
+            rate = coll/att;
+        }else{
+            rate = (double) collisions/access;
+        }
+
+        return rate*100;
     }
 
     public static double collisionRate(){
@@ -462,7 +497,8 @@ public class WSN {
             transmissions +=  node.getCollisionParam()[1];
         }
         double avThroughput = (((double)(transmissions - collisions)) * (double) (frameSize * 8)) / currentTime;
-        return avThroughput / maxAvailableThroughput;
+        double normThr = avThroughput / maxAvailableThroughput;
+        return normThr;
     }
 
 
@@ -692,6 +728,7 @@ public class WSN {
     public static void saveToFile(String filename) throws IOException{
 
         File f = new File(filename);
+        String protocol = WSN.p.getClass().getSimpleName();
 
         // automatically checks if file exists or not.
         // if the file does not exist, it automatically creates it
@@ -712,11 +749,25 @@ public class WSN {
 
         // print column names
         if (printColumns){
-            fw.append(String.format("%s;%s;%s;%s;%s", "nodecount", "framesize", "width", "height", "tx-time"));
+            fw.append(String.format("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s", "protocol", "running-time", "nodecount", "simulation-time", "framesize", "width",
+                    "height", "tx-time", "collision-rate", "alternate-rate", "throughput"));
         }
 
         // save simulation parameters and results
-        fw.append(String.format("\n%d;%d;%f;%f;%.2f", nodes.size(), frameSize, width, height, txTime));
+        int seconds = new Double(simulationTime/1e6).intValue();
+        fw.append(String.format("\n" +
+                        "%s;" +
+                        "%d;%d;%d;%d;" +
+                        "%.2f;%.2f;" +
+                        "%.2f;" +
+                        "%.3f;%.3f;" +
+                        "%.3f",
+                protocol,
+                runningTime, nodes.size(), seconds , frameSize,
+                width, height,
+                txTime,
+                WSN.collisionRate(), WSN.alternateCollisionRate(),
+                WSN.throughput(simulationTime)));
 
         // close file
         fw.close();

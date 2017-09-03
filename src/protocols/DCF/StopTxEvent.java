@@ -46,6 +46,11 @@ public class StopTxEvent extends Event {
                 System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             }
 
+            if (WSN.transmitting.size() == 1){
+                // i'm the last transmitting node
+                WSN.collisions++;
+            }
+
             n.collided = false;         // NB: check if it is useful or a problem !!
             // increment collision counter of this node
             this.n.addCollision();
@@ -165,6 +170,8 @@ public class StopTxEvent extends Event {
             }
 
         }
+
+        WSN.transmitting.remove(n);
     }
 
 

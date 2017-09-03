@@ -50,6 +50,7 @@ public class StopTxEvent extends Event {
                 // interference at receiver -> collision
                 if (WSN.debug) { System.out.println("  Transmission unsuccessful!!"); }
                 n.addCollision();
+                WSN.collided.add(time);
                 // the round is finished, next transmission attempt in the next round
                 n.CONTIaddRound();
             }else{
