@@ -212,7 +212,7 @@ public class StopTxEvent extends Event {
 
     private void reschedule(Node node, Scheduler scheduler) {
         // schedule CheckChannelStatus event for the specified node
-        scheduler.schedule(new CheckChannelStatus(node, time + WSN.DIFS, WSN.DIFS));
+        scheduler.schedule(new CheckChannelStatus(node, time + WSN.SIFS + WSN.tACK + WSN.DIFS, WSN.DIFS));
         node.freeChannel = true;
 
         if (WSN.debug) {

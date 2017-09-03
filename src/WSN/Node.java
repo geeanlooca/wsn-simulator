@@ -557,10 +557,6 @@ public class Node {
             case 2: // NO change in the position
                 break;
         }
-
-
-
-
     }
 
 }

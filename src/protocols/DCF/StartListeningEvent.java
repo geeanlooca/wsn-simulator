@@ -27,6 +27,8 @@ public class StartListeningEvent extends Event {
 
         Scheduler scheduler = Scheduler.getInstance();
 
+        //System.out.println("Node ["+ n.getId() + "] BO: " + n.getBOcounter());
+
         ArrayList<Node> neighbors = this.n.getNeighborList();
         if (neighbors.isEmpty()){
             // this node has no neighbors
@@ -59,7 +61,6 @@ public class StartListeningEvent extends Event {
                 scheduler.schedule(new CheckChannelStatus(n, time + WSN.DIFS, WSN.DIFS));
                 // mark the contention initial time (useful to Delay)
                 this.n.startTXTime(this.time);
-
             }
             else if(n.getStatus() == WSN.NODE_STATUS.IDLING){
                 // channel busy (caused by an update of the neighbors). Reschedule this event

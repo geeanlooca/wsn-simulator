@@ -74,7 +74,6 @@ public class StartTxEvent extends Event {
 
             // reset the contention slot counter of this listening node (this round is finished)
             listening.resetContSlot(this.time);
-
         }
     }
 }

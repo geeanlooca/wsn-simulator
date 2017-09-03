@@ -486,7 +486,7 @@ public class WSN {
             list = node.getSlotCounterList();
             slotCounterList.addAll(list);
         }
-        double allAverageSlotCounter =calculateAverage(slotCounterList);
+        double allAverageSlotCounter = calculateAverage(slotCounterList);
         return allAverageSlotCounter;
     }
 
