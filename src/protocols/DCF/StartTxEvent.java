@@ -30,7 +30,6 @@ public class StartTxEvent extends Event {
         this.n.setLineColor(Color.MAGENTA);
 
         // save the contention slot counter (this round is finished)
-        this.n.storeContSlotNumber();
 
         if (WSN.transmitting.size() == 0){
             WSN.access++;
@@ -58,6 +57,8 @@ public class StartTxEvent extends Event {
 
         }
 
+        this.n.storeContSlotNumber(this.time);
+
         n.setStatus(WSN.NODE_STATUS.TRANSMITTING);
 
         LinkedList<Node> listeningNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.LISTENING);
@@ -71,8 +72,8 @@ public class StartTxEvent extends Event {
             // save the node that force the backoff freezing to discriminate among multiple backoff resumes
             listening.lastBOstopped = this.n;
 
-            // reset the contention slot counter of this node (this round is finished)
-            listening.resetContSlot();
+            // reset the contention slot counter of this listening node (this round is finished)
+            listening.resetContSlot(this.time);
 
         }
     }

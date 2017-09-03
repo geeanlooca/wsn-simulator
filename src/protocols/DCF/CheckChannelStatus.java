@@ -94,7 +94,10 @@ public class CheckChannelStatus extends Event {
                     statement = true;
                     if (WSN.debug) {System.out.println(" Channel busy! Destination Node "+dest.getId()+" is receiving from Node: "+entry.getId()); }
                     scheduler.schedule(new CheckChannelStatus(n, time + WSN.DIFS, WSN.DIFS));
-                    if (duration == WSN.DIFS){this.n.addDIFStime();} else if (duration == WSN.tSlot){ this.n.addSlotTime();};
+                    if (duration == WSN.DIFS){this.n.addDIFStime();} else if (duration == WSN.tSlot){
+                        this.n.addSlotTime();
+                        this.n.addContSlot();
+                    }
                     break;
                 }
             }

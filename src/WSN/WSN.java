@@ -315,14 +315,14 @@ public class WSN {
         simulationTime = currentTime;
 
 //        WSN.printCollisionRate();
-//        WSN.printContentionSlot();
+//        WSN.printContentionSlot2();
 //        WSN.printThroughput();
 //        WSN.CONTIprintThroughput();
 //        WSN.printThroughput2(currentTime);
 //        WSN.printDelay();
 //        WSN.printFairness(windowSize);
 //        WSN.printNoNeighbors();
-
+        System.out.println("\n");
         System.out.println("Collision rate [%]: "+WSN.collisionRate());
         System.out.println("Alternate Collision rate [%]: "+WSN.alternateCollisionRate());
         System.out.println("Number of contention slot: "+WSN.contentionSlot());
@@ -435,14 +435,16 @@ public class WSN {
         //      (# of transmission slots that a node spends in a contention).
 
         ArrayList<Integer> slotNumberList;
-        double allAverageSlotNumber =0;
+        double allAverageSlotNumber = 0;
         double numb = WSN.nodes.size();
         System.out.println("\n[ DCF ] ");
         System.out.println(" Node ||  Average # of Contention Slots ");
 
         for (Node node : WSN.nodes) {
             slotNumberList = node.getSlotCounterList();
-            if(debug){System.out.println(node.getId() + "\t\t" + slotNumberList.toString());}
+            //if(debug){System.out.println(node.getId() + "\t\t" + slotNumberList.toString());}
+            System.out.println(node.getId() + "\t\t" + slotNumberList.toString());
+
             double avSlotNumber = calculateAverage(slotNumberList);
             allAverageSlotNumber +=  avSlotNumber / numb;
 
@@ -451,18 +453,41 @@ public class WSN {
         System.out.println("\n Total Average Number of Contention Slot = " +allAverageSlotNumber);
     }
 
+
+
+    public static void printContentionSlot2(){
+        // calculate the average number of contention slot (# of transmission slots that a node spends in a contention).
+        // new method
+        ArrayList<Integer> list;
+        ArrayList<Integer> slotCounterList = new ArrayList<Integer>();
+
+        double numb = WSN.nodes.size();
+        System.out.println("\n[ DCF ] ");
+        System.out.println(" Node ||  Average # of Contention Slots ");
+        for (Node node : WSN.nodes) {
+            list = node.getSlotCounterList();
+            //System.out.println(node.getId() + "\t\t" + list.toString());
+
+            slotCounterList.addAll(list);
+            double avSlotNumber = calculateAverage(list);
+            System.out.println(node.getId() + "\t\t\t\t" + avSlotNumber);
+        }
+        double allAverageSlotCounter =calculateAverage(slotCounterList);
+        System.out.println("\n Total Average Number of Contention Slot = " +allAverageSlotCounter);
+    }
+
     public static double contentionSlot(){
         // calculate the average number of contention slot (# of transmission slots that a node spends in a contention).
-        ArrayList<Integer> slotNumberList;
-        double allAverageSlotNumber =0;
+        // new method
+        ArrayList<Integer> list;
+        ArrayList<Integer> slotCounterList = new ArrayList<Integer>();
         double numb = WSN.nodes.size();
         for (Node node : WSN.nodes) {
-            slotNumberList = node.getSlotCounterList();
-            if(debug){System.out.println(node.getId() + "\t\t" + slotNumberList.toString());}
-            double avSlotNumber = calculateAverage(slotNumberList);
-            allAverageSlotNumber +=  avSlotNumber / numb;
+            list = node.getSlotCounterList();
+            slotCounterList.addAll(list);
         }
-        return allAverageSlotNumber;
+        double allAverageSlotCounter =calculateAverage(slotCounterList);
+        return allAverageSlotCounter;
     }
 
 
@@ -709,7 +734,7 @@ public class WSN {
             for (Integer entry : list) {
                 sum += entry;
             }
-            return sum.doubleValue() / list.size();
+            return (((double) sum )/( (double) list.size()));
         }
         return sum;
     }

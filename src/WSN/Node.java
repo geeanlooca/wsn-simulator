@@ -68,6 +68,7 @@ public class Node {
     private int collCounter;
 
     private int slotCounter;
+    private double slotCountResetTime;
     private ArrayList<Integer> slotCounterList;
 
     private double totalTime;
@@ -128,6 +129,7 @@ public class Node {
         transCounter = 0;
         collCounter = 0;
         slotCounter = 0;
+        slotCountResetTime=0;
         startTX =0;
         this.slotCounterList = new ArrayList<Integer>();
         this.totalTimeList = new ArrayList<Double>();
@@ -301,13 +303,23 @@ public class Node {
         if (WSN.debug){ System.out.println("Contention Slot Counter: \t"+ this.slotCounter);}
     }
 
-    public void resetContSlot(){ this.slotCounter=0;
+    public void resetContSlot(double time){
+        this.slotCountResetTime = time;
+        this.slotCounter=0;
         if (WSN.debug){ System.out.println("Node "+this.getId()+" reset contention slot counter"); }
     }
 
-    public void storeContSlotNumber() {
-        this.slotCounterList.add(this.slotCounter);
+    public void storeContSlotNumber(double time) {
+        // in case of collision save the counter only one time
+        if (!this.collided){
+            this.slotCounterList.add(this.slotCounter);
+            if (WSN.debug){ System.out.println(" Store contention slot counter"); }
+        } else if(this.slotCountResetTime != time){
+            this.slotCounterList.add(this.slotCounter);
+            if (WSN.debug){ System.out.println(" Store contention slot counter"); }
+        }
         this.slotCounter = 0;
+        this.slotCountResetTime=0;
         if (WSN.debug){ System.out.println("Contention Slot Counter List: \t"+ this.slotCounterList);}
 
     }
