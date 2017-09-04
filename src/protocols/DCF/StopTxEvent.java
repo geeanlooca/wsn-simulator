@@ -49,6 +49,9 @@ public class StopTxEvent extends Event {
             if (WSN.transmitting.size() == 1){
                 // i'm the last transmitting node
                 WSN.collisions++;
+                if (WSN.debug){
+                    System.out.println("Contention round ended with COLLISION (" + (double) WSN.collisions/WSN.access + ")");
+                }
             }
 
             n.collided = false;         // NB: check if it is useful or a problem !!

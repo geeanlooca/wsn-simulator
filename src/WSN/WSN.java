@@ -75,7 +75,8 @@ public class WSN {
     public static double SIFS = 10;
     public static double DIFS = 50;
     public static double tSlot = 20;
-    public static double tACK = 20 + tPLC;
+    public static double tACK = (double) Math.round((14 * 8)
+            / (1) * 100) / 100 + tPLC;
     public static double txTime =  (double) Math.round((frameSize * 8)
             / (maxAvailableThroughput) * 100) / 100 + tPLC;
 
@@ -256,6 +257,14 @@ public class WSN {
 
     public void setAnimationDelay(int ms) {
         this.sleepDelay = ms;
+    }
+
+    public static void setFrameSize(int bytes){
+        frameSize = bytes;
+        tACK = (double) Math.round((14 * 8)
+                / (1) * 100) / 100 + tPLC;
+        txTime =  (double) Math.round((frameSize * 8)
+                / (maxAvailableThroughput) * 100) / 100 + tPLC;
     }
 
     public void debugging(boolean enable){
@@ -774,8 +783,8 @@ public class WSN {
 
         // print column names
         if (printColumns){
-            fw.append(String.format("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s", "protocol", "running-time", "nodecount", "simulation-time", "framesize", "width",
-                    "height", "tx-time", "collision-rate", "alternate-rate", "throughput"));
+            fw.append(String.format("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s", "protocol", "running-time", "nodecount", "simulation-time", "framesize", "width",
+                    "height", "tx-time", "collision-rate", "alternate-rate", "throughput", "delay"));
         }
 
         // save simulation parameters and results
@@ -786,13 +795,13 @@ public class WSN {
                         "%.2f;%.2f;" +
                         "%.2f;" +
                         "%.3f;%.3f;" +
-                        "%.3f",
+                        "%.3f;%.3f",
                 protocol,
                 runningTime, nodes.size(), seconds , frameSize,
                 width, height,
                 txTime,
                 WSN.collisionRate(), WSN.alternateCollisionRate(),
-                WSN.throughput(simulationTime)));
+                WSN.throughput(simulationTime), WSN.delay()/1000));
 
         // close file
         fw.close();

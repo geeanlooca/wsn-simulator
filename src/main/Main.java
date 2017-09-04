@@ -163,7 +163,7 @@ public class Main {
         }
 
         WSN netw = new WSN(nodeCount, networkWidth, networkHeight, p, topologyID, mobilityID, gui);
-        WSN.frameSize = framesize;
+        netw.setFrameSize(framesize);
         netw.setPanelSize(600, 600);
 
         netw.debugging(debugging);

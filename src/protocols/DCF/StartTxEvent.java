@@ -34,6 +34,9 @@ public class StartTxEvent extends Event {
         if (WSN.transmitting.size() == 0){
             WSN.access++;
             WSN.transmitting.add(n);
+            if (WSN.debug){
+                System.out.println("New contention round added (total=" + WSN.access+")");
+            }
         }
 
         LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
