@@ -379,7 +379,7 @@ public class Node {
     public void CONTIsetTotalTime(){
         CONTIaddRound();
         if (WSN.debug) {System.out.println("Node "+this.getId()+" used "+this.CONTIroundCounter+" rounds to succeeds ");}
-        double delay = this.CONTIroundCounter * (CONTIp.length * WSN.CONTIslotTime  + WSN.txTime) ;
+        double delay = this.CONTIroundCounter * (WSN.DIFS + CONTIp.length * WSN.CONTIslotTime + WSN.txTime + WSN.SIFS + WSN.tACK) ;
         this.delayList.add(delay);
         this.CONTIroundCounter = 0;
     }
