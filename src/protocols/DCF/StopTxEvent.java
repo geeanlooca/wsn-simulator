@@ -32,7 +32,8 @@ public class StopTxEvent extends Event {
         this.n.setSize(WSN.normSize);
         n.setStatus(WSN.NODE_STATUS.IDLING);
         this.n.setLineColor(Color.lightGray);
-        Random r = new Random();
+        RNG r = RNG.getInstance();
+
         // add txTime to the total packet transmission time
         this.n.addTXtime();
 
