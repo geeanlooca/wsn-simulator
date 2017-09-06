@@ -5,6 +5,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.*;
+import java.util.List;
+
 import WSN.RNG;
 
 /**
@@ -86,8 +88,12 @@ public class Node {
 
     // CONTI
     public int CONTIslotNumber = 0;
-    //public double[] CONTIp = {0.18, 0.31, 0.4, 0.48, 0.48, 0.49, 0.49};
-    public double[] CONTIp = {0.2563, 0.36715, 0.4245, 0.4314, 0.5, 0.5};
+    public double[] CONTIp = {0.18, 0.31, 0.4, 0.48, 0.48, 0.49, 0.49};
+    //public double[] CONTIp = {0.2563, 0.36715, 0.4245, 0.4314, 0.5, 0.5};
+
+    public int GALTIERcounter = 0;
+    public List<Integer> GALTIERseq = new ArrayList<>();
+    public int GALTIERidx = 0;
 
     public int CONTIroundCounter =0;
 
@@ -230,6 +236,9 @@ public class Node {
     }
 
     public void setCW(int CW){
+        if (WSN.debug){
+            System.out.println("CW changed from " + this.CW + " to " + CW);
+        }
         windows.add(CW);
         this.CW = CW;
     }

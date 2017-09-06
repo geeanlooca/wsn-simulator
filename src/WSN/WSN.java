@@ -122,11 +122,17 @@ public class WSN {
     public static double CONTIslotTime = 20;
 
     //
+    // GALTIER
+    //
+    public static List<List<Double>> galtierP = new ArrayList<>();
+
+
+    //
     // Methods
     //
 
     /************************      CONSTRUCTOR      ***********************/
-    public WSN(int nodeCount, double width, double height, Protocol p, int topologyID, int mobilityID, boolean gui) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public WSN(int nodeCount, double width, double height, Protocol p, int topologyID, int mobilityID, boolean gui) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
 
         RNG r = RNG.getInstance();
         nodes = new LinkedList<>();
@@ -160,6 +166,7 @@ public class WSN {
             scheduler.schedule(e);
         }
 
+        initializeGALTIER(nodeCount);
         //scheduler.schedule(new UpdatePosition(1000, mobilityID));
 
         // create GUI window
@@ -337,7 +344,7 @@ public class WSN {
         System.out.println("Number of contention slot: "+WSN.contentionSlot());
         System.out.println("Throughput: "+WSN.throughput(currentTime));
         System.out.println("Delay [us]: "+WSN.delay());
-        System.out.println("Normalized fairness: "+WSN.fairness(windowSize));      // there is also the trace size to be considered...
+        //System.out.println("Normalized fairness: "+WSN.fairness(windowSize));      // there is also the trace size to be considered...
         System.out.println("No neighbors [%]: "+WSN.noNeighbors());
 
         long endTime   = System.currentTimeMillis();
@@ -416,12 +423,12 @@ public class WSN {
     public static double alternateCollisionRate(){
 
         double rate;
-        if (p.getClass().getSimpleName().equals("CONTI")){
+        if (p.getClass().getSimpleName().equals("DCF")){
+            rate = (double) collisions/access;
+        }else{
             double coll = collided.size();
             double att = attempted.size();
             rate = coll/att;
-        }else{
-            rate = (double) collisions/access;
         }
 
         return rate*100;
@@ -805,6 +812,30 @@ public class WSN {
 
         // close file
         fw.close();
+
+        WSN.printCollisionRate();
+    }
+
+    public static void initializeGALTIER(int nodeCount) throws IOException {
+
+        String filepath;
+        BufferedReader br;
+        try {
+            filepath = String.format("data/galtier/galtier-%d.dat", WSN.nodes.size());
+            br = new BufferedReader(new FileReader(filepath));
+        }catch (Exception e){
+            filepath = "data/galtier/galtier-paper.dat";
+            br = new BufferedReader(new FileReader(filepath));
+        }
+
+        String line;
+        while ( (line = br.readLine()) != null){
+            List<Double> doubleData = new ArrayList<>();
+            Arrays.asList(line.split(";"))
+                    .forEach(p -> doubleData.add(Double.parseDouble(p)));
+            galtierP.add(doubleData);
+        }
+        br.close();
     }
 
     /*****************************
