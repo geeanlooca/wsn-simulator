@@ -49,6 +49,7 @@ public class CheckChannelStatus extends Event {
                     n.addTransmission();
                     // keep track of the nodes that start a transmission (useful to Fairness calculation)
                     WSN.nodeTrace.add(this.n);
+                    WSN.nodeTraceTimes.add(this.time);
 
                     scheduler.schedule(new StartTxEvent(n, time));
                 }
@@ -68,6 +69,7 @@ public class CheckChannelStatus extends Event {
                     n.addTransmission();
                     // keep track of the nodes that start a transmission (useful to Fairness calculation)
                     WSN.nodeTrace.add(this.n);
+                    WSN.nodeTraceTimes.add(this.time);
 
                     scheduler.schedule(new StartTxEvent(n,  time));
                 }else {

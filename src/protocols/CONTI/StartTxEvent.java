@@ -63,6 +63,8 @@ public class StartTxEvent extends Event {
 
         // keep track of the nodes that start a transmission (useful to Fairness calculation)
         WSN.nodeTrace.add(this.n);
+        WSN.nodeTraceTimes.add(this.time);
+
         // increase transmission counter for this node
         n.addTransmission();
 
