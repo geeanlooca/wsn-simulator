@@ -88,7 +88,7 @@ public class Node {
 
     // CONTI
     public int CONTIslotNumber = 0;
-    public double[] CONTIp = {0.18, 0.31, 0.4, 0.48, 0.48, 0.49, 0.49};
+    //public double[] CONTIp = {0.18, 0.31, 0.4, 0.48, 0.48, 0.49, 0.49};
     //public double[] CONTIp = {0.2563, 0.36715, 0.4245, 0.4314, 0.5, 0.5};
 
     public int GALTIERcounter = 0;
@@ -96,6 +96,8 @@ public class Node {
     public int GALTIERidx = 0;
     public double[] CONTIp = {0.18, 0.31, 0.4, 0.48, 0.48, 0.49, 0.49};
     //public double[] CONTIp = {0.2563, 0.36715, 0.4245, 0.4314, 0.5, 0.5};
+
+    private int probVectSize = CONTIp.length;    // to be updated!!!!!!! also for GALTIER
 
     public int CONTIroundCounter =0;
 
@@ -390,7 +392,7 @@ public class Node {
     public void CONTIsetTotalTime(){
         CONTIaddRound();
         if (WSN.debug) {System.out.println("Node "+this.getId()+" used "+this.CONTIroundCounter+" rounds to succeeds ");}
-        double delay = this.CONTIroundCounter * (WSN.DIFS + CONTIp.length * WSN.CONTIslotTime + WSN.txTime + WSN.SIFS + WSN.tACK) ;
+        double delay = this.CONTIroundCounter * (WSN.DIFS + probVectSize * WSN.CONTIslotTime + WSN.txTime + WSN.SIFS + WSN.tACK) ;
         this.delayList.add(delay);
         this.CONTIroundCounter = 0;
     }

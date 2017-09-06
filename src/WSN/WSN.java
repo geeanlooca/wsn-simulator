@@ -906,6 +906,14 @@ public class WSN {
         return avNoNeighbors;
     }
 
+    private static ArrayList<Double> getDelayList (){
+        // concatenate all the delays used in the simulation
+        ArrayList<Double> delayList = new ArrayList<>();
+        for (Node entry : WSN.nodes){
+            delayList.addAll(entry.getDelayList());
+        }
+        return delayList;
+    }
 
 
     private static double calculateAverage(List <Integer> list) {
@@ -977,7 +985,23 @@ public class WSN {
         // close file
         fw.close();
 
-        WSN.printCollisionRate();
+        // export delay list
+
+        filename = String.format("./results/delayList--"+"%s-"+"%d-"+ "%d"+".csv", protocol, nodes.size(), frameSize );
+
+        f = new File(filename);
+
+        // automatically checks if file exists or not.
+        // if the file does not exist, it automatically creates it
+        f.getParentFile().mkdirs();
+        created = f.createNewFile();
+        printColumns = created;
+
+        fw = new FileWriter(filename, false);
+        for (double entry : WSN.getDelayList()){ fw.append(String.format("%.3f;", entry)); }
+
+        fw.close();
+
     }
 
     public static void initializeGALTIER(int nodeCount) throws IOException {

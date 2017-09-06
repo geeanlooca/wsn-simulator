@@ -147,6 +147,9 @@ public class Main {
                 case "CONTI":
                     p = new CONTI();
                     break;
+                case "GALTIER":
+                    p = new GALTIER();
+                    break;
                 default:
                     p = new DCF();
                     break;
@@ -162,7 +165,7 @@ public class Main {
             file = "./results/simulations/default.csv";
         }
 
-        WSN netw = new WSN(nodeCount, networkWidth, networkHeight, new GALTIER(), topologyID, mobilityID, gui);
+        WSN netw = new WSN(nodeCount, networkWidth, networkHeight, p, topologyID, mobilityID, gui);
         netw.setFrameSize(framesize);
         netw.setPanelSize(600, 600);
 
