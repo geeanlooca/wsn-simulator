@@ -11,7 +11,7 @@ import itertools
 
 framesize = [250, 600, 950, 1300, 1550, 1650, 2000, 2346]
 protocol = "DCF"
-nodes = 20
+nodes = 10
 file = "./{0}-framesize-{1}-nodes.csv".format(protocol, nodes)
 
 if (os.path.isfile(file)):

@@ -4,10 +4,11 @@ import WSN.*;
 import protocols.*;
 import protocols.CONTI.CONTI;
 import protocols.DCF.DCF;
+import protocols.GALTIER.GALTIER;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Created by Gianluca on 16/07/2017.
@@ -17,7 +18,6 @@ public class Main {
 
         // set locale to US to format decimal numbers with a dot instead of comma
         Locale.setDefault(Locale.US);
-
 
         // network size and topology number
         int networkWidth, networkHeight, topologyID, mobilityID, delay, nodeCount, framesize;
@@ -162,7 +162,7 @@ public class Main {
             file = "./results/simulations/default.csv";
         }
 
-        WSN netw = new WSN(nodeCount, networkWidth, networkHeight, p, topologyID, mobilityID, gui);
+        WSN netw = new WSN(nodeCount, networkWidth, networkHeight, new GALTIER(), topologyID, mobilityID, gui);
         netw.setFrameSize(framesize);
         netw.setPanelSize(600, 600);
 
