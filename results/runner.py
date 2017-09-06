@@ -18,7 +18,7 @@ if (os.path.isfile(file)):
     os.remove(file)
 
 for i in framesize:
-    cmd = "java -Dframesize={0} -Dnodes=\"{1}\" -Dtime=1200 -Doutput={2} -Dprotocol=\"{3}\" -jar wsn-simulator.jar ".format(
+    cmd = "/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin/java -Dframesize={0} -Dnodes=\"{1}\" -Dtime=1200 -Doutput={2} -Dprotocol=\"{3}\" -jar wsn-simulator-master\ 2.jar ".format(
         str(i), str(nodes), file, protocol)
     os.system(cmd)
 
