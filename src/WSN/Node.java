@@ -98,6 +98,7 @@ public class Node {
     //public double[] CONTIp = {0.2563, 0.36715, 0.4245, 0.4314, 0.5, 0.5};
 
     private int probVectSize = CONTIp.length;    // to be updated!!!!!!! also for GALTIER
+//    private int probVectSize = WSN.galtierP.size();    // to be updated!!!!!!! also for GALTIER
 
     public int CONTIroundCounter =0;
 

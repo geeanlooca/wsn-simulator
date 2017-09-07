@@ -128,7 +128,6 @@ public class WSN {
     // GALTIER
     //
     public static List<List<Double>> galtierP = new ArrayList<>();
-    public static List<Double> CONTIp = new ArrayList<>();
 
 
     //
@@ -171,16 +170,7 @@ public class WSN {
             scheduler.schedule(e);
         }
 
-        System.out.println(p.getClass().getSimpleName());
-
-        if (p.getClass().getSimpleName().equals("CONTI")){
-            initializeCONTI(nodeCount);
-        }
-
-        if (p.getClass().getSimpleName().equals("GALTIER")){
-            initializeGALTIER(nodeCount);
-        }
-
+        initializeGALTIER(nodeCount);
         //scheduler.schedule(new UpdatePosition(1000, mobilityID));
 
         // create GUI window
@@ -1008,86 +998,32 @@ public class WSN {
         printColumns = created;
 
         fw = new FileWriter(filename, false);
-        for (double entry : WSN.getDelayList()){ fw.append(String.format("%.3f\n", entry)); }
+        for (double entry : WSN.getDelayList()){ fw.append(String.format("%.3f;", entry)); }
 
         fw.close();
 
     }
 
-    public static void initializeCONTI(int nodeCount) throws IOException {
-        String filename;
-        String s = System.getProperty("scheme");
-        switch (s){
-            case "paper":
-                // p that optmizes throughput
-                filename = "data/CONTI/CONTI-optimal.dat";
-                break;
-
-            case "optimal":
-                // select optimum p for the given number of stations
-                filename = String.format("data/CONTI/CONTI-%d.dat", nodeCount);
-                break;
-
-            case "generic":
-                filename = String.format("data/CONTI/CONTI-100.dat", nodeCount);
-                break;
-
-            default:
-                filename = String.format("data/CONTI/CONTI-100.dat", nodeCount);
-                break;
-        }
-
-        BufferedReader br;
-        try {
-            br = new BufferedReader(new FileReader(filename));
-            String line = br.readLine();
-            Arrays.asList(line.split(";"))
-                    .forEach(p -> CONTIp.add(Double.parseDouble(p)));
-
-            br.close();
-        }catch (Exception e){
-            System.out.println("Error: can't open parameter file for CONTI.");
-            System.exit(1);
-        }
-    }
-
     public static void initializeGALTIER(int nodeCount) throws IOException {
 
         String filepath;
-        String s = System.getProperty("scheme");
-        switch (s){
-            case "paper":
-                filepath = "data/galtier/galtier-paper.dat";
-                break;
-
-            case "optimal":
-                filepath = String.format("data/galtier/galtier-%d.dat", nodeCount);
-                break;
-
-            case "7slots":
-                filepath = String.format("data/galtier/galtier-100-7.dat", nodeCount);
-                break;
-
-            default:
-            filepath = "data/galtier/galtier-paper.dat";
-            break;
-        }
-
+        BufferedReader br;
         try {
-            BufferedReader br = new BufferedReader(new FileReader(filepath));
-            String line;
-            while ( (line = br.readLine()) != null){
-                List<Double> doubleData = new ArrayList<>();
-                Arrays.asList(line.split(";"))
-                        .forEach(p -> doubleData.add(Double.parseDouble(p)));
-                galtierP.add(doubleData);
-            }
-            br.close();
+            filepath = String.format("wsn-simulator/data/galtier/galtier-%d.dat", WSN.nodes.size());
+            br = new BufferedReader(new FileReader(filepath));
         }catch (Exception e){
-            System.out.println("Error: can't open parameter file for GALTIER.");
-            System.exit(1);
+            filepath = "wsn-simulator/data/galtier/galtier-paper.dat";
+            br = new BufferedReader(new FileReader(filepath));
         }
 
+        String line;
+        while ( (line = br.readLine()) != null){
+            List<Double> doubleData = new ArrayList<>();
+            Arrays.asList(line.split(";"))
+                    .forEach(p -> doubleData.add(Double.parseDouble(p)));
+            galtierP.add(doubleData);
+        }
+        br.close();
     }
 
     /*****************************
