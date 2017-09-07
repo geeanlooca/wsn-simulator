@@ -18,7 +18,7 @@ public class StartContentionSlot extends Event {
         Scheduler scheduler = Scheduler.getInstance();
 
         // get probability to send a jam
-        double p = n.CONTIp[n.CONTIslotNumber];
+        double p = WSN.CONTIp.get(n.CONTIslotNumber);
 
         RNG r = RNG.getInstance();
         if (r.nextDouble() < p){
@@ -43,6 +43,6 @@ public class StartContentionSlot extends Event {
 
     @Override
     public String toString(){
-        return "["+this.time+"][ContentionSlot " + (n.CONTIslotNumber+1) + "/" + n.CONTIp.length + "][Node " + n.getId() + "]";
+        return "["+this.time+"][ContentionSlot " + (n.CONTIslotNumber+1) + "/" + WSN.CONTIp.size() + "][Node " + n.getId() + "]";
     }
 }

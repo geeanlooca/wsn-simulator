@@ -68,7 +68,7 @@ public class StopTxEvent extends Event {
             n.setBOcounter(r.nextInt(n.getCW() + 1));
 
             // start new round NOW
-            scheduler.schedule(new StartListeningEvent(n, time + WSN.tACK + WSN.SIFS));
+            scheduler.schedule(new StartListeningEvent(n, time + WSN.DIFS));
 
             // At the end of the StopTxEvent new CheckChannelEvents must be rescheduled for all the listening nodes (that have stopped the BO during the startTXEvent). However
             //  if a collision occurs the whole rescheduling has to happen during the stopTXEvent associated to the last collided node, in order to avoid duplicated events and unwanted behaviors.
@@ -139,7 +139,7 @@ public class StopTxEvent extends Event {
 
                     // check if the rescheduled is already happened.
                     if (!listening.freeChannel && listening.getStatus() == WSN.NODE_STATUS.LISTENING) {
-                        reschedule(listening, scheduler);
+                        reschedule(listening, scheduler, WSN.DIFS);
 
                     }
                 }
@@ -169,7 +169,7 @@ public class StopTxEvent extends Event {
 
                 // check if the rescheduled is already happened.  If the transmission succeeds only the last Node that stops the BO counter for this node can resume it.
                 if (!listening.freeChannel && (listening.lastBOstopped.getId() == this.n.getId())) {
-                    reschedule(listening, scheduler);
+                    reschedule(listening, scheduler, WSN.SIFS + WSN.tACK + WSN.DIFS);
                 }
             }
 
@@ -214,9 +214,9 @@ public class StopTxEvent extends Event {
     }
 
 
-    private void reschedule(Node node, Scheduler scheduler) {
+    private void reschedule(Node node, Scheduler scheduler, double timeshift) {
         // schedule CheckChannelStatus event for the specified node
-        scheduler.schedule(new CheckChannelStatus(node, time + WSN.SIFS + WSN.tACK + WSN.DIFS, WSN.DIFS));
+        scheduler.schedule(new CheckChannelStatus(node, time + timeshift, WSN.DIFS));
         node.freeChannel = true;
 
         if (WSN.debug) {

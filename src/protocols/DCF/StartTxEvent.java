@@ -31,13 +31,16 @@ public class StartTxEvent extends Event {
 
         // save the contention slot counter (this round is finished)
 
-        if (WSN.transmitting.size() == 0){
+        if (WSN.transmitting.size() == 0) {
             WSN.access++;
-            WSN.transmitting.add(n);
             if (WSN.debug){
                 System.out.println("New contention round added (total=" + WSN.access+")");
             }
         }
+
+        WSN.transmitting.add(n);
+
+
 
         LinkedList<Node> transmittingNodes = WSN.getNeighborsStatus(this.n, WSN.NODE_STATUS.TRANSMITTING);
 

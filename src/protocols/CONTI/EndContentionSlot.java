@@ -21,7 +21,7 @@ public class EndContentionSlot extends Event {
         Scheduler scheduler = Scheduler.getInstance();
 
         n.CONTIslotNumber++;
-        int maxSlots = n.CONTIp.length;
+        int maxSlots = WSN.CONTIp.size();
 
 
         // determine if node goes on with the contention or defers
@@ -88,6 +88,6 @@ public class EndContentionSlot extends Event {
 
     @Override
     public String toString(){
-        return "["+this.time+"][EndContentionSlot " + (n.CONTIslotNumber+1) + "/" + n.CONTIp.length + "][Node " + n.getId() + "]";
+        return "["+this.time+"][EndContentionSlot " + (n.CONTIslotNumber+1) + "/" + WSN.CONTIp.size() + "][Node " + n.getId() + "]";
     }
 }
