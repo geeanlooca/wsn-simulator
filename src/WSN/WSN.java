@@ -31,7 +31,7 @@ public class WSN {
     final static double maxAvailableThroughput = 11;    // Mb/s
     public static int frameSize = 1500;               // bytes
 
-    private int windowSize = 1000;                 //  window size used in Fairness calculation
+    private static int windowSize = 1000;                 //  window size used in Fairness calculation
     private double windowDuration = 2;              //  window duration (expressed in seconds) used in Fairness calculation
 
     public static double PrxThreshold = -82;        // threshold on received power (dBm)
@@ -123,11 +123,13 @@ public class WSN {
     //
 
     public static double CONTIslotTime = 20;
+    public static int probVectSize;
 
     //
     // GALTIER
     //
     public static List<List<Double>> galtierP = new ArrayList<>();
+    public static List<Double> CONTIp = new ArrayList<>();
 
 
     //
@@ -154,6 +156,7 @@ public class WSN {
         this.p = p;
         WSN.nodeTrace = new ArrayList<>();
         WSN.nodeTraceTimes = new ArrayList<>();
+        WSN.probVectSize = 0;
 
         for (int i = 0; i < this.nodeCount; i++) {
 
@@ -170,7 +173,16 @@ public class WSN {
             scheduler.schedule(e);
         }
 
-        initializeGALTIER(nodeCount);
+        System.out.println(p.getClass().getSimpleName());
+
+        if (p.getClass().getSimpleName().equals("CONTI")){
+            initializeCONTI(nodeCount);
+        }
+
+        if (p.getClass().getSimpleName().equals("GALTIER")){
+            initializeGALTIER(nodeCount);
+        }
+
         //scheduler.schedule(new UpdatePosition(1000, mobilityID));
 
         // create GUI window
@@ -278,6 +290,11 @@ public class WSN {
                 / (maxAvailableThroughput) * 100) / 100 + tPLC;
     }
 
+    // fairness window size
+    public void setWindowSize(int size){
+        this.windowSize = size;
+    }
+
     public void debugging(boolean enable){
         debug = enable;
     }
@@ -289,6 +306,8 @@ public class WSN {
     public void run(double maxTime) {
 
         System.out.println("tx time: "+txTime);
+        System.out.println("probVectSize: "+probVectSize);
+
 
         setNeighborsList();
         printNeighbors();
@@ -320,7 +339,6 @@ public class WSN {
 
             //System.out.format("Progress: %.2f %%\n", ((currentTime/maxTime)*100.0));
 
-            //if (((currentTime/maxTime)*100.0)>70) {WSN.debug = true;}
 
             if (debug){
                 System.out.println("\n");
@@ -351,7 +369,7 @@ public class WSN {
         System.out.println("Normalized fairnessSIZE [OLD]: "+WSN.fairnessSIZE(windowSize));
         System.out.println("Normalized fairnessSIZE (only one 5000 trace): "+WSN.fairnessSIZE_2(windowSize));
         System.out.println("Normalized fairnessSIZE (many 5000 traces): "+WSN.fairnessSIZE_3(windowSize));
-        System.out.println("Normalized fairnessTIME (windowDuration= "+windowDuration+"s): "+WSN.fairnessTIME(windowDuration));
+        System.out.println("Normalized fairnessTIME : "+WSN.fairnessTIME());
         System.out.println("No neighbors [%]: "+WSN.noNeighbors());
 
         long endTime   = System.currentTimeMillis();
@@ -814,9 +832,28 @@ public class WSN {
         return sum / (double) allStepFairness.size();
     }
 
-    private static double fairnessTIME(double windowDuration){
+    private static double fairnessTIME(){
         // fairness calculation with Jain's fairness index and sliding windows (like into the 2011 paper)
         // [ it works with a TIME WINDOW ]
+        double windowDuration=0;
+
+
+        String protocol = WSN.p.getClass().getSimpleName();
+        switch (protocol){
+            case "DCF":
+                windowDuration = 2;
+                break;
+            case "CONTI":
+                windowDuration = 0.5;
+                break;
+            case "GALTIER":
+                windowDuration = 0.5;
+                break;
+            default:
+                System.out.println("Error with protocol name!");
+                System.exit(1);
+        }
+
         for (Node node : WSN.nodes) { node.setListIterator(); }
 
         ArrayList<Double>  allWindowFairness = new ArrayList<>();
@@ -962,8 +999,8 @@ public class WSN {
 
         // print column names
         if (printColumns){
-            fw.append(String.format("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s", "protocol", "running-time", "nodecount", "simulation-time", "framesize", "width",
-                    "height", "tx-time", "collision-rate", "alternate-rate", "throughput", "delay"));
+            fw.append(String.format("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s", "protocol", "running-time", "nodecount", "simulation-time", "framesize", "width",
+                    "height", "tx-time", "collision-rate", "alternate-rate", "throughput", "delay", "contention-slots", "fairness-window-size", "fairness-size", "fairness-time"));
         }
 
         // save simulation parameters and results
@@ -974,13 +1011,18 @@ public class WSN {
                         "%.2f;%.2f;" +
                         "%.2f;" +
                         "%.3f;%.3f;" +
-                        "%.3f;%.3f",
+                        "%.3f;%.3f;" +
+                        "%.2f;" +
+                        "%d;%.3f;%.3f",
+
                 protocol,
                 runningTime, nodes.size(), seconds , frameSize,
                 width, height,
                 txTime,
                 WSN.collisionRate(), WSN.alternateCollisionRate(),
-                WSN.throughput(simulationTime), WSN.delay()/1000));
+                WSN.throughput(simulationTime), WSN.delay()/1000,
+                WSN.contentionSlot(),
+                WSN.windowSize, WSN.fairnessSIZE_3(WSN.windowSize), WSN.fairnessTIME()));
 
         // close file
         fw.close();
@@ -998,32 +1040,89 @@ public class WSN {
         printColumns = created;
 
         fw = new FileWriter(filename, false);
-        for (double entry : WSN.getDelayList()){ fw.append(String.format("%.3f;", entry)); }
+        for (double entry : WSN.getDelayList()){ fw.append(String.format("%.3f\n", entry)); }
 
         fw.close();
 
     }
 
+    public static void initializeCONTI(int nodeCount) throws IOException {
+        String filename;
+        String s = System.getProperty("scheme");
+        switch (s){
+            case "paper":
+                // p that optmizes throughput
+                filename = "data/CONTI/CONTI-optimal.dat";
+                break;
+
+            case "optimal":
+                // select optimum p for the given number of stations
+                filename = String.format("data/CONTI/CONTI-%d.dat", nodeCount);
+                break;
+
+            case "generic":
+                filename = String.format("data/CONTI/CONTI-100.dat", nodeCount);
+                break;
+
+            default:
+                filename = String.format("data/CONTI/CONTI-100.dat", nodeCount);
+                break;
+        }
+
+        BufferedReader br;
+        try {
+            br = new BufferedReader(new FileReader(filename));
+            String line = br.readLine();
+            Arrays.asList(line.split(";"))
+                    .forEach(p -> CONTIp.add(Double.parseDouble(p)));
+
+            br.close();
+        }catch (Exception e){
+            System.out.println("Error: can't open parameter file for CONTI.");
+            System.exit(1);
+        }
+        probVectSize = CONTIp.size();
+    }
+
     public static void initializeGALTIER(int nodeCount) throws IOException {
 
         String filepath;
-        BufferedReader br;
-        try {
-            filepath = String.format("wsn-simulator/data/galtier/galtier-%d.dat", WSN.nodes.size());
-            br = new BufferedReader(new FileReader(filepath));
-        }catch (Exception e){
-            filepath = "wsn-simulator/data/galtier/galtier-paper.dat";
-            br = new BufferedReader(new FileReader(filepath));
+        String s = System.getProperty("scheme");
+        switch (s){
+            case "paper":
+                filepath = "data/galtier/galtier-paper.dat";
+                break;
+
+            case "optimal":
+                filepath = String.format("data/galtier/galtier-%d.dat", nodeCount);
+                break;
+
+            case "7slots":
+                filepath = String.format("data/galtier/galtier-100-7.dat", nodeCount);
+                break;
+
+            default:
+            filepath = "/data/galtier/galtier-paper.dat";
+            break;
         }
 
-        String line;
-        while ( (line = br.readLine()) != null){
-            List<Double> doubleData = new ArrayList<>();
-            Arrays.asList(line.split(";"))
-                    .forEach(p -> doubleData.add(Double.parseDouble(p)));
-            galtierP.add(doubleData);
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filepath));
+            String line;
+            while ( (line = br.readLine()) != null){
+                List<Double> doubleData = new ArrayList<>();
+                Arrays.asList(line.split(";"))
+                        .forEach(p -> doubleData.add(Double.parseDouble(p)));
+                galtierP.add(doubleData);
+            }
+            br.close();
+        }catch (Exception e){
+            System.out.println("Error: can't open parameter file for GALTIER.");
+            System.exit(1);
         }
-        br.close();
+
+        probVectSize = galtierP.size();
+
     }
 
     /*****************************

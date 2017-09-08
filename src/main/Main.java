@@ -20,7 +20,7 @@ public class Main {
         Locale.setDefault(Locale.US);
 
         // network size and topology number
-        int networkWidth, networkHeight, topologyID, mobilityID, delay, nodeCount, framesize;
+        int networkWidth, networkHeight, topologyID, mobilityID, delay, nodeCount, framesize, windowSize;
 
         double seconds = 1e6;
         double minutes = seconds * 60;
@@ -92,6 +92,19 @@ public class Main {
 
         }catch (Exception e){
             framesize = 1500;
+        }
+
+        // fairness window Size
+        windowSize = 1000;
+        try{
+            windowSize = Integer.parseInt(System.getProperty("windowSize"));
+            if (windowSize <= 0){
+                System.out.printf("Invalid window size.");
+                System.exit(1);
+            }
+
+        }catch (Exception e){
+            windowSize = 1000;
         }
 
         // simulation time
@@ -167,6 +180,7 @@ public class Main {
 
         WSN netw = new WSN(nodeCount, networkWidth, networkHeight, p, topologyID, mobilityID, gui);
         netw.setFrameSize(framesize);
+        netw.setWindowSize(windowSize);
         netw.setPanelSize(600, 600);
 
         netw.debugging(debugging);
