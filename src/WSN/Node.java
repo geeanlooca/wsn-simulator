@@ -73,8 +73,6 @@ public class Node {
     private double slotCountResetTime;
     private ArrayList<Integer> slotCounterList;
 
-    private double totalTime;
-    private ArrayList<Double> totalTimeList;
 
     private double startTX;
     public boolean holdDelay;
@@ -141,7 +139,6 @@ public class Node {
         slotCountResetTime=0;
         startTX =0;
         this.slotCounterList = new ArrayList<Integer>();
-        this.totalTimeList = new ArrayList<Double>();
         this.delayList = new ArrayList<Double>();
         this.holdDelay = false;
         this.nodeLog = new ArrayList<Boolean>();
@@ -307,7 +304,6 @@ public class Node {
         }else{ return null; }
     }
 
-
     // methods to calculate the Average Number of Contention Slots
 
     public void addContSlot(){
@@ -338,11 +334,9 @@ public class Node {
     public ArrayList<Integer> getSlotCounterList() { return this.slotCounterList; }
 
 
-    // methods to calculate the packet total transmission time useful for Throughput and Delay
+    // methods to calculate the   delay
 
-    public void addDIFStime(){ this.totalTime += WSN.DIFS; }    // maybe useless
-    public void addSlotTime(){ this.totalTime += WSN.tSlot; }   // maybe useless
-    public void addTXtime(){ this.totalTime += WSN.txTime; }    // maybe useless
+
     // catch the current time when contention begins
     public void startTXTime(double time){
         if (!holdDelay){
@@ -350,19 +344,10 @@ public class Node {
         }
     }
 
-
     public void setTotalTime( double time){
-        // throughput
-        this.totalTime += WSN.SIFS + WSN.tACK;                   // maybe useless
-        this.totalTimeList.add(this.totalTime);                  // maybe useless
-        this.totalTime=0;                                        // maybe useless
-
-        // delay
 
         double delay = (time + WSN.SIFS + WSN.tACK) - this.startTX;
-
         this.delayList.add(Math.floor(delay * 100) /100);
-
 
         if (WSN.debug) {
             double totalTimeTemp = 0;
@@ -381,7 +366,6 @@ public class Node {
         if (WSN.debug){ System.out.println("Delay = "+ delay); }
     }
 
-    public ArrayList<Double> getTotalTimeList() { return this.totalTimeList; }   // maybe useless
     public ArrayList<Double> getDelayList() { return this.delayList; }
 
 
@@ -396,7 +380,6 @@ public class Node {
         this.delayList.add(delay);
         this.CONTIroundCounter = 0;
     }
-
 
         /********** mobility ******/
     public void move(int mobilityID)

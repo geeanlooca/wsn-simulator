@@ -55,8 +55,6 @@ public class CheckChannelStatus extends Event {
                 }
                 // increment contention slot counter
                 this.n.addContSlot();
-                // add a tSLOT to the packet transmission time
-                this.n.addSlotTime();
             }
             else if (duration == WSN.DIFS){
 
@@ -78,7 +76,6 @@ public class CheckChannelStatus extends Event {
                 }
 
                 // add a DIFS time to the packet transmission time
-                n.addDIFStime();
             }
         }
     }
@@ -96,10 +93,7 @@ public class CheckChannelStatus extends Event {
                     statement = true;
                     if (WSN.debug) {System.out.println(" Channel busy! Destination Node "+dest.getId()+" is receiving from Node: "+entry.getId()); }
                     scheduler.schedule(new CheckChannelStatus(n, time + WSN.DIFS, WSN.DIFS));
-                    if (duration == WSN.DIFS){this.n.addDIFStime();} else if (duration == WSN.tSlot){
-                        this.n.addSlotTime();
-                        this.n.addContSlot();
-                    }
+                    if (duration == WSN.tSlot){ this.n.addContSlot(); }
                     break;
                 }
             }

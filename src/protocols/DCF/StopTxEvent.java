@@ -35,7 +35,6 @@ public class StopTxEvent extends Event {
         RNG r = RNG.getInstance();
 
         // add txTime to the total packet transmission time
-        this.n.addTXtime();
 
 
         if (n.collided) {
