@@ -929,7 +929,7 @@ public class WSN {
         String s = System.getProperty("scheme");
         switch (s){
             case "paper":
-                filepath = "wsn-simulator/data/galtier/galtier-paper.dat";
+                filepath = "data/galtier/galtier-paper.dat";
                 break;
 
             case "optimal":

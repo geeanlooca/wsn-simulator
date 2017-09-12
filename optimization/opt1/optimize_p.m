@@ -1,7 +1,7 @@
 function [ p_opt ] = optimize_p( u )
     p = 0.5; % starting point
     gamma0 = 0.00005; % learning rate
-    stopping_th = 1e-5;
+    stopping_th = 1e-6;
 
     J = costobj(p, u); % compute initial value of cost function
 

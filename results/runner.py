@@ -1,56 +1,20 @@
 import os
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import itertools
 
+framesize = [250, 600, 950, 1300, 1650, 2000, 2346]
+time=2400
+protocol = "GALTIER"
+nodes = [5, 20, 50]
+scheme = "paper"
+runs = 10
 
-# plt.rc('text', usetex=True)
-# plt.rc('font', family='serif')
+for n in nodes:
+    file = "./{0}-{1}-framesize-{2}nodes.csv".format(protocol, scheme, str(n))
 
+    if (os.path.isfile(file)):
+        os.remove(file)
 
-framesize = [250, 600, 950, 1300, 1550, 1650, 2000, 2346]
-protocol = "DCF"
-nodes = 10
-file = "./{0}-framesize-{1}-nodes.csv".format(protocol, nodes)
-
-if (os.path.isfile(file)):
-    os.remove(file)
-
-for i in framesize:
-    cmd = "/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin/java -Dframesize={0} -Dnodes=\"{1}\" -Dtime=1200 -Doutput={2} -Dprotocol=\"{3}\" -jar wsn-simulator-master\ 2.jar ".format(
-        str(i), str(nodes), file, protocol)
-    os.system(cmd)
-
-
-
-df = pd.read_csv(file, sep=';')
-nodecounts = df['nodecount'].unique()
-
-fig = plt.figure()
-for i,ms in zip(nodecounts, itertools.cycle('s^+*>')):
-    subdf = df[df['nodecount'] == i]
-    fsize = subdf['framesize']
-    delay = subdf['delay']
-    throughput = subdf['throughput']
-    plt.plot(fsize, delay, label="n = " + str(i), marker=ms)
-
-plt.xlabel("Framesize [bytes]")
-plt.ylabel("Delay [ms]")
-plt.xticks(fsize)
-plt.legend()
-plt.show()
-
-fig = plt.figure()
-for i,ms in zip(nodecounts, itertools.cycle('s^+*>')):
-    subdf = df[df['nodecount'] == i]
-    fsize = subdf['framesize']
-    delay = subdf['delay']
-    throughput = subdf['throughput']
-    plt.plot(fsize, throughput, label="n = " + str(i), marker=ms)
-
-plt.xlabel("Framesize [bytes]")
-plt.ylabel("Normalized throughput")
-plt.xticks(fsize)
-plt.legend()
-plt.show()
+    for f in framesize:
+        print  "\n\nTESTING WITH {0} NODES AND {1} BYTES".format(str(n), str(f))
+        cmd = "java -Dscheme=\"{0}\" -Dframesize={1} -Dnodes=\"{2}\" -Dtime={3} -Doutput={4} -Dprotocol=\"{5}\" -jar wsn-simulator.jar ".format(
+        scheme, str(f), str(n), str(time), file, protocol)
+        os.system(cmd)

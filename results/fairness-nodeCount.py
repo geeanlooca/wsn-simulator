@@ -10,20 +10,18 @@ import itertools
 
 
 framesize = 1500
-time=2400
-protocol = "GALTIER"
-nodes = [5, 10, 20, 30, 40, 50, 70, 100]
-scheme = "optimal"
-file = "./{0}-{1}-nodes-{2}-framesize.csv".format(protocol, scheme, framesize)
+protocol = "DCF"
+nodes = [5, 10, 20, 50]
+file = "./{0}-paper-fairness-nodes-{1}-framesize.csv".format(protocol, framesize)
 
 if (os.path.isfile(file)):
     os.remove(file)
 
-for i in nodes:
-    print "SIMULATING WITH {0} NODES".format(str(i))
-    cmd = "java -Dscheme=\"{0}\" -Dframesize={1} -Dnodes=\"{2}\" -Dtime={3} -Doutput={4} -Dprotocol=\"{5}\" -jar wsn-simulator.jar ".format(
-        scheme, str(framesize), str(i), str(time), file, protocol)
-    os.system(cmd)
+for j in range(10):
+    for i in nodes:
+        cmd = "/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin/java -Dscheme=\"paper\" -Dframesize={0} -Dnodes=\"{1}\" -Dtime=2400 -Doutput={2} -Dprotocol=\"{3}\" -jar wsn-simulator-master\ 2.jar ".format(
+            str(framesize), str(i), file, protocol)
+        os.system(cmd)
 
 
 #

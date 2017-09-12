@@ -3,7 +3,7 @@ set(0,'DefaultFigureWindowStyle','docked')
 set(0,'DefaultTextInterpreter','latex')
 
 p = linspace(0,1,256);
-U = [5 10 20 40];
+U = [4 10 20 40];
 
 handles = [];
 figure('Color', 'White');

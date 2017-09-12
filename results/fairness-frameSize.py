@@ -9,24 +9,22 @@ import itertools
 # plt.rc('font', family='serif')
 
 
-framesize = 1500
-time=2400
-protocol = "GALTIER"
-nodes = [5, 10, 20, 30, 40, 50, 70, 100]
-scheme = "optimal"
-file = "./{0}-{1}-nodes-{2}-framesize.csv".format(protocol, scheme, framesize)
+framesize = [250, 950, 1300, 1650, 2346]
+protocol = "DCF"
+nodes = 20
+file = "./{0}-paper-fairness-framesize-{1}-nodes.csv".format(protocol, nodes)
 
 if (os.path.isfile(file)):
     os.remove(file)
 
-for i in nodes:
-    print "SIMULATING WITH {0} NODES".format(str(i))
-    cmd = "java -Dscheme=\"{0}\" -Dframesize={1} -Dnodes=\"{2}\" -Dtime={3} -Doutput={4} -Dprotocol=\"{5}\" -jar wsn-simulator.jar ".format(
-        scheme, str(framesize), str(i), str(time), file, protocol)
-    os.system(cmd)
+for j in range(10):
+    for i in framesize:
+        cmd = "/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin/java -Dframesize={0} -Dnodes=\"{1}\" -Dtime=2400 -Doutput={2} -Dprotocol=\"{3}\" -jar wsn-simulator-master\ 2.jar ".format(
+            str(i), str(nodes), file, protocol)
+        os.system(cmd)
 
 
-#
+
 # df = pd.read_csv(file, sep=';')
 # nodecounts = df['nodecount'].unique()
 #
@@ -43,7 +41,7 @@ for i in nodes:
 # plt.xticks(fsize)
 # plt.legend()
 # plt.show()
-
+#
 # fig = plt.figure()
 # for i,ms in zip(nodecounts, itertools.cycle('s^+*>')):
 #     subdf = df[df['nodecount'] == i]
